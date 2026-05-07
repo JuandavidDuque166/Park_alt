@@ -1,6 +1,7 @@
 const catchAsync = require('../errors/catchAsync');
 const AppError = require('../errors/appError');
 const httpStatus = require('../constants/httpStatus');
+
 /**
  * Controlador para subir imagenes
  * Multer procesa el archivo antes de llegar aqui
