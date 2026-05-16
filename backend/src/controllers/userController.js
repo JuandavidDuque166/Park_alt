@@ -1,5 +1,5 @@
 const UserService = require('../services/userServices');
-const AppEror = require('../errors/AppError');
+const AppError = require('../errors/AppError');
 const httpStatus = require('../constants/httpStatus');
 const {validateCreateUser, validateUpdateUser} = require ('../validators/userValidator'); // <--- IMPORTACION NUEVA
 
@@ -13,7 +13,7 @@ const UserController = {
                 data: users
             });
         } catch (error) {
-            next (next)
+            next(error);
         }
     },
 
@@ -24,7 +24,7 @@ const UserController = {
 
             if (!validation.success) {
                 // Formateamos los errores para que sean legibles
-                const errorMessage = validation.error.errors.map(e => e.message).join(', ');
+                const errorMessage = validation.error.issues.map(e => e.message).join(', ');
                 throw new AppError(errorMessage, httpStatus.BAD_REQUEST);
             }
 
@@ -49,7 +49,7 @@ const UserController = {
             const validation = validateUpdateUser(req.body);
 
             if (!validation.success) {
-                const errorMessage = validation.error.errors.map(e => e.message).join(', ');
+                const errorMessage = validation.error.issues.map(e => e.message).join(', ');
                 throw new AppError(errorMessage, httpStatus.BAD_REQUEST);
             }
 

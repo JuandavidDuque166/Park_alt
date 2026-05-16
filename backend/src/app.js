@@ -29,9 +29,9 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // Importar rutas
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
-const roleRoutes = require('./routes/roleRoutes');
-const permisoRoutes = require('./routes/permisoRoutes');
-const negocioRoutes = require('./routes/negocioRoutes');
+const roleRoutes = require('./routes/rolesRoutes');
+const permisoRoutes = require('./routes/permisosRoutes');
+const negocioRoutes = require('./routes/negocioRouter');
 const uploadRoutes = require('./routes/uploadRoutes');
 
 // Rutas de autenticación y usuarios

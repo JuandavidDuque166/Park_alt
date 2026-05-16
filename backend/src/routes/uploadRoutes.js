@@ -3,7 +3,7 @@ const router = express.Router();
 const uploadController = require('../controllers/uploadController');
 const upload = require('../middlewares/uploadMiddleware');
 const { protect } = require('../middlewares/authMiddleware');
-const { restrictTo } = require('../middlewares/roleMiddleware');
+const { restrictTo } = require('../middlewares/rolesMiddleware');
 
 // Proteger todas las rutas
 router.use(protect);

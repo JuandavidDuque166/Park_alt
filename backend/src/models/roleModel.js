@@ -9,7 +9,7 @@ const RoleModel = {
         `;
         const [rows] = await db.execute(query);
         return rows;
-    }
+    },
 
     //Obtener un rol por ID
     async findById(id) {
@@ -72,7 +72,7 @@ const RoleModel = {
     // Obtener permisos completos con ID para edición
     async getPermissionsWithIdByRoleId(roleId) {
         const query = `
-            SELECT p.id_permiso, p.nombre, p.p.descripcion
+            SELECT p.id_permiso, p.nombre, p.descripcion
             FROM permisos p
             INNER JOIN rol_permiso rp ON p.id_permiso = rp.id_permiso
             WHERE rp.id_rol = ?

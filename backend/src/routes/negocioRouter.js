@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const negocioController = require('../controllers/authController');
-const { protect } = require('../middleware/authMiddleware');
-const { restrictTo } = require('../middleware/roleMiddleware');
+const negocioController = require('../controllers/negocioControler');
+const { protect } = require('../middlewares/authMiddleware');
+const { restrictTo } = require('../middlewares/rolesMiddleware');
 
 // Todas las rutas estan protegidas 
 router.use(protect);

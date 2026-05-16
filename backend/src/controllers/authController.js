@@ -1,5 +1,5 @@
 const AuthService = require('../services/authService');
-const {validateRegister, validaLogin} = require('../validators/authValidator');
+const { validateRegister, validateLogin } = require('../validators/authValidator');
 const AppError = require('../errors/AppError');
 const httpStatus = require('../constants/httpStatus');
 
@@ -12,7 +12,7 @@ const authController = {
             
             if (!validation.success) {
                 // Formateamos los errores de zod
-                const errorMenssage = validation.error.errors.map(e => e.message).join('.');
+                const errorMenssage = validation.error.issues.map(e => e.message).join('.');
                 throw new AppError(errorMenssage, httpStatus.BAD_REQUEST);
             }
             // 2. Llamada al servicio
@@ -31,10 +31,10 @@ const authController = {
     async login(req, res, next) {
         try {
             //1. Validacion de entrada
-            const validation = validaLogin(req.body);
+            const validation = validateLogin(req.body);
 
             if (!validation.success) {
-                const errorMenssage = validation.error.errors.map(e => e.message).join(', ');
+                const errorMenssage = validation.error.issues.map(e => e.message).join(', ');
                 throw new AppError(errorMenssage, httpStatus.BAD_REQUEST);
             }
 

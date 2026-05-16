@@ -1,5 +1,5 @@
 const express = require('express');
-const AuthController = require('../controllers/AuthController');
+const AuthController = require('../controllers/authController');
 // const { protect } = require('../middleware/authMiddleware'); //Proteger la ruta
 // const { restricTo } = require('../middleware/roleMiddleware'); //Restrinccion según su roles
 

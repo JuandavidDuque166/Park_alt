@@ -1,56 +1,54 @@
-const NegocioModel = require('../models/negocioModel');
+const ParqueaderoModel = require('../models/parqueaderoModel');
 const AppError = require('../errors/AppError');
 const httpStatus = require('../constants/httpStatus');
 
 const NegocioService = {
-    async getAllNegocios() {
-        const negocios = await NegocioModel.findAll();
-        return negocios;
+        async getAllNegocios() {
+        return ParqueaderoModel.findAll();
     },
 
     async getNegocioById(id) {
-        const negocio = await NegocioModel.findById(id);
+        const parqueadero = await ParqueaderoModel.findById(id);
 
-        if (!negocio) {
-            throw new AppError('Negocio no encontrado', httpStatus.NOT_FOUND);
+        if (!parqueadero) {
+        throw new AppError('Parqueadero no encontrado', httpStatus.NOT_FOUND);
         }
 
-        return negocio;
+        return parqueadero;
     },
 
     async createNegocio(negocioData) {
-        // Validar email único si se proporciona
         if (negocioData.email) {
-            const negocios = await NegocioModel.findAll();
-            const emailExists = negocios.some(n => n.email === negocioData.email);
-            if (emailExists) {
-                throw new AppError('El email ya está registrado', httpStatus.BAD_REQUEST);
-            }
+        const parqueaderos = await ParqueaderoModel.findAll();
+        const emailExists = parqueaderos.some((p) => p.email === negocioData.email);
+        if (emailExists) {
+            throw new AppError('El email ya está registrado', httpStatus.BAD_REQUEST);
+        }
         }
 
-        const negocioId = await NegocioModel.create(negocioData);
-        return { id_negocio: negocioId, ...negocioData };
+        const parqueaderoId = await ParqueaderoModel.create(negocioData);
+        return { id_parqueadero: parqueaderoId, ...negocioData };
     },
 
     async updateNegocio(id, negocioData) {
-        // Verificar si existe
-        const negocioExists = await NegocioModel.findById(id);
-        if (!negocioExists) {
-            throw new AppError('Negocio no encontrado', httpStatus.NOT_FOUND);
+        const parqueaderoExistente = await ParqueaderoModel.findById(id);
+        if (!parqueaderoExistente) {
+        throw new AppError('Parqueadero no encontrado', httpStatus.NOT_FOUND);
         }
 
-        // Validar email único si se está cambiando
-        if (negocioData.email && negocioData.email !== negocioExists.email) {
-            const negocios = await NegocioModel.findAll();
-            const emailExists = negocios.some(n => n.email === negocioData.email && n.id_negocio !== id);
-            if (emailExists) {
-                throw new AppError('El email ya está registrado', httpStatus.BAD_REQUEST);
-            }
+        if (negocioData.email && negocioData.email !== parqueaderoExistente.email) {
+        const parqueaderos = await ParqueaderoModel.findAll();
+        const emailExists = parqueaderos.some(
+            (p) => p.email === negocioData.email && p.id_parqueadero !== Number(id)
+        );
+        if (emailExists) {
+            throw new AppError('El email ya está registrado', httpStatus.BAD_REQUEST);
+        }
         }
 
-        const affectedRows = await NegocioModel.update(id, negocioData);
+        const affectedRows = await ParqueaderoModel.update(id, negocioData);
         return affectedRows > 0;
     }
-};
+    };
 
 module.exports = NegocioService;

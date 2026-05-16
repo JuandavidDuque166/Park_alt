@@ -22,10 +22,10 @@ const AuthService = {
     },
 
     async loginUser(credentials) {
-        const { email, clave } = credentials;
+        const { login, clave } = credentials;
 
         // 1. Buscar usuario por email (Usamos el modelo que ya creamos)
-        const user = await UserModel.findByEmail(email);
+        const user = await UserModel.findByEmail(login);
 
         // 2. Verificar si existe
         if (!user) {
@@ -34,7 +34,10 @@ const AuthService = {
         }
 
         // 3. Comparar contraseñas (Texto plano vs Hash en DB)
-        const isMatch = await bcrypt.compare(clave, user.clave);
+        const isHashedPassword = user.clave.startsWith('$2a$') || user.clave.startsWith('$2b$') || user.clave.startsWith('$2y$');
+        const isMatch = isHashedPassword
+            ? await bcrypt.compare(clave, user.clave)
+            : clave === user.clave;
 
         if (!isMatch) {
             throw new AppError('Credenciales inválidas', httpStatus.UNAUTHORIZED);
