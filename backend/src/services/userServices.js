@@ -1,12 +1,12 @@
 const bcrypt = require('bcrypt');
 const AppError = require ('../errors/appError');
 const httpStatus = require ('../constants/httpStatus');
-const userModel = require('../models/userModel');
+const UserModel = require('../models/userModel');
 
 const UserService = {
     async getAllUsers() {
         //El servicio delega la busqueda al modelo
-        const users = await userModel.findAll();
+        const users = await UserModel.findAll();
         return users;
     },
 

@@ -78,7 +78,7 @@ const UserController = {
     async delete(req, res, next) {
         try {
             const { id } = req.params;
-            const currentUserId = req.user.id; 
+            const currentUserId = req.user.id_usuario; 
 
             //Llamamos al servicio.
             //Si el usuario no existe, el servicio lanzara el erro 404.
@@ -86,7 +86,7 @@ const UserController = {
             //Si todo sale bien, la ejecución continua.
             await UserService.deleteUser(id, currentUserId);
 
-            res.status(httpStatus.NO_CONTENT).json({
+            res.status(httpStatus.OK).json({
                 status: 'success',
                 message: 'Usuario eliminado correctamente'
             });

@@ -22,9 +22,30 @@ CREATE TABLE vehiculo (
 CREATE TABLE usuario (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
     contrasena VARCHAR(255) NOT NULL,
     rol ENUM('ADMINISTRADOR','VIGILANTE') NOT NULL,
     estado BOOLEAN DEFAULT TRUE
+);
+CREATE TABLE roles (
+    id_rol INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) UNIQUE NOT NULL
+);
+CREATE TABLE permisos (
+    id_permiso INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) UNIQUE NOT NULL,
+    descripcion VARCHAR(255)
+);
+CREATE TABLE rol_permiso (
+    id_rol INT NOT NULL,
+    id_permiso INT NOT NULL,
+    PRIMARY KEY (id_rol, id_permiso),
+    CONSTRAINT fk_rol_permiso_rol
+    FOREIGN KEY (id_rol)
+    REFERENCES roles(id_rol),
+    CONSTRAINT fk_rol_permiso_permiso
+    FOREIGN KEY (id_permiso)
+    REFERENCES permisos(id_permiso)
 );
 CREATE TABLE espacio (
     id_espacio INT AUTO_INCREMENT PRIMARY KEY,
@@ -107,8 +128,8 @@ VALUES
 
 INSERT INTO roles (nombre) 
 VALUES 
-('Administrador', 
-'Operario');
+('Administrador'),
+('Vigilante');
 
 INSERT INTO permisos (nombre, descripcion)
 Values
@@ -130,10 +151,10 @@ VALUES
 (2, 2),
 (2, 3);
 
-INSERT INTO usuario(nombre, email, clave, id_rol)
+INSERT INTO usuario(nombre, email, contrasena, rol)
 VALUES
 ('admin', 'juandaduque880@gmail.com','123456', 'ADMINISTRADOR'),
-('operario1', 'empleado@gmail.com', '123456', 'OPERARIO');
+('vigilante1', 'empleado@gmail.com', '123456', 'VIGILANTE');
 
 INSERT INTO espacio(numero, nivel)
 VALUES
