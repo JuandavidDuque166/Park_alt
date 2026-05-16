@@ -1,14 +1,14 @@
-const UserService = require('../services/userService');
+const UserService = require('../services/userServices');
 const AppEror = require('../errors/AppError');
 const httpStatus = require('../constants/httpStatus');
-const {validateCreateUser, validateCreateUser} = require ('../validators/userValidator'); // <--- IMPORTACION NUEVA
+const {validateCreateUser, validateUpdateUser} = require ('../validators/userValidator'); // <--- IMPORTACION NUEVA
 
 const UserController = {
-    async getAll(req, res, next){
+    async getAll(req, res, next) {
         try {
             const users = await UserService.getAllUsers();
             res.status(httpStatus.OK).json({
-                status: 'success'
+                status: 'success',
                 results: users.length,
                 data: users
             });

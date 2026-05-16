@@ -1,6 +1,6 @@
 const AuthService = require('../services/authService');
-const {validateRegister, validaLogin} = require('../validators/authValidation');
-const AppError = require('../error/AppError');
+const {validateRegister, validaLogin} = require('../validators/authValidator');
+const AppError = require('../errors/AppError');
 const httpStatus = require('../constants/httpStatus');
 
 const authController = {

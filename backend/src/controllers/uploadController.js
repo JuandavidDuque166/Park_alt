@@ -18,7 +18,7 @@ exports.uploadImage = catchAsync(async (req, res, next) => {
         status: 'success',
         data: {
             filename: req.file.filename,
-            url: imageUrl
+            url: imageUrl,
             size: req.file.size
         }
     });
