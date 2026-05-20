@@ -23,10 +23,9 @@ const UserModel = {
                 id_usuario,
                 nombre,
                 email,
-                contrasena AS clave,
-                rol,
-                ${roleId} AS id_rol,
-                ${roleLabel} AS rol_nombre
+                clave,
+                id_rol,
+                estado
             FROM usuario
             WHERE email = ? AND estado = 1
         `;
@@ -37,7 +36,7 @@ const UserModel = {
     async create(user) {
         const { nombre, email, clave, id_rol } = user;
         const query = `
-            INSERT INTO usuario (nombre, email, contrasena, rol)
+            INSERT INTO usuario (nombre, email, clave, id_rol)
             VALUES (?, ?, ?, ?)
         `;
         const [result] = await db.execute(query, [nombre, email, clave, id_rol]);
@@ -48,7 +47,7 @@ const UserModel = {
         const { id, nombre, email, clave, id_rol } = user;
         const query = `
             UPDATE usuario
-            SET nombre = ?, email = ?, contrasena = ?, rol = ?
+            SET nombre = ?, email = ?, clave = ?, id_rol = ?
             WHERE id_usuario = ?
         `;
 
@@ -62,10 +61,9 @@ const UserModel = {
                 id_usuario,
                 nombre,
                 email,
-                contrasena AS clave,
-                rol,
-                ${roleId} AS id_rol,
-                ${roleLabel} AS rol_nombre
+                clave,
+                id_rol,
+                estado
             FROM usuario
             WHERE id_usuario = ? AND estado = 1
         `;
@@ -79,9 +77,8 @@ const UserModel = {
                 id_usuario,
                 nombre,
                 email,
-                rol,
-                ${roleId} AS id_rol,
-                ${roleLabel} AS rol_nombre,
+                clave,
+                id_rol,
                 estado
             FROM usuario
         `;
