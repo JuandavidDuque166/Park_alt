@@ -1,8 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from './guards/ProtectedRoute';
-import { Layout } from './components/Layout';
 import { Login } from './pages/Login';
-import { Inicio } from './pages/Inicio';
+import  Dashboard  from './pages/Dashboard';
 import { Usuarios } from './pages/Usuarios';
 import { Roles } from './pages/Roles';
 import { Permisos } from './pages/Permisos';
@@ -18,13 +17,9 @@ function App() {
         <Route path="/login" element={<Login />} />
 
         <Route
-          element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }
+          path="/"
         >
-          <Route path="/inicio" element={<Inicio />} />
+          <Route path="/inicio" element={<Dashboard />} />
           <Route path="/usuarios" element={<Usuarios />} />
           <Route path="/roles" element={<Roles />} />
           <Route path="/permisos" element={<Permisos />} />
