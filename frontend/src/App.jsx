@@ -5,8 +5,8 @@ import  Dashboard  from './pages/Dashboard';
 import { Usuarios } from './pages/Usuarios';
 import { Roles } from './pages/Roles';
 import { Permisos } from './pages/Permisos';
-import { Negocio } from './pages/Negocio';
 import { Perfil } from './pages/Perfil';
+import SalidaVehiculos from './pages/SalidaVehiculos';
 import './App.css';
 
 function App() {
@@ -23,7 +23,7 @@ function App() {
           <Route path="/usuarios" element={<Usuarios />} />
           <Route path="/roles" element={<Roles />} />
           <Route path="/permisos" element={<Permisos />} />
-          <Route path="/negocio" element={<Negocio />} />
+          <Route path="/salida-vehiculos" element={<SalidaVehiculos />} />
           <Route path="/perfil" element={<Perfil />} />
         </Route>
 

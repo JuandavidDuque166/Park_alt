@@ -1,21 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate, NavLink } from 'react-router-dom';
+import { useNavigate, Outlet, useLocation, NavLink, Link } from 'react-router-dom';
 import './Dashboard.css';
 
-const Dashboard = () => {
-  // Estado inicial simulando la respuesta de tu backend
+  const Dashboard = () => {
+  // 2. ESTADO INICIAL
+  // Iniciamos los contadores en 0 y las listas vacías para que la pantalla no falle mientras carga
   const [data, setData] = useState({
-    vehiculosActivos: 2,
-    espaciosDisponibles: 98,
-    espaciosTotales: 100,
+    vehiculosActivos: 0,
+    espaciosDisponibles: 0,
+    espaciosTotales: 0,
     recaudoDia: 0,
     entradasDia: 0,
-    ultimosIngresos: [
-      { placa: 'DEF456', tipo: 'CARRO', nivel: 'SOTANO', hora: '08:30 a. m.', estado: 'Temporal' },
-      { placa: 'GHI789', tipo: 'MOTO', nivel: 'ALTURA', hora: '10:15 a. m.', estado: 'Temporal' }
-    ]
+    ultimosIngresos: []       // Array para la lista naranja (Visitantes)     // Array para la lista blanca (Aprendices, Instructores, etc.)
   });
+
+  // 3. EFECTO DE CARGA (useEffect) ACTUALIZADO EN TIEMPO REAL
+  useEffect(() => {
+    const obtenerEstadisticas = async () => {
+      try {
+        const respuesta = await api.get('/dashboard/resumen');
+        // Actualizamos nuestro estado con la información que mandó Node.js
+        setData(respuesta.data.data);
+      } catch (error) {
+        console.error('Error al cargar las estadísticas:', error);
+      }
+
+
+    };
+    obtenerEstadisticas();
+    }, []);
+
+
 
   return (
     <div className="dashboard-container">
@@ -32,8 +47,10 @@ const Dashboard = () => {
         </div>
         
         <nav className="sidebar-nav">
+          <NavLink to='/salida-vehiculos'>
+            <p>↪️ Salida Vehículos</p>
+          </NavLink>
           <button className="nav-item active">🏠 Inicio</button>
-          <button className="nav-item">↪️ Salida Vehículos</button>
           <button className="nav-item">🅿️ Control Parqueadero</button>
           <button className="nav-item">💲 Tarifas</button>
           <button className="nav-item">📅 Mensualidades</button>
