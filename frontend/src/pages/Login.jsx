@@ -1,18 +1,13 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import './Login.css';
 
 export const Login = () => {
     const [formData, setFormData] = useState({ email: '', clave: '' });
     const [error, setError] = useState('');
-    const navigate = useNavigate();
 
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
@@ -20,12 +15,19 @@ export const Login = () => {
         setError('');
 
         try {
+            console.log("Intentando login...");
             const response = await authService.login(formData.email, formData.clave);
-            console.log('Login exitoso:', response);
-            navigate('/inicio');
+            
+            if (response.status === 'success') {
+                localStorage.setItem('usuario', JSON.stringify(response.data));
+                console.log("Login exitoso, redirigiendo a /DashboardAdmin...");
+                
+                // Redirección forzada
+                window.location.href = '/DashboardAdmin'; 
+            }
         } catch (error) {
             console.error('Error al iniciar sesión:', error);
-            setError(error.response?.data?.message || 'Credenciales incorrectas');
+            setError('Credenciales incorrectas');
         }
     };
 
@@ -40,32 +42,30 @@ export const Login = () => {
                 <form onSubmit={handleSubmit} className="login-form">
                     <div className="form-group">
                         <label htmlFor="email">Correo Electrónico</label>
-                        <input
-                            type="email"
+                        <input 
+                            type="email" 
                             id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            placeholder="correo@ejemplo.com"
+                            name="email" 
+                            placeholder="correo@ejemplo.com" 
+                            onChange={handleChange} 
+                            required 
                         />
                     </div>
-
+                    
                     <div className="form-group">
                         <label htmlFor="clave">Contraseña</label>
-                        <input
-                            type="password"
+                        <input 
+                            type="password" 
                             id="clave"
-                            name="clave"
-                            value={formData.clave}
-                            onChange={handleChange}
-                            required
-                            placeholder="Tu contraseña"
+                            name="clave" 
+                            placeholder="Tu contraseña" 
+                            onChange={handleChange} 
+                            required 
                         />
                     </div>
-
+                    
                     {error && <div className="error-message">{error}</div>}
-
+                    
                     <button type="submit" className="btn-login">
                         Iniciar Sesión
                     </button>
@@ -74,3 +74,5 @@ export const Login = () => {
         </div>
     );
 };
+
+export default Login;

@@ -1,4 +1,4 @@
-import { api, getData } from './api';
+import { api } from '../services/api';
 
 export const rolesService = {
   async obtenerRoles() {

@@ -230,3 +230,5 @@ export const Roles = () => {
         </div>
     );
 };
+
+export default Roles;

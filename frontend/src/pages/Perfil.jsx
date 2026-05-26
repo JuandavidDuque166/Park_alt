@@ -286,3 +286,5 @@ return (
         </div>
     );
 };
+
+export default Perfil;
