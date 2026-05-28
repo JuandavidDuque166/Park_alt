@@ -15,19 +15,18 @@ export const Login = () => {
         setError('');
 
         try {
-            console.log("Intentando login...");
+            console.log('Intentando login...', formData);
             const response = await authService.login(formData.email, formData.clave);
-            
+
             if (response.status === 'success') {
-                localStorage.setItem('usuario', JSON.stringify(response.data));
-                console.log("Login exitoso, redirigiendo a /DashboardAdmin...");
-                
-                // Redirección forzada
-                window.location.href = '/DashboardAdmin'; 
+                console.log('Login exitoso, redirigiendo a /DashboardAdmin...');
+                window.location.href = '/DashboardAdmin';
+            } else {
+                setError(response.message || 'No se pudo iniciar sesión');
             }
         } catch (error) {
             console.error('Error al iniciar sesión:', error);
-            setError('Credenciales incorrectas');
+            setError(error.message || 'Credenciales incorrectas');
         }
     };
 

@@ -30,6 +30,8 @@ const authController = {
     //Controlador para el login de usuarios
     async login(req, res, next) {
         try {
+            console.log('AuthController.login - body received:', req.body);
+
             //1. Validacion de entrada
             const validation = validateLogin(req.body);
 
@@ -44,11 +46,12 @@ const authController = {
             // 3. Enviar respuesta
             res.status(httpStatus.OK).json({
                 status: 'success',
-                token, //El frontend guardará esto
+                token,
                 data: user
             });
 
         } catch (error) {
+            console.error('AuthController.login - error:', error.message);
             next(error);
         }
     }

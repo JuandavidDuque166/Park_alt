@@ -11,15 +11,22 @@ const getAuthHeaders = () => {
 export const authService = {
   // Login
   async login(email, clave) {
-    const response = await axios.post(`${API_URL}/auth/login`, { email, clave });
-    if (response.data.status === 'success' && response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      // Guardar datos del usuario directamente desde la respuesta del login
-      if (response.data.data) {
-        localStorage.setItem('usuario', JSON.stringify(response.data.data));
+    try {
+      const response = await axios.post(`${API_URL}/auth/login`, { email, clave });
+
+      if (response.data.status === 'success' && response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        if (response.data.data) {
+          localStorage.setItem('usuario', JSON.stringify(response.data.data));
+        }
       }
+
+      return response.data;
+    } catch (error) {
+      console.error('authService.login error:', error);
+      const message = error.response?.data?.message || error.message || 'Error al iniciar sesión';
+      throw new Error(message);
     }
-    return response.data;
   },
 
   // Obtener usuario desde localStorage

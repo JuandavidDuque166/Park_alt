@@ -392,3 +392,5 @@ export const Negocio = () => {
         </div>
     );
 };
+
+export default Negocio;

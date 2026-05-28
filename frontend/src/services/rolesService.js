@@ -2,26 +2,32 @@ import { api } from '../services/api';
 
 export const rolesService = {
   async obtenerRoles() {
-    return getData(await api.get('/roles'));
+    const response = await api.get('/roles');
+    return response.data.data;
   },
 
   async obtenerRolPorId(id) {
-    return getData(await api.get(`/roles/${id}`));
+    const response = await api.get(`/roles/${id}`);
+    return response.data.data;
   },
 
   async agregarRol(rol) {
-    return getData(await api.post('/roles', rol));
+    const response = await api.post('/roles', rol);
+    return response.data.data;
   },
 
   async actualizarRol(id, rol) {
-    return getData(await api.put(`/roles/${id}`, rol));
+    const response = await api.put(`/roles/${id}`, rol);
+    return response.data.data;
   },
 
   async eliminarRol(id) {
-    return getData(await api.delete(`/roles/${id}`));
+    const response = await api.delete(`/roles/${id}`);
+    return response.data;
   },
 
   async asignarPermisos(id, permisos) {
-    return getData(await api.put(`/roles/${id}/permisos`, { permissionsIDs: permisos }));
+    const response = await api.put(`/roles/${id}/permisos`, { permissionsIDs: permisos });
+    return response.data.data;
   },
 };

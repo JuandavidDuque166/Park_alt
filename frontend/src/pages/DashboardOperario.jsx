@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Outlet, useLocation, NavLink, Link } from 'react-router-dom';
+import { api } from '../services/api';
 import './DashboardOperario.css';
 
-  const DashboardOperario = () => {
+const DashboardOperario = () => {
   // 2. ESTADO INICIAL
   // Iniciamos los contadores en 0 y las listas vacías para que la pantalla no falle mientras carga
   const [data, setData] = useState({
@@ -19,10 +19,9 @@ import './DashboardOperario.css';
     const obtenerEstadisticas = async () => {
       try {
         const respuesta = await api.get('/dashboard/resumen');
-        // Actualizamos nuestro estado con la información que mandó Node.js
-        setData(respuesta.data.data);
+        setData(respuesta.data?.data || {});
       } catch (error) {
-        console.error('Error al cargar las estadísticas:', error);
+        console.error('Error al cargar las estadísticas:', error.response?.data?.message || error.message || error);
       }
 
 
@@ -33,41 +32,7 @@ import './DashboardOperario.css';
 
 
   return (
-    <div className="dashboard-container">
-      {/* SIDEBAR */}
-      <aside className="sidebar">
-        <div className="sidebar-header">
-          <div className="brand">
-            <span className="brand-icon">🚘</span>
-            <div>
-              <h2>Sistema Parqueadero</h2>
-              <p>Operario</p>
-            </div>
-          </div>
-        </div>
-        
-        <nav className="sidebar-nav">
-          <NavLink to='/salida-vehiculos'>
-            <p>↪️ Salida Vehículos</p>
-          </NavLink>
-          <button className="nav-item active">🏠 Inicio</button>
-          <button className="nav-item"> Ingreso vehículos</button>
-          <button className="nav-item">🚘 Salida vehiculos</button>
-          <button className="nav-item">🅿️ Control Parqueadero</button>
-          <button className="nav-item">📅 Mensualidades</button>
-          <button className="nav-item">👥 Usuarios</button>
-        </nav>
-
-        <div className="sidebar-footer">
-          <div className="user-info">
-            <p className="role-text">Usuario</p>
-            <p className="name-text">Alex operario</p>
-          </div>
-          <button className="btn-logout">↪ Cerrar Sesión</button>
-        </div>
-      </aside>
-
-      {/* MAIN CONTENT */}
+    <div className="dashboard-content">
       <main className="main-content">
         <header className="top-header">
           <h1>Inicio</h1>

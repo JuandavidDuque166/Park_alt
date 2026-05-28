@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Outlet, useLocation, NavLink, Link } from 'react-router-dom';
+import { api } from '../services/api';
 import './DashboardAdmin.css';
 
-  const DashboardAdmin = () => {
+const DashboardAdmin = () => {
   // 2. ESTADO INICIAL
   // Iniciamos los contadores en 0 y las listas vacías para que la pantalla no falle mientras carga
   const [data, setData] = useState({
@@ -11,18 +11,21 @@ import './DashboardAdmin.css';
     espaciosTotales: 0,
     recaudoDia: 0,
     entradasDia: 0,
-    ultimosIngresos: []       // Array para la lista naranja (Visitantes)     // Array para la lista blanca (Aprendices, Instructores, etc.)
+    ultimosIngresos: []
   });
+  const [error, setError] = useState('');
 
   // 3. EFECTO DE CARGA (useEffect) ACTUALIZADO EN TIEMPO REAL
   useEffect(() => {
     const obtenerEstadisticas = async () => {
       try {
         const respuesta = await api.get('/dashboard/resumen');
-        // Actualizamos nuestro estado con la información que mandó Node.js
-        setData(respuesta.data.data);
+        setData(respuesta.data?.data || {});
+        setError('');
       } catch (error) {
-        console.error('Error al cargar las estadísticas:', error);
+        const message = error.response?.data?.message || error.message || 'Error al obtener estadísticas del dashboard';
+        console.error('Error al cargar las estadísticas:', message, error);
+        setError(message);
       }
 
 
@@ -33,41 +36,7 @@ import './DashboardAdmin.css';
 
 
   return (
-    <div className="dashboard-container">
-      {/* SIDEBAR */}
-      <aside className="sidebar">
-        <div className="sidebar-header">
-          <div className="brand">
-            <span className="brand-icon">🚘</span>
-            <div>
-              <h2>Sistema Parqueadero</h2>
-              <p>Administrador</p>
-            </div>
-          </div>
-        </div>
-        
-        <nav className="sidebar-nav">
-          <NavLink to='/salida-vehiculos'>
-            <p>↪️ Salida Vehículos</p>
-          </NavLink>
-          <button className="nav-item active">🏠 Inicio</button>
-          <button className="nav-item">🅿️ Control Parqueadero</button>
-          <button className="nav-item">💲 Tarifas</button>
-          <button className="nav-item">📅 Mensualidades</button>
-          <button className="nav-item">👥 Usuarios</button>
-          <button className="nav-item">📊 Reportes</button>
-        </nav>
-
-        <div className="sidebar-footer">
-          <div className="user-info">
-            <p className="role-text">Usuario</p>
-            <p className="name-text">Carlos Administrador</p>
-          </div>
-          <button className="btn-logout">↪ Cerrar Sesión</button>
-        </div>
-      </aside>
-
-      {/* MAIN CONTENT */}
+    <div className="dashboard-content">
       <main className="main-content">
         <header className="top-header">
           <h1>Inicio</h1>
@@ -75,6 +44,11 @@ import './DashboardAdmin.css';
         </header>
 
         {/* TOP CARDS */}
+        {error && (
+          <section className="error-banner">
+            <p>Error al cargar estadísticas: {error}</p>
+          </section>
+        )}
         <section className="metrics-grid">
           <div className="metric-card">
             <div className="card-info">

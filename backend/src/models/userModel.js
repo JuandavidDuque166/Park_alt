@@ -3,7 +3,7 @@ const db = require('../config/conexion_db');
 const roleLabel = `
     CASE
         WHEN rol = 'ADMINISTRADOR' THEN 'Administrador'
-        WHEN rol = 'VIGILANTE' THEN 'Vigilante'
+        WHEN rol = 'OPERARIO' THEN 'Operario'
         ELSE rol
     END
 `;
@@ -11,7 +11,7 @@ const roleLabel = `
 const roleId = `
     CASE
         WHEN rol = 'ADMINISTRADOR' THEN 1
-        WHEN rol = 'VIGILANTE' THEN 2
+        WHEN rol = 'OPERARIO' THEN 2
         ELSE NULL
     END
 `;
@@ -20,14 +20,16 @@ const UserModel = {
     async findByEmail(login) {
         const query = `
             SELECT
-                id_usuario,
-                nombre,
-                email,
+                u.id_usuario,
+                u.nombre,
+                u.email,
                 clave,
-                id_rol,
-                estado
-            FROM usuario
-            WHERE email = ? AND estado = 1
+                u.id_rol,
+                r.nombre as rol,
+                u.estado
+            FROM usuario u
+            LEFT JOIN roles r ON u.id_rol = r.id_rol
+            WHERE u.email = ? AND u.estado = 1
         `;
         const [rows] = await db.execute(query, [login]);
         return rows[0];
@@ -74,13 +76,15 @@ const UserModel = {
     async findAll() {
         const query = `
             SELECT
-                id_usuario,
-                nombre,
-                email,
+                u.id_usuario,
+                u.nombre,
+                u.email,
                 clave,
-                id_rol,
-                estado
-            FROM usuario
+                u.id_rol,
+                r.nombre as rol,
+                u.estado
+            FROM usuario u
+            LEFT JOIN roles r ON u.id_rol = r.id_rol
         `;
         const [rows] = await db.execute(query);
         return rows;

@@ -24,33 +24,44 @@ const AuthService = {
     async loginUser(credentials) {
         const { login, clave } = credentials;
 
-        // 1. Buscar usuario por email (Usamos el modelo que ya creamos)
+        // 1. Buscar usuario por email
         const user = await UserModel.findByEmail(login);
+        console.log('AuthService.loginUser - login intent:', { login, userFound: !!user });
 
         // 2. Verificar si existe
         if (!user) {
-            // Retornamos null o lanzamos error genérico
             throw new AppError('Credenciales inválidas', httpStatus.UNAUTHORIZED);
         }
 
-        // 3. Comparar contraseñas (Texto plano vs Hash en DB)
-        const isHashedPassword = user.clave.startsWith('$2a$') || user.clave.startsWith('$2b$') || user.clave.startsWith('$2y$');
+        const storedPassword = String(user.clave || '');
+        const userRole = user.id_rol;
+        const roleNombre = user.rol; // Viene del JOIN con la tabla roles
+
+        // 3. Comparar contraseñas (Texto plano vs Hash en BD)
+        const isHashedPassword = storedPassword.startsWith('$2a$') || storedPassword.startsWith('$2b$') || storedPassword.startsWith('$2y$');
         const isMatch = isHashedPassword
-            ? await bcrypt.compare(clave, user.clave)
-            : clave === user.clave;
+            ? await bcrypt.compare(clave, storedPassword)
+            : clave === storedPassword;
 
         if (!isMatch) {
+            console.log('AuthService.loginUser - password mismatch for user:', { login, userId: user.id_usuario });
             throw new AppError('Credenciales inválidas', httpStatus.UNAUTHORIZED);
         }
 
         // 4. Generar Token JWT
-        const token = signToken(user.id_usuario, user.id_rol);
+        const token = signToken(user.id_usuario, userRole);
 
-        // 5. Retornar datos (SIN LA CLAVE)
-        // Eliminamos la clave del objeto antes de enviarlo
-        delete user.clave;
+        // 5. Retornar datos limpios
+        const safeUser = {
+            id_usuario: user.id_usuario,
+            nombre: user.nombre,
+            email: user.email,
+            id_rol: userRole,
+            rol_nombre: roleNombre,
+            estado: user.estado
+        };
 
-        return { user, token };
+        return { user: safeUser, token };
     }
 };
 

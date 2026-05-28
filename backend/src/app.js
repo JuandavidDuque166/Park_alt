@@ -33,6 +33,7 @@ const roleRoutes = require('./routes/rolesRoutes');
 const permisoRoutes = require('./routes/permisosRoutes');
 const negocioRoutes = require('./routes/negocioRouter');
 const uploadRoutes = require('./routes/uploadRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 // Rutas de autenticación y usuarios
 app.use('/api/auth', authRoutes);
@@ -41,6 +42,7 @@ app.use('/api/roles', roleRoutes);
 app.use('/api/permisos', permisoRoutes);
 app.use('/api/negocios', negocioRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Manejo de rutas no encontradas (404)
 app.all(/(.*)/, (req, res, next) => {

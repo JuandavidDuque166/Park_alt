@@ -56,7 +56,7 @@ const protect = async (req, res, next) => {
 };
 
 // Middleware para restringir acceso por roles
-//Uso: restrictTo('administrador', 'Empleado')
+//Uso: restrictTo('Crear', 'Leer', 'Actualizar', 'Eliminar')
 const restrictTo = (...roles) => {
     return (req, res, next) => {
         //req.user viene del middleware 'protect'
@@ -67,8 +67,11 @@ const restrictTo = (...roles) => {
             ));
         }
 
+        // Usar el id_rol del usuario (que viene de la BD)
+        const userRole = req.user.id_rol;
+
         //Verificar si el rol del usuario está en la lista de roles permitidos
-        if (!roles.includes(req.user.rol_nombre)) {
+        if (!roles.includes(userRole)) {
             return next(new AppError(
                 'No tienes permiso para realizar esta acción.',
                 httpStatus.FORBIDDEN
