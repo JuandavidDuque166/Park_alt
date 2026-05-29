@@ -1,0 +1,114 @@
+/* Contenedor principal de la vista */
+.salida-container {
+  padding: 32px;
+  background-color: #f8f9fc; /* Fondo claro general */
+  min-height: 100vh;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #1a202c;
+}
+
+/* Header con el botón de cerrar */
+.salida-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 16px;
+}
+
+.btn-close-icon {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: #4a5568;
+  cursor: pointer;
+  padding: 4px;
+  margin-top: 4px;
+  transition: color 0.2s ease;
+}
+
+.btn-close-icon:hover {
+  color: #1a202c;
+}
+
+.header-titles h2 {
+  margin: 0 0 4px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.header-titles p {
+  margin: 0;
+  font-size: 14px;
+  color: #718096;
+}
+
+/* Tarjeta Blanca de Búsqueda */
+.search-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #edf2f7;
+  max-width: 800px; /* Limita el ancho para que no se estire excesivamente en pantallas grandes */
+}
+
+.search-card h3 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+/* Formulario (Input + Botón) */
+.search-form {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1; /* Toma todo el espacio disponible */
+  padding: 14px 16px;
+  font-size: 16px;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  outline: none;
+  color: #2d3748;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-input::placeholder {
+  color: #a0aec0;
+}
+
+.search-input:focus {
+  border-color: #2b6cb0;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+/* Botón Buscar */
+.btn-buscar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #1a56db; /* Color azul del diseño */
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-buscar:hover {
+  background-color: #1e4ebb;
+}
+
+.icon-search {
+  margin-top: -2px;
+}

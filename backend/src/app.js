@@ -4,6 +4,8 @@ const helmet = require('helmet');
 const path = require('path');
 const AppError = require('./errors/AppError');
 const globalErrorHandler = require('./middlewares/errorHandler');
+const IngresoController = require('./controllers/ingresoVehiculoController');
+const upload = require('./middlewares/uploadMiddleware');
 
 const app = express();
 
@@ -31,19 +33,19 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const roleRoutes = require('./routes/rolesRoutes');
 const permisoRoutes = require('./routes/permisosRoutes');
-const negocioRoutes = require('./routes/negocioRouter');
 const uploadRoutes = require('./routes/uploadRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const ingresoVehiculoRoutes = require('./routes/ingresoVehiculoRoutes');
+
 
 // Rutas de autenticación y usuarios
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api/permisos', permisoRoutes);
-app.use('/api/negocios', negocioRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/dashboard', dashboardRoutes);
-
+app.use('/api/ingresos', ingresoVehiculoRoutes);
 // Manejo de rutas no encontradas (404)
 app.all(/(.*)/, (req, res, next) => {
     next(new AppError(`No se pudo encontrar ${req.originalUrl} en este servidor`, 404));

@@ -1,0 +1,160 @@
+.control-container {
+  padding: 24px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.control-header h2 {
+  margin: 0 0 4px 0;
+  font-size: 24px;
+  color: #1a202c;
+}
+
+.control-header p {
+  margin: 0 0 24px 0;
+  color: #718096;
+  font-size: 14px;
+}
+
+/* Tarjetas Superiores */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.card, .section-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border: 1px solid #edf2f7;
+}
+
+.card span {
+  color: #718096;
+  font-size: 14px;
+}
+
+.card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.card-content h3 {
+  font-size: 32px;
+  margin: 0;
+  color: #1a202c;
+}
+
+.icon-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+}
+.icon-badge.blue { background-color: #ebf8ff; color: #3182ce; }
+.icon-badge.orange { background-color: #fffaf0; color: #dd6b20; }
+.icon-badge.green { background-color: #f0fff4; color: #38a169; }
+
+/* Ocupación por nivel */
+.levels-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.level-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.level-card h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+}
+
+.level-stats p {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0;
+  font-size: 14px;
+  color: #4a5568;
+}
+
+.text-red { color: #e53e3e; }
+.text-green { color: #38a169; }
+
+.progress-bar-container {
+  width: 100%;
+  height: 6px;
+  background-color: #edf2f7;
+  border-radius: 4px;
+  margin: 12px 0 8px 0;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #38a169;
+}
+
+.percentage-text {
+  text-align: center;
+  font-size: 12px;
+  color: #a0aec0;
+  margin: 0;
+}
+
+/* Tabla */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.level-filter {
+  padding: 8px 12px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  background: white;
+  color: #2d3748;
+}
+
+.vehicles-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.vehicles-table th, .vehicles-table td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #edf2f7;
+  font-size: 14px;
+}
+
+.vehicles-table th {
+  color: #718096;
+  font-weight: 600;
+}
+
+.badge-temporal {
+  background-color: #ebf8ff;
+  color: #3182ce;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}

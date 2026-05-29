@@ -1,0 +1,145 @@
+/* Contenedor principal */
+.mensualidades-container {
+  padding: 32px;
+  background-color: #f8f9fc;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #1a202c;
+}
+
+/* Header con el botón de cerrar */
+.mensualidades-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 16px;
+}
+
+.btn-close-icon {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: #4a5568;
+  cursor: pointer;
+  padding: 4px;
+  margin-top: 4px;
+  transition: color 0.2s ease;
+}
+
+.btn-close-icon:hover {
+  color: #1a202c;
+}
+
+.header-titles h2 {
+  margin: 0 0 4px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.header-titles p {
+  margin: 0;
+  font-size: 14px;
+  color: #718096;
+}
+
+/* Tarjeta Principal */
+.mensualidades-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #edf2f7;
+}
+
+/* Info del encabezado de la tarjeta */
+.card-header-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.icon-badge-purple {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background-color: #faf5ff;
+  color: #805ad5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-header-info h3 {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.card-header-info p {
+  margin: 0;
+  font-size: 14px;
+  color: #718096;
+}
+
+/* Título de la tabla */
+.table-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 16px;
+}
+
+/* Tabla de datos */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.mensualidades-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mensualidades-table th, 
+.mensualidades-table td {
+  text-align: left;
+  padding: 16px;
+  border-bottom: 1px solid #edf2f7;
+  font-size: 14px;
+}
+
+.mensualidades-table th {
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.mensualidades-table td {
+  color: #4a5568;
+}
+
+.mensualidades-table td strong {
+  color: #1a202c;
+}
+
+/* Botón de acción (Ojo) */
+.btn-action-eye {
+  background: transparent;
+  border: none;
+  color: #718096;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-action-eye:hover {
+  color: #2b6cb0;
+  background-color: #ebf8ff;
+}
