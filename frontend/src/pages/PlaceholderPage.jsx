@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import './Inicio.css';
 
 const PlaceholderPage = ({ title, description }) => {
   return (
