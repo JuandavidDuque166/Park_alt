@@ -34,18 +34,18 @@ export const Login = () => {
         <div className="login-container">
             <div className="login-card">
                 <div className="login-header">
-                    <h2>Iniciar Sesión</h2>
-                    <p>Sistema de Gestión</p>
+                    <h2>Sistema de Parqueadero</h2>
+                    <p>Gestión en altura y subterráneo</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="login-form">
                     <div className="form-group">
-                        <label htmlFor="email">Correo Electrónico</label>
+                        <label htmlFor="email">Usuario</label>
                         <input 
                             type="email" 
                             id="email"
                             name="email" 
-                            placeholder="correo@ejemplo.com" 
+                            placeholder="Ingrese su usuario" 
                             onChange={handleChange} 
                             required 
                         />
@@ -57,7 +57,7 @@ export const Login = () => {
                             type="password" 
                             id="clave"
                             name="clave" 
-                            placeholder="Tu contraseña" 
+                            placeholder="Ingrese su contraseña" 
                             onChange={handleChange} 
                             required 
                         />
