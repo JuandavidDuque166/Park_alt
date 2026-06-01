@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // 1. Importamos el hook de navegación
 import { authService } from '../services/authService';
 import './Login.css';
 
 export const Login = () => {
     const [formData, setFormData] = useState({ email: '', clave: '' });
     const [error, setError] = useState('');
+    const navigate = useNavigate(); // 2. Inicializamos el hook
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -16,11 +18,13 @@ export const Login = () => {
 
         try {
             console.log('Intentando login...', formData);
+            // El componente llama al servicio, y el servicio habla con el backend
             const response = await authService.login(formData.email, formData.clave);
 
             if (response.status === 'success') {
-                console.log('Login exitoso, redirigiendo a /DashboardAdmin...');
-                window.location.href = '/DashboardAdmin';
+                console.log('Login exitoso, redirigiendo...');
+                // 3. Usamos navigate para cambiar de vista sin recargar la página
+                navigate('/DashboardAdmin'); 
             } else {
                 setError(response.message || 'No se pudo iniciar sesión');
             }

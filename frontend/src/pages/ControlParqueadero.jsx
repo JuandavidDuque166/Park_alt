@@ -82,6 +82,8 @@ const ControlParqueadero = () => {
             <option>Todos los niveles</option>
             <option>Nivel 1</option>
             <option>Nivel 2</option>
+            <option>Nivel 3</option>
+            <option>Subterráneo</option>
           </select>
         </div>
         <table className="vehicles-table">

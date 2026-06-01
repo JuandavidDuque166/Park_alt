@@ -139,7 +139,7 @@ const IngresoVehiculo = () => {
               <label>Tipo de Vehículo *</label>
               <select name="idTipo" value={formData.idTipo} onChange={handleInputChange} required>
                 <option value="">Seleccione</option>
-                <option value="1">Carro</option>
+                <option value="1">Automovil/Camioneta/Camperos/Motobuses/Motocarros</option>
                 <option value="2">Moto</option>
                 <option value="3">Bicicleta</option>
               </select>
@@ -149,8 +149,10 @@ const IngresoVehiculo = () => {
               <label>Nivel / Zona *</label>
               <select name="nivel" value={formData.nivel} onChange={handleInputChange} required>
                 <option value="">Seleccione</option>
-                <option value="ALTURA">Altura</option>
-                <option value="SOTANO">Sótano</option>
+                <option value="NIVEL 1">Nivel 1</option>
+                <option value="NIVEL 2">Nivel 2</option>
+                <option value="NIVEL 3">Nivel 3</option>
+                <option value="SUBTERRANEO">Subterraneo</option>
               </select>
             </div>
 

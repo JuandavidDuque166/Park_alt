@@ -8,11 +8,14 @@ import Perfil from './pages/Perfil';
 import Permisos from './pages/Permisos';
 import Usuarios from './pages/Usuarios';
 import IngresoVehiculosOperario from './pages/IngresovehiculosOperario';
-import PlaceholderPage from './pages/PlaceholderPage';
+import Reportes from './pages/Reportes';
 import DashboardLayout from './components/DashboardLayout';
 import ControlParqueadero from './pages/ControlParqueadero';
 import SalidaVehiculo from './pages/SalidaVehiculo';
 import Mensualidades from './pages/Mensualidades';
+
+// Nota: Asegúrate de tener importado PlaceholderPage si lo vas a usar en Tarifas
+// import PlaceholderPage from './pages/PlaceholderPage'; 
 
 import './App.css';
 
@@ -37,9 +40,13 @@ function App() {
             <Route path="/ingreso-vehiculos" element={<IngresoVehiculosOperario />} />
             <Route path="/salida-vehiculos" element={<SalidaVehiculo />} />
             <Route path="/control-parqueadero" element={<ControlParqueadero />} />
-            <Route path="/tarifas" element={<PlaceholderPage title="Tarifas" description="Funcionalidad pendiente de implementación." />} />
-            <Route path="/mensualidades" element={<Mensualidades title="Mensualidades" description="Funcionalidad pendiente de implementación." />} />
-            <Route path="/reportes" element={<PlaceholderPage title="Reportes" description="Funcionalidad pendiente de implementación." />} />
+            
+            {/* Aquí dejamos Tarifas como Placeholder hasta que lo diseñemos */}
+            
+            
+            {/* LIMPIEZA: Quitamos las props de placeholder de Mensualidades y Reportes */}
+            <Route path="/mensualidades" element={<Mensualidades />} />
+            <Route path="/reportes" element={<Reportes />} />
           </Route>
         </Route>
 
