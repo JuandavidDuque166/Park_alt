@@ -1,0 +1,87 @@
+/* Contenedor principal que permite scroll si el contenido es muy ancho */
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* ¡Esto es lo que hace que la info no se pierda! */
+    margin-top: 20px;
+}
+
+.mensualidades-table {
+    width: 100%;
+    min-width: 900px; /* Asegura que la tabla no se aplaste en pantallas pequeñas */
+    border-collapse: collapse;
+}
+
+.mensualidades-table th, .mensualidades-table td {
+    padding: 15px;
+    text-align: left;
+    white-space: normal; /* Permite que el texto ocupe espacio y no se corte */
+    word-wrap: break-word; /* Si una palabra es muy larga, baja a la siguiente línea */
+    font-size: 0.9rem;
+}
+
+/* Eliminar el corte con puntos suspensivos */
+.mensualidades-table td {
+    overflow: visible; 
+    text-overflow: clip; 
+}
+
+.form-control-input, 
+.form-control-select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box; /* Crucial para que el tamaño sea exacto */
+    display: block;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px; /* Espacio entre botones */
+    width: 100%;
+}
+
+.modal form input, 
+.modal form select {
+    width: 100%;             /* Se expanden al 100% del modal */
+    padding: 12px;           /* Espacio interno uniforme */
+    margin-bottom: 15px;     /* Separación entre cada campo */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;  /* ¡Clave! Evita que el padding rompa el ancho */
+    display: block;          /* Obliga a que cada uno ocupe su propia línea */
+}
+
+.modal-btns {
+    display: flex;
+    gap: 10px;               /* Espacio entre el botón de guardar y cancelar */
+    width: 100%;
+}
+
+.btn-comun {
+    flex: 1;                 /* Hace que ambos botones midan lo mismo */
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Colores */
+.btn-actualizar { background-color: #059669; color: white; }
+.btn-cancelar { background-color: #e5e7eb; color: #374151; }
+
+.toast-oculto {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #00a844; /* Verde */
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transform: translateY(-100px);
+    transition: transform 0.3s ease;
+    z-index: 9999;
+}

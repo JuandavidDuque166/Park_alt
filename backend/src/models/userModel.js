@@ -23,10 +23,11 @@ const UserModel = {
                 u.id_usuario,
                 u.nombre,
                 u.email,
-                clave,
+                u.clave,
                 u.id_rol,
                 r.nombre as rol,
-                u.estado
+                u.estado,
+                u.fecha_creacion
             FROM usuario u
             LEFT JOIN roles r ON u.id_rol = r.id_rol
             WHERE u.email = ? AND u.estado = 1
@@ -46,18 +47,18 @@ const UserModel = {
     },
 
     async update(user) {
-        const { id, nombre, email, clave, id_rol } = user;
+        const { id, nombre, email, clave, id_rol, estado } = user;
         const query = `
             UPDATE usuario
-            SET nombre = ?, email = ?, clave = ?, id_rol = ?
+            SET nombre = ?, email = ?, clave = ?, id_rol = ?, estado = ?
             WHERE id_usuario = ?
         `;
 
-        const [result] = await db.execute(query, [nombre, email, clave, id_rol, id]);
+        const [result] = await db.execute(query, [nombre, email, clave, id_rol, estado, id]);
         return result.affectedRows;
     },
 
-    async findById(id) {
+    async findById(id, onlyActive = true) {
         const query = `
             SELECT
                 id_usuario,
@@ -65,9 +66,10 @@ const UserModel = {
                 email,
                 clave,
                 id_rol,
-                estado
+                estado,
+                fecha_creacion
             FROM usuario
-            WHERE id_usuario = ? AND estado = 1
+            WHERE id_usuario = ? ${onlyActive ? 'AND estado = 1' : ''}
         `;
         const [rows] = await db.execute(query, [id]);
         return rows[0];
@@ -82,7 +84,8 @@ const UserModel = {
                 clave,
                 u.id_rol,
                 r.nombre as rol,
-                u.estado
+                u.estado,
+                u.fecha_creacion
             FROM usuario u
             LEFT JOIN roles r ON u.id_rol = r.id_rol
         `;

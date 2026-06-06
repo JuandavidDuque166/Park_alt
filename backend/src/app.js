@@ -34,6 +34,8 @@ const permisoRoutes = require('./routes/permisosRoutes');
 const negocioRoutes = require('./routes/negocioRouter');
 const uploadRoutes = require('./routes/uploadRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const tarifasRoutes = require('./routes/tarifasRoutes');
+const mensualidadesRoutes = require('./routes/mensualidadesRoutes');
 
 // Rutas de autenticación y usuarios
 app.use('/api/auth', authRoutes);
@@ -43,6 +45,8 @@ app.use('/api/permisos', permisoRoutes);
 app.use('/api/negocios', negocioRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/tarifas', tarifasRoutes);
+app.use('/api', mensualidadesRoutes);
 
 // Manejo de rutas no encontradas (404)
 app.all(/(.*)/, (req, res, next) => {

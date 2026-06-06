@@ -33,41 +33,41 @@ const UserService = {
 },
 
 async updateUser(id, updateData) {
-    // 1. Verificar si el usuario existe
-    const userExists = await UserModel.findById(id);
-    if (!userExists) {
-        throw new AppError('Usuario no encontrado', httpStatus.NOT_FOUND);
-    }
-
-    // 2. Validar email único si se está cambiando
-    if (updateData.email && updateData.email !== userExists.email) {
-        const emailInUse = await UserModel.findByEmail(updateData.email);
-        if (emailInUse) {
-            throw new AppError('El email ya está registrado', httpStatus.BAD_REQUEST);
+        // 1. Verificar si el usuario existe (incluye inactivos para poder activarlos/desactivarlos)
+        const userExists = await UserModel.findById(id, false);
+        if (!userExists) {
+            throw new AppError('Usuario no encontrado', httpStatus.NOT_FOUND);
         }
-    }
 
-    // 3. Manejo de contraseña en actualización
-    let hashedKey = userExists.clave; // Por defecto usamos la que ya tiene
+        // 2. Validar email único si se está cambiando
+        if (updateData.email && updateData.email !== userExists.email) {
+            const emailInUse = await UserModel.findByEmail(updateData.email);
+            if (emailInUse) {
+                throw new AppError('El email ya está registrado', httpStatus.BAD_REQUEST);
+            }
+        }
 
-    if (updateData.clave && updateData.clave.trim() !== '') {
-        const salt = await bcrypt.genSalt(10);
-        hashedKey = await bcrypt.hash(updateData.clave, salt);
-    }
+        // 3. Manejo de contraseña en actualización
+        let hashedKey = userExists.clave; // Por defecto usamos la que ya tiene
 
-    // 4. Construir objeto con valores actualizados o existentes
-    const userToUpdate = {
-        id: id,
-        nombre: updateData.nombre !== undefined ? updateData.nombre : userExists.nombre,
-        email: updateData.email !== undefined ? updateData.email : userExists.email,
-        id_rol: updateData.id_rol !== undefined ? updateData.id_rol : userExists.id_rol,
-        clave: hashedKey
-    };
+        if (updateData.clave && updateData.clave.trim() !== '') {
+            const salt = await bcrypt.genSalt(10);
+            hashedKey = await bcrypt.hash(updateData.clave, salt);
+        }
 
-const affectedRows = await UserModel.update(userToUpdate);
-    return affectedRows > 0;
-},
+        // 4. Construir objeto con valores actualizados o existentes
+        const userToUpdate = {
+            id: id,
+            nombre: updateData.nombre !== undefined ? updateData.nombre : userExists.nombre,
+            email: updateData.email !== undefined ? updateData.email : userExists.email,
+            id_rol: updateData.id_rol !== undefined ? updateData.id_rol : userExists.id_rol,
+            clave: hashedKey,
+            estado: updateData.estado !== undefined ? updateData.estado : userExists.estado
+        };
 
+        const affectedRows = await UserModel.update(userToUpdate);
+        return affectedRows > 0;
+    },
 // Añadir currentUserId
 async deleteUser(idToDelete, currentUserId) {
     // Prevención de auto sabotaje (admin no puede borrarse a sí mismo)

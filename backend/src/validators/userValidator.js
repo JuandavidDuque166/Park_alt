@@ -11,7 +11,9 @@ const createUserSchema = z.object({
 
 // 2. Esquema para ACTUALIZAR usuario (Todo es OPCIONAL)
 // Usamos .partial() para decir "validame solo lo que venga, no exijas todo"
-const updateUserSchema = createUserSchema.partial();
+const updateUserSchema = createUserSchema.partial().extend({
+    estado: z.enum(['ACTIVO', 'INACTIVO']).optional()
+});
 
 const validateCreateUser = (data) => {
     return createUserSchema.safeParse(data);

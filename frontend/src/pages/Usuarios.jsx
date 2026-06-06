@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { usuariosService } from '../services/usuariosService';
 import { rolesService } from '../services/rolesService';
-import { FiUsers, FiEdit2, FiTrash2 } from 'react-icons/fi';
-import { MdEmail } from 'react-icons/md';
+import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import './Usuarios.css';
 
 export const Usuarios = () => {
@@ -12,11 +11,7 @@ export const Usuarios = () => {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [usuarioForm, setUsuarioForm] = useState({
-    id_usuario: null,
-    nombre: '',
-    email: '',
-    clave: '',
-    id_rol: ''
+    id_usuario: null, nombre: '', email: '', clave: '', id_rol: ''
   });
 
   useEffect(() => {
@@ -24,265 +19,160 @@ export const Usuarios = () => {
     cargarRoles();
   }, []);
 
+  const mostrarAlerta = (mensaje) => {
+    const toast = document.getElementById('toast-alerta');
+    toast.innerText = mensaje;
+    toast.classList.add('toast-visible');
+    setTimeout(() => toast.classList.remove('toast-visible'), 3000);
+  };
+
   const cargarUsuarios = async () => {
     try {
       const data = await usuariosService.obtenerUsuarios();
       setUsuarios(data);
-    } catch (error) {
-      console.error('Error al obtener usuarios', error);
-    }
+    } catch (error) { console.error('Error al cargar usuarios', error); }
   };
 
   const cargarRoles = async () => {
     try {
       const data = await rolesService.obtenerRoles();
-      setRoles(data);
-    } catch (error) {
-      console.error('Error al obtener roles', error);
-    }
+      setRoles(Array.isArray(data) ? data : data?.data || []);
+    } catch (error) { setRoles([]); }
   };
 
   const cargarPermisos = async (idRol) => {
-    if (!idRol) {
-      setPermisos([]);
-      return;
-    }
-
+    if (!idRol) { setPermisos([]); return; }
     try {
       const rol = await rolesService.obtenerRolPorId(idRol);
       setPermisos(rol.permisos || []);
-    } catch (error) {
-      console.error('Error al cargar permisos', error);
-      setPermisos([]);
-    }
+    } catch (error) { setPermisos([]); }
   };
 
   const abrirModalCrear = () => {
     setModoEdicion(false);
-    setUsuarioForm({
-      id_usuario: null,
-      nombre: '',
-      email: '',
-      clave: '',
-      id_rol: ''
-    });
+    setUsuarioForm({ id_usuario: null, nombre: '', email: '', clave: '', id_rol: '' });
     setPermisos([]);
     setMostrarModal(true);
   };
 
   const abrirModalEditar = (usuario) => {
     setModoEdicion(true);
-    setUsuarioForm({
-      id_usuario: usuario.id_usuario,
-      nombre: usuario.nombre,
-      email: usuario.email,
-      clave: '',
-      id_rol: usuario.id_rol || ''
-    });
-
-    if (usuario.id_rol) {
-      cargarPermisos(usuario.id_rol);
-    }
-
+    setUsuarioForm({ id_usuario: usuario.id_usuario, nombre: usuario.nombre, email: usuario.email, clave: '', id_rol: usuario.id_rol });
+    if (usuario.id_rol) cargarPermisos(usuario.id_rol);
     setMostrarModal(true);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUsuarioForm({
-      ...usuarioForm,
-      [name]: value
-    });
-
-    if (name === 'id_rol') {
-      cargarPermisos(value);
-    }
+    setUsuarioForm({ ...usuarioForm, [name]: value });
+    if (name === 'id_rol') cargarPermisos(value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!usuarioForm.nombre || usuarioForm.nombre.trim().length < 3) {
-      alert('El nombre debe tener al menos 3 caracteres');
-      return;
-    }
-
-    if (!usuarioForm.email) {
-      alert('El email es obligatorio');
-      return;
-    }
-
-    if (!modoEdicion && (!usuarioForm.clave || usuarioForm.clave.length < 6)) {
-      alert('La contraseña debe tener al menos 6 caracteres');
-      return;
-    }
-
-    if (modoEdicion && usuarioForm.clave && usuarioForm.clave.length < 6) {
-      alert('La contraseña debe tener al menos 6 caracteres');
-      return;
-    }
-
-    if (!usuarioForm.id_rol) {
-      alert('Debe seleccionar un rol');
-      return;
-    }
-
     try {
-      const usuarioData = {
-        nombre: usuarioForm.nombre,
-        email: usuarioForm.email,
-        id_rol: Number(usuarioForm.id_rol)
-      };
-
+      const usuarioData = { nombre: usuarioForm.nombre, email: usuarioForm.email, id_rol: Number(usuarioForm.id_rol) };
       if (modoEdicion) {
-        if (usuarioForm.clave) {
-          usuarioData.clave = usuarioForm.clave;
-        }
+        if (usuarioForm.clave) usuarioData.clave = usuarioForm.clave;
         await usuariosService.actualizarUsuario(usuarioForm.id_usuario, usuarioData);
-        alert('Usuario actualizado correctamente');
       } else {
         usuarioData.clave = usuarioForm.clave;
         await usuariosService.agregarUsuario(usuarioData);
-        alert('Usuario creado correctamente');
       }
-
+      mostrarAlerta("¡Guardado exitosamente!");
       cargarUsuarios();
       setMostrarModal(false);
-    } catch (error) {
-      const mensaje = error.response?.data?.message || error.response?.data?.errors?.[0]?.message || 'Error desconocido';
-      alert('Error: ' + mensaje);
-    }
+    } catch (error) { alert('Error: ' + (error.response?.data?.message || 'Error desconocido')); }
   };
 
-  const eliminarUsuario = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este usuario?')) {
-      return;
-    }
+  const isActivo = (estado) => {
+    return estado === true || estado === 1 || estado === '1' || estado === 'ACTIVO';
+  };
 
+  const cambiarEstadoUsuario = async (usuario) => {
+    const activo = isActivo(usuario.estado);
+    const nuevoEstado = activo ? 'INACTIVO' : 'ACTIVO';
+    if (!window.confirm(`¿Deseas ${activo ? 'desactivar' : 'activar'} al usuario ${usuario.nombre}?`)) return;
     try {
-      await usuariosService.eliminarUsuario(id);
-      alert('Usuario eliminado correctamente');
-      cargarUsuarios();
+      await usuariosService.actualizarUsuario(usuario.id_usuario, { estado: nuevoEstado });
+      await cargarUsuarios();
+      mostrarAlerta(`Estado actualizado a ${nuevoEstado}`);
     } catch (error) {
-      alert('Error al eliminar: ' + (error.response?.data?.message || 'Error desconocido'));
+      const mensajeError = error.response?.data?.message || error.message || 'Error desconocido al actualizar el usuario';
+      alert(`Error al cambiar el estado: ${mensajeError}`);
     }
   };
 
   return (
     <>
-      <div className="usuarios-container">
-        <div className="titulo-container">
-          <h2><FiUsers /> Gestión de Usuarios</h2>
-          <button className="btn-add" onClick={abrirModalCrear}>
-            Crear Usuario
-          </button>
+      <div className="card">
+        <div className="header-actions">
+          <h2>Gestión de Usuarios</h2>
+          <button className="btn-add" onClick={abrirModalCrear}>+ Nuevo Usuario</button>
         </div>
 
-        <div className="usuarios-grid">
-          {usuarios.map(usuario => (
-            <div key={usuario.id_usuario} className="usuario-card">
-              <div className="usuario-info">
-                <h3>{usuario.nombre}</h3>
-                <p><MdEmail /> {usuario.email}</p>
-                <span className="rol-badge">{usuario.rol}</span>
-              </div>
-              <div className="usuario-acciones">
-                <button className="btn-icon" onClick={() => abrirModalEditar(usuario)}>
-                  <FiEdit2 />
-                </button>
-                <button className="btn-icon eliminar" onClick={() => eliminarUsuario(usuario.id_usuario)}>
-                  <FiTrash2 />
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="table-container">
+          <table className="tabla-sistema">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+  {usuarios.map(u => (
+    <tr key={u.id_usuario}>
+      <td>{u.nombre}</td>
+      <td>{u.email}</td>
+      <td>{u.rol}</td>
+      <td>
+        <span className={`badge ${isActivo(u.estado) ? 'activa' : 'inactiva'}`}>
+          {isActivo(u.estado) ? 'ACTIVO' : 'INACTIVO'}
+        </span>
+      </td>
+      <td>{new Date(u.fecha_creacion).toLocaleDateString()}</td>
+      <td className="actions">
+        <button onClick={() => abrirModalEditar(u)} title="Editar">
+          <FiEdit2 />
+        </button>
+        <button
+          type="button"
+          className={isActivo(u.estado) ? 'delete' : ''}
+          onClick={() => cambiarEstadoUsuario(u)}
+          title={isActivo(u.estado) ? 'Desactivar usuario' : 'Activar usuario'}
+        >
+          {isActivo(u.estado) ? 'Desactivar' : 'Activar'}
+        </button>
+      </td>
+    </tr>
+  ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
       {mostrarModal && (
-        <div className="modal-backdrop" onClick={() => setMostrarModal(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>{modoEdicion ? 'Editar Usuario' : 'Crear Nuevo Usuario'}</h2>
-              <button className="btn-close" onClick={() => setMostrarModal(false)}>x</button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="modal-form">
-              <div className="form-group">
-                <label>Nombre Completo *</label>
-                <input
-                  type="text"
-                  name="nombre"
-                  value={usuarioForm.nombre}
-                  onChange={handleChange}
-                  required
-                  minLength="3"
-                  placeholder="Nombre del usuario"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Correo Electrónico *</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={usuarioForm.email}
-                  onChange={handleChange}
-                  required
-                  placeholder="correo@ejemplo.com"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Contraseña {modoEdicion ? '(opcional)' : '*'}</label>
-                <input
-                  type="password"
-                  name="clave"
-                  value={usuarioForm.clave}
-                  onChange={handleChange}
-                  required={!modoEdicion}
-                  minLength="6"
-                  placeholder={modoEdicion ? 'Dejar vacío para no cambiar' : 'Mínimo 6 caracteres'}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Rol *</label>
-                <select
-                  name="id_rol"
-                  value={usuarioForm.id_rol}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Selecciona un rol</option>
-                  {roles.map(rol => (
-                    <option key={rol.id_rol} value={rol.id_rol}>
-                      {rol.nombre}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {permisos.length > 0 && (
-                <div className="permisos-info">
-                  <h4>Permisos del Rol:</h4>
-                  <div className="permisos-list">
-                    {permisos.map((permiso, index) => (
-                      <span key={index} className="permiso-chip">
-                        {permiso.nombre || permiso}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <button type="submit" className="btn-submit">
-                {modoEdicion ? 'Actualizar Usuario' : 'Crear Usuario'}
-              </button>
+        <div className="modal-backdrop">
+          <div className="modal">
+            <h2>{modoEdicion ? 'Editar' : 'Crear'} Usuario</h2>
+            <form onSubmit={handleSubmit}>
+              <input name="nombre" value={usuarioForm.nombre} onChange={handleChange} placeholder="Nombre" required />
+              <input name="email" value={usuarioForm.email} onChange={handleChange} placeholder="Email" required />
+              <select name="id_rol" value={usuarioForm.id_rol} onChange={handleChange} required>
+                <option value="">Selecciona rol</option>
+                {roles.map(r => <option key={r.id_rol} value={r.id_rol}>{r.nombre}</option>)}
+              </select>
+              <button type="submit">Guardar</button>
+              <button type="button" onClick={() => setMostrarModal(false)}>Cancelar</button>
             </form>
           </div>
         </div>
       )}
+      <div id="toast-alerta" className="toast-oculto">Operación realizada</div>
     </>
   );
 };

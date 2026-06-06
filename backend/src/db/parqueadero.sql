@@ -6,7 +6,7 @@ USE parqueadero;
 CREATE TABLE cliente (
     id_cliente INT AUTO_INCREMENT PRIMARY KEY,
     nombre_completo VARCHAR(100) NOT NULL,
-    documento VARCHAR(50) UNIQUE NOT NULL,
+    documento VARCHAR(50) UNIQUE,
     telefono VARCHAR(20)
 );
 
@@ -61,7 +61,8 @@ CREATE TABLE usuario (
     email VARCHAR(150) UNIQUE NOT NULL,
     clave VARCHAR(255) NOT NULL,
     id_rol INT NOT NULL,
-    estado BOOLEAN DEFAULT TRUE,
+    estado ENUM('ACTIVO','INACTIVO') DEFAULT 'ACTIVO',
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_usuario_rol
     FOREIGN KEY (id_rol)
     REFERENCES roles(id_rol)
@@ -73,9 +74,8 @@ CREATE TABLE tarifa (
     valor_hora DECIMAL(10,2) NOT NULL,
     valor_fraccion DECIMAL(10,2) NOT NULL,
     valor_dia DECIMAL(10,2) NOT NULL,
-    CONSTRAINT fk_tarifa_tipo
-    FOREIGN KEY (id_tipo)
-    REFERENCES tipo_vehiculo(id_tipo)
+    valor_mensual DECIMAL(10,2) NOT NULL DEFAULT 0,
+    CONSTRAINT fk_tarifa_tipo FOREIGN KEY (id_tipo) REFERENCES tipo_vehiculo(id_tipo)
 );
 
 CREATE TABLE control_i_s (
@@ -99,7 +99,7 @@ CREATE TABLE control_i_s (
 
 CREATE TABLE pago (
     id_pago INT AUTO_INCREMENT PRIMARY KEY,
-    metodo_pago ENUM('EFECTIVO','NEQUI','DAVIPLATA','TARJETA') NOT NULL,
+    metodo_pago ENUM('EFECTIVO', 'TRASNFERENCIA') NOT NULL,
     valor_total DECIMAL(10,2) NOT NULL,
     fecha_pago DATETIME NOT NULL,
     id_ingreso INT NOT NULL,
@@ -124,7 +124,9 @@ CREATE TABLE mensualidad (
     id_vehiculo INT NOT NULL,
     fecha_inicio DATE NOT NULL,
     fecha_fin DATE NOT NULL,
+    valor DECIMAL(10,2) NOT NULL,
     estado ENUM('ACTIVA','VENCIDA') DEFAULT 'ACTIVA',
+    nivel_servicio varchar (100),
     CONSTRAINT fk_mensualidad_cliente
     FOREIGN KEY (id_cliente)
     REFERENCES cliente(id_cliente),
@@ -133,12 +135,21 @@ CREATE TABLE mensualidad (
     REFERENCES vehiculo(id_vehiculo)
 );
 
+INSERT INTO cliente (nombre_completo, documento, telefono) VALUES 
+('Juan Pérez', '1001234567', '3001112233'),
+('María García', '1007654321', '3104445566'),
+('Carlos López', '1009876543', '3207778899');
+
 -- 3. INSERCIÓN DE DATOS INICIALES (Semillas)
 
 INSERT INTO tipo_vehiculo(nombre)
 VALUES
-('CARRO'),
-('MOTO'),
+('AUTOMOVIL'),
+('CAMPERO'), 
+('CAMIONETA'), 
+('MICROBUS'), 
+('MOTOCARRO'), 
+('MOTOCICLETA'), 
 ('BICICLETA');
 
 INSERT INTO roles (nombre) 
@@ -158,15 +169,30 @@ VALUES
 (1, 1), (1, 2), (1, 3), (1, 4), -- Permisos de Administrador
 (2, 1), (2, 2), (2, 3);         -- Permisos de Operario
 
-INSERT INTO usuario(nombre, email, clave, id_rol)
+INSERT INTO usuario(nombre, email, clave, id_rol,  fecha_creacion)
 VALUES
-('admin', 'juandaduque880@gmail.com','123456', 1),
-('operario1', 'empleado@gmail.com', '123456', 2);
+('admin', 'juandaduque880@gmail.com','123456', 1, '2026-06-03'),
+('operario1', 'empleado@gmail.com', '123456', 2, '2026-06-03');
 
 INSERT INTO espacio(numero, nivel)
 VALUES
-(1, 'SOTANO'),
+(1, 'SUBTERRANEO'),
 (2, 'ALTURA');
+
+INSERT INTO tarifa (id_tipo, valor_hora, valor_fraccion, valor_dia, valor_mensual) VALUES 
+-- Automóviles, Camperos, Camionetas, Microbuses, Motocarros
+(1, 5000, 1100, 37600, 160000), -- Automóvil
+(2, 5000, 1100, 37600, 160000), -- Campero
+(3, 5000, 1100, 37600, 160000), -- Camioneta
+(4, 5000, 1100, 37600, 160000), -- Microbus
+(5, 5000, 1100, 37600, 160000), -- Motocarro
+
+-- Motocicletas
+(6, 2400, 750, 16400, 65800),   -- Motocicleta
+
+-- Bicicletas
+(7, 750, 200, 3750, 25600);     -- Bicicleta
+
 
 -- 4. CONSULTAS Y REPORTES DE PRUEBA
 
@@ -197,3 +223,14 @@ VALUES (NOW(), 'http://ruta-a-imagen.com/xyz123.jpg', 1, 1, 2);
 
 -- Marcar el espacio como OCUPADO
 UPDATE espacio SET estado = 'OCUPADO' WHERE id_espacio = 1;
+
+INSERT INTO vehiculo (placa, id_tipo) VALUES 
+('ABC-001', 1), -- ID 1 (Automóvil)
+('XYZ-002', 6), -- ID 2 (Motocicleta)
+('LMN-003', 3); -- ID 3 (Camioneta)
+
+INSERT INTO mensualidad (id_cliente, id_vehiculo, fecha_inicio, fecha_fin, valor, estado, nivel_servicio) 
+VALUES 
+(1, 1, '2026-06-01', '2026-07-01', 149500.00, 'ACTIVA', 'Subterraneo'),
+(2, 2, '2026-05-15', '2026-06-15', 61500.00, 'ACTIVA', 'Subterraneo'),
+(3, 3, '2026-04-01', '2026-05-01', 149500.00, 'VENCIDA', 'Subterraneo');
