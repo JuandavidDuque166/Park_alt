@@ -85,3 +85,22 @@
     transition: transform 0.3s ease;
     z-index: 9999;
 }
+.fecha-row {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 15px !important;
+    width: 100% !important;
+    margin-bottom: 15px !important;
+}
+
+.fecha-col {
+    flex: 1 !important;
+    min-width: 0 !important; /* Vital para que el flexbox no se rompa */
+}
+
+.fecha-input {
+    width: 100% !important;
+    display: block !important;
+    box-sizing: border-box !important;
+}
