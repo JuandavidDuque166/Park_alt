@@ -4,14 +4,14 @@ class IngresoVehiculoController {
   static async registrar(req, res, next) {
     try {
       // 1. Extraemos los datos exactos que requiere nuestro nuevo script SQL
-      const { placa, idTipo, idEspacio, idUsuario } = req.body;
+      const { placa, id_tipo } = req.body;
       const archivoFoto = req.file;
 
       // 2. Validación actualizada: Verificamos que lleguen las llaves foráneas necesarias
-      if (!placa || !idTipo || !idEspacio || !idUsuario) {
+      if (!placa || !id_tipo) {
         return res.status(400).json({
           success: false,
-          error: 'Faltan datos obligatorios (placa, idTipo, idEspacio, idUsuario)'
+          error: 'Faltan datos obligatorios (placa, id_tipo)'
         });
       }
 
@@ -19,9 +19,7 @@ class IngresoVehiculoController {
       const resultado = await IngresoService.procesarIngreso(
         { 
           placa: placa.trim().toUpperCase(), 
-          idTipo: parseInt(idTipo, 10), 
-          idEspacio: parseInt(idEspacio, 10), 
-          idUsuario: parseInt(idUsuario, 10) 
+          id_tipo: parseInt(id_tipo, 10), 
         }, 
         archivoFoto
       );

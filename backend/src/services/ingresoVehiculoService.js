@@ -1,9 +1,9 @@
-const IngresoModel = require('../models/ingresoVehiculoModel');
+const IngresoVehiculoModel = require('../models/ingresoVehiculoModel');
 
 class IngresoVehiculoService {
   static async procesarIngreso(datosIngreso, archivoFoto) {
     // Estos nombres de variables asumen lo que viene de req.body en el Controlador
-    const { placa, idTipo, idEspacio, idUsuario } = datosIngreso;
+    const { placa, id_tipo } = datosIngreso;
 
     // 1. Verificar si el vehículo existe en la DB; si no, crearlo.
     let vehiculo = await IngresoVehiculoModel.buscarVehiculo(placa);
@@ -12,7 +12,7 @@ class IngresoVehiculoService {
     if (vehiculo) {
       idVehiculo = vehiculo.id_vehiculo;
     } else {
-      idVehiculo = await IngresoVehiculoModel.registrarVehiculoNuevo(placa, idTipo);
+      idVehiculo = await IngresoVehiculoModel.registrarVehiculoNuevo(placa, id_tipo);
     }
 
     // 2. Validar si el vehículo ya está adentro (control_i_s sin fecha_hora_salida)
@@ -30,8 +30,6 @@ class IngresoVehiculoService {
     // 4. Registrar en control_i_s y ocupar el espacio
     const idIngreso = await IngresoVehiculoModel.registrarIngreso({
       idVehiculo,
-      idEspacio,
-      idUsuario, // El ID del operario que está en turno haciendo el registro
       urlImagen
     });
 

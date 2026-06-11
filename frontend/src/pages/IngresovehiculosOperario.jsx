@@ -46,12 +46,10 @@ const IngresoVehiculo = () => {
     setIsLoading(true);
     setMensaje({ tipo: '', texto: '' });
 
-    // 1. Construir el FormData con los datos exactos que espera el Backend
+    // 1. Construir el FormData con los nombres EXACTOS que espera el backend
     const dataToSend = new FormData();
     dataToSend.append('placa', formData.placa);
-    dataToSend.append('idTipo', formData.idTipo);
-    dataToSend.append('nivel', formData.nivel);
-    dataToSend.append('idUsuario', '2'); // Simulando el ID del operario logueado
+    dataToSend.append('id_tipo', formData.idTipo); // Cambiado a id_tipo
     
     if (formData.foto) {
       dataToSend.append('foto', formData.foto);

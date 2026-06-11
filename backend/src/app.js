@@ -37,10 +37,12 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const tarifasRoutes = require('./routes/tarifasRoutes');
 const mensualidadesRoutes = require('./routes/mensualidadesRoutes');
+const ingresoVehiculoRoutes = require('./routes/ingresoVehiculoRoutes');
 
 // Rutas de autenticación y usuarios
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/ingresos', ingresoVehiculoRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api/permisos', permisoRoutes);
 app.use('/api/upload', uploadRoutes);

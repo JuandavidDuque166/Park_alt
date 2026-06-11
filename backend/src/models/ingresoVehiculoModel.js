@@ -30,7 +30,7 @@ class IngresoVehiculoModel {
 
   // 4. Registrar el ingreso y actualizar el estado del espacio
   static async registrarIngreso(data) {
-    const { idVehiculo, idEspacio, idUsuario, urlImagen } = data;
+    const { idVehiculo, urlImagen } = data;
     
     // Obtenemos una conexión para manejar una transacción (opcional pero recomendado)
     const connection = await db.getConnection();
@@ -39,16 +39,11 @@ class IngresoVehiculoModel {
 
       // Insertar en control_i_s
       const [result] = await connection.query(
-        `INSERT INTO control_i_s (fecha_hora_entrada, url_imagen, id_vehiculo, id_espacio, id_usuario) 
-         VALUES (NOW(), ?, ?, ?, ?)`,
-        [urlImagen, idVehiculo, idEspacio, idUsuario]
+        `INSERT INTO control_i_s (fecha_hora_entrada, url_imagen, id_vehiculo) 
+         VALUES (NOW(), ?, ?)`,
+        [urlImagen, idVehiculo]
       );
 
-      // Actualizar el espacio a OCUPADO
-      await connection.query(
-        `UPDATE espacio SET estado = 'OCUPADO' WHERE id_espacio = ?`,
-        [idEspacio]
-      );
 
       await connection.commit();
       return result.insertId;
