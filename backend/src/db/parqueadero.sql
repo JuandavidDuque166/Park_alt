@@ -83,9 +83,9 @@ CREATE TABLE control_i_s (
     fecha_hora_entrada DATETIME NOT NULL,
     fecha_hora_salida DATETIME,
     url_imagen VARCHAR(255), -- Evidencia fotográfica (CU04)
-    id_vehiculo INT NOT NULL,
-    id_espacio INT NOT NULL,
-    id_usuario INT NOT NULL,
+    id_vehiculo INT NULL,
+    id_espacio INT NULL,
+    id_usuario INT NULL,
     CONSTRAINT fk_control_vehiculo
     FOREIGN KEY (id_vehiculo)
     REFERENCES vehiculo(id_vehiculo),
