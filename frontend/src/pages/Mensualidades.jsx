@@ -16,7 +16,10 @@ const Mensualidades = () => {
     const [mensualidadDetalle, setMensualidadDetalle] = useState(null);
     
     const usuario = JSON.parse(localStorage.getItem('usuario'));
-    const esOperario = usuario?.rol === 'OPERARIO';
+    
+    // Validación corregida usando rol_nombre
+    const esOperario = String(usuario?.rol_nombre || '').toUpperCase() === 'OPERARIO';
+    
     const regexPropietario = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]+$/;
     const propietarioValido = !formData.propietario || regexPropietario.test(formData.propietario);
 
@@ -173,9 +176,11 @@ const Mensualidades = () => {
             <div className="card">
                 <div className="header-actions">
                     <h2>Gestión de Mensualidades</h2>
-                    <button className="btn-add" onClick={abrirNuevoModal}>
-                        <FaPlus /> Nueva Mensualidad
-                    </button>
+                    {!esOperario && (
+                        <button className="btn-add" onClick={abrirNuevoModal}>
+                            <FaPlus /> Nueva Mensualidad
+                        </button>
+                    )}
                 </div>
                 <div className="table-container">
                     <table className="mensualidades-table">
