@@ -1,98 +1,271 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { FaPlus } from 'react-icons/fa';
+import { FiEye, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import toast from 'react-hot-toast';
+import { api } from '../services/api';
 import './Mensualidades.css';
 
 const Mensualidades = () => {
-  // Estado simulado con los datos del prototipo de Figma
-  const [mensualidades, setMensualidades] = useState([
-    {
-      id: 1,
-      placa: 'ABC123',
-      tipo: 'Carro',
-      propietario: 'María González',
-      telefono: '3001234567',
-      vigencia: '31/3/2026 - 30/4/2026',
-      valor: '$250.000'
-    },
-    {
-      id: 2,
-      placa: 'XYZ789',
-      tipo: 'Moto',
-      propietario: 'Pedro Martínez',
-      telefono: '3009876543',
-      vigencia: '31/3/2026 - 30/4/2026',
-      valor: '$150.000'
-    }
-  ]);
+    const [mensualidades, setMensualidades] = useState([]);
+    const [tarifas, setTarifas] = useState([]);
+    const [tarifasError, setTarifasError] = useState(false);
+    const [modalAbierto, setModalAbierto] = useState(false);
+    const [modalDetallesAbierto, setModalDetallesAbierto] = useState(false);
+    const [modoEdicion, setModoEdicion] = useState(false);
+    const [formData, setFormData] = useState({ id: null, placa: '', tipo: '', nivel_servicio: '', propietario: '', telefono: '', vigencia: '', fecha_fin: '', valor: '' });
+    const [mensualidadDetalle, setMensualidadDetalle] = useState(null);
+    
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    const esOperario = usuario?.rol === 'OPERARIO';
+    const regexPropietario = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]+$/;
+    const propietarioValido = !formData.propietario || regexPropietario.test(formData.propietario);
 
-  return (
-    <div className="mensualidades-container">
-      {/* Encabezado de la vista */}
-      <div className="mensualidades-header">
-        <button className="btn-close-icon" aria-label="Cerrar">
-          ✕
-        </button>
-        <div className="header-titles">
-          <h2>Mensualidades</h2>
-          <p>Gestión en altura y subterráneo</p>
-        </div>
-      </div>
+    const mostrarAlerta = (mensaje) => {
+        const toastElement = document.getElementById('toast-alerta');
+        if (toastElement) {
+            toastElement.innerText = mensaje;
+            toastElement.classList.add('toast-visible');
+            setTimeout(() => toastElement.classList.remove('toast-visible'), 3000);
+        }
+    };
 
-      {/* Tarjeta principal */}
-      <div className="mensualidades-card">
-        <div className="card-header-info">
-          <div className="icon-badge-purple">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7z"/>
-              <path d="M2 10a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z"/>
-            </svg>
-          </div>
-          <div>
-            <h3>Consulta de Mensualidades</h3>
-            <p>Visualización de vehículos con mensualidad activa</p>
-          </div>
-        </div>
+    const formatearFechaInput = (fecha) => {
+        if (!fecha) return '';
+        if (typeof fecha === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(fecha)) return fecha;
+        const date = new Date(fecha);
+        if (Number.isNaN(date.getTime())) return '';
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
 
-        <h4 className="table-title">Mensualidades Activas ({mensualidades.length})</h4>
+    const sumarDias = (fecha, dias) => {
+        const date = new Date(fecha);
+        date.setDate(date.getDate() + dias);
+        const offset = date.getTimezoneOffset();
+        const adjustedDate = new Date(date.getTime() - (offset * 60 * 1000));
+        return adjustedDate.toISOString().split('T')[0];
+    };
 
-        {/* Tabla de datos */}
-        <div className="table-responsive">
-          <table className="mensualidades-table">
-            <thead>
-              <tr>
-                <th>Placa</th>
-                <th>Tipo</th>
-                <th>Propietario</th>
-                <th>Teléfono</th>
-                <th>Vigencia</th>
-                <th>Valor</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mensualidades.map((item) => (
-                <tr key={item.id}>
-                  <td><strong>{item.placa}</strong></td>
-                  <td>{item.tipo}</td>
-                  <td>{item.propietario}</td>
-                  <td>{item.telefono}</td>
-                  <td>{item.vigencia}</td>
-                  <td>{item.valor}</td>
-                  <td>
-                    <button className="btn-action-eye" aria-label="Ver detalles">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-                      </svg>
+    const cargarMensualidades = async () => {
+        try {
+            const res = await api.get('/mensualidades');
+            setMensualidades(res.data);
+        } catch (err) {
+            toast.error("Error cargando mensualidades");
+        }
+    };
+
+    const cargarTarifas = async () => {
+        try {
+            const res = await api.get('/tarifas');
+            setTarifas(res.data);
+            setTarifasError(false);
+        } catch (err) {
+            console.error('Error cargando tarifas:', err);
+            toast.error("No se pudieron cargar las tarifas.");
+            setTarifasError(true);
+        }
+    };
+
+    useEffect(() => {
+        cargarMensualidades();
+        cargarTarifas();
+    }, []);
+
+    const abrirNuevoModal = () => {
+        const hoy = new Date();
+        const hoyStr = hoy.toISOString().split('T')[0];
+        setModoEdicion(false);
+        setFormData({
+            id: null, placa: '', tipo: '', nivel_servicio: '', propietario: '', telefono: '', vigencia: hoyStr, fecha_fin: sumarDias(hoyStr, 30), valor: ''
+        });
+        setModalAbierto(true);
+    };
+
+    const abrirEditarModal = (mensualidad) => {
+        setModoEdicion(true);
+        setFormData({
+            ...mensualidad,
+            vigencia: formatearFechaInput(mensualidad.vigencia || mensualidad.fecha_inicio),
+            fecha_fin: formatearFechaInput(mensualidad.fecha_fin),
+            valor: mensualidad.valor ?? ''
+        });
+        setModalAbierto(true);
+    };
+
+    const abrirModalDetalles = (mensualidad) => {
+        setMensualidadDetalle({
+            ...mensualidad,
+            vigencia: formatearFechaInput(mensualidad.vigencia || mensualidad.fecha_inicio),
+            fecha_fin: formatearFechaInput(mensualidad.fecha_fin),
+            valor: mensualidad.valor ?? ''
+        });
+        setModalDetallesAbierto(true);
+    };
+
+    const handlePropietarioChange = (e) => {
+        const value = e.target.value;
+        if (value === '' || regexPropietario.test(value)) {
+            setFormData({ ...formData, propietario: value });
+        }
+    };
+
+    const handleTipoVehiculoChange = (e) => {
+        const tipoSeleccionado = e.target.value;
+        setFormData({ ...formData, tipo: tipoSeleccionado });
+        if (tarifas && tarifas.length > 0 && tipoSeleccionado) {
+            const tarifaEncontrada = tarifas.find(t => t.tipo && t.tipo.toUpperCase() === tipoSeleccionado.toUpperCase());
+            if (tarifaEncontrada) {
+                const valorMensual = tarifaEncontrada.valor_mensual ?? tarifaEncontrada.valor ?? tarifaEncontrada.valor_dia ?? 0;
+                setFormData(prev => ({ ...prev, tipo: tipoSeleccionado, valor: valorMensual > 0 ? String(valorMensual) : '' }));
+            }
+        }
+    };
+
+    const guardarMensualidad = async (e) => {
+        e.preventDefault();
+        if (!propietarioValido || !formData.propietario?.trim()) {
+            toast.error('El propietario solo puede contener letras y espacios');
+            return;
+        }
+        const payload = {
+            placa: formData.placa?.trim().toUpperCase(),
+            tipo: formData.tipo?.trim().toUpperCase(),
+            nivel_servicio: formData.nivel_servicio?.trim().toUpperCase(),
+            propietario: formData.propietario?.trim(),
+            telefono: formData.telefono,
+            fecha_inicio: formData.vigencia,
+            fecha_fin: formData.fecha_fin,
+            valor: formData.valor
+        };
+
+        try {
+            if (modoEdicion) {
+                await api.put(`/mensualidades/${formData.id}`, payload);
+                mostrarAlerta("Mensualidad actualizada correctamente");
+            } else {
+                await api.post('/mensualidades', payload);
+                mostrarAlerta("Mensualidad creada correctamente");
+            }
+            setModalAbierto(false);
+            cargarMensualidades();
+        } catch (err) {
+            toast.error("Error al guardar la mensualidad");
+        }
+    };
+
+    const eliminar = async (id) => {
+        if (window.confirm("¿Seguro que deseas eliminar esta mensualidad?")) {
+            try {
+                await api.delete(`/mensualidades/${id}`);
+                cargarMensualidades();
+                mostrarAlerta("Eliminado correctamente");
+            } catch (err) {
+                toast.error("No se pudo eliminar");
+            }
+        }
+    };
+
+    return (
+        <div className="mensualidades-page">
+            <div className="card">
+                <div className="header-actions">
+                    <h2>Gestión de Mensualidades</h2>
+                    <button className="btn-add" onClick={abrirNuevoModal}>
+                        <FaPlus /> Nueva Mensualidad
                     </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                </div>
+                <div className="table-container">
+                    <table className="mensualidades-table">
+                        <thead>
+                            <tr><th>Placa</th><th>Tipo</th><th>Servicio</th><th>Propietario</th><th>Teléfono</th><th>Vigencia</th><th>Valor</th><th>Acciones</th></tr>
+                        </thead>
+                        <tbody>
+                            {mensualidades.map(m => (
+                                <tr key={m.id}>
+                                    <td>{m.placa}</td>
+                                    <td>{m.tipo}</td>
+                                    <td>{m.nivel_servicio}</td>
+                                    <td>{m.propietario}</td>
+                                    <td>{m.telefono}</td>
+                                    <td>{formatearFechaInput(m.vigencia || m.fecha_inicio)} - {formatearFechaInput(m.fecha_fin)}</td>
+                                    <td>${Number(m.valor).toLocaleString()}</td>
+                                    <td className="actions">
+                                        {esOperario ? (
+                                            <button onClick={() => abrirModalDetalles(m)}><FiEye /></button>
+                                        ) : (
+                                            <>
+                                                <button onClick={() => abrirEditarModal(m)}><FiEdit2 /></button>
+                                                <button className="delete" onClick={() => eliminar(m.id)}><FiTrash2 /></button>
+                                            </>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {modalAbierto && (
+                <div className="modal-backdrop">
+                    <div className="modal">
+                        <div className="modal-header"><h3>{modoEdicion ? 'Editar' : 'Nueva'} Mensualidad</h3></div>
+                        <form onSubmit={guardarMensualidad}>
+                            <label>Placa *</label>
+                            <input value={formData.placa} onChange={e => setFormData({...formData, placa: e.target.value.toUpperCase()})} required maxLength={6}/>
+                            <label>Tipo de Vehículo *</label>
+                            <select value={formData.tipo} onChange={handleTipoVehiculoChange} required>
+                                <option value="">Seleccione...</option>
+                                {tarifas.map(t => <option key={t.id_tipo} value={t.tipo}>{t.tipo}</option>)}
+                            </select>
+                            <label>Nivel de Servicio *</label>
+                            <select value={formData.nivel_servicio} onChange={e => setFormData({...formData, nivel_servicio: e.target.value})} required>
+                                <option value="">Seleccione...</option>
+                                <option value="ALTURA">Altura</option>
+                                <option value="SUBTERRANEO">Subterraneo</option>
+                            </select>
+                            <label>Propietario *</label>
+                            <input value={formData.propietario} onChange={handlePropietarioChange} disabled={modoEdicion} required />
+                            <label>Teléfono *</label>
+                            <input type="tel" value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value.replace(/\D/g, '')})} required maxLength={10} />
+                            <div className="fecha-row">
+                            <div className="fecha-col">
+                                <label>Inicio *</label>
+                                <input 
+                                    type="date" 
+                                    className="fecha-input" 
+                                    value={formData.vigencia} 
+                                    onChange={e => setFormData({...formData, vigencia: e.target.value, fecha_fin: sumarDias(e.target.value, 30)})} 
+                                    required 
+                                />
+                            </div>
+                            <div className="fecha-col">
+                                <label>Fin *</label>
+                                <input 
+                                    type="date" 
+                                    className="fecha-input" 
+                                    value={formData.fecha_fin} 
+                                    onChange={e => setFormData({...formData, fecha_fin: e.target.value})} 
+                                    required 
+                                />
+                            </div>
+                            </div>
+                            <label>Valor ($) *</label>
+                            <input type="number" value={formData.valor} onChange={e => setFormData({...formData, valor: e.target.value})} readOnly={!tarifasError} required />
+                            <div className="modal-btns">
+                                <button type="submit" className="btn-comun btn-actualizar">{modoEdicion ? 'Actualizar' : 'Guardar'}</button>
+                                <button type="button" className="btn-comun btn-cancelar" onClick={() => setModalAbierto(false)}>Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+            <div id="toast-alerta" className="toast-oculto">Operación realizada</div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Mensualidades;

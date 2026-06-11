@@ -1,145 +1,106 @@
-/* Contenedor principal */
-.mensualidades-container {
-  padding: 32px;
-  background-color: #f8f9fc;
-  min-height: 100vh;
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  color: #1a202c;
-}
-
-/* Header con el botón de cerrar */
-.mensualidades-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 32px;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 16px;
-}
-
-.btn-close-icon {
-  background: transparent;
-  border: none;
-  font-size: 20px;
-  color: #4a5568;
-  cursor: pointer;
-  padding: 4px;
-  margin-top: 4px;
-  transition: color 0.2s ease;
-}
-
-.btn-close-icon:hover {
-  color: #1a202c;
-}
-
-.header-titles h2 {
-  margin: 0 0 4px 0;
-  font-size: 24px;
-  font-weight: 600;
-  color: #1a202c;
-}
-
-.header-titles p {
-  margin: 0;
-  font-size: 14px;
-  color: #718096;
-}
-
-/* Tarjeta Principal */
-.mensualidades-card {
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 32px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #edf2f7;
-}
-
-/* Info del encabezado de la tarjeta */
-.card-header-info {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
-.icon-badge-purple {
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-  background-color: #faf5ff;
-  color: #805ad5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.card-header-info h3 {
-  margin: 0 0 4px 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #2d3748;
-}
-
-.card-header-info p {
-  margin: 0;
-  font-size: 14px;
-  color: #718096;
-}
-
-/* Título de la tabla */
-.table-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 16px;
-}
-
-/* Tabla de datos */
-.table-responsive {
-  overflow-x: auto;
+/* Contenedor principal que permite scroll si el contenido es muy ancho */
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* ¡Esto es lo que hace que la info no se pierda! */
+    margin-top: 20px;
 }
 
 .mensualidades-table {
-  width: 100%;
-  border-collapse: collapse;
+    width: 100%;
+    min-width: 900px; /* Asegura que la tabla no se aplaste en pantallas pequeñas */
+    border-collapse: collapse;
 }
 
-.mensualidades-table th, 
+.mensualidades-table th, .mensualidades-table td {
+    padding: 15px;
+    text-align: left;
+    white-space: normal; /* Permite que el texto ocupe espacio y no se corte */
+    word-wrap: break-word; /* Si una palabra es muy larga, baja a la siguiente línea */
+    font-size: 0.9rem;
+}
+
+/* Eliminar el corte con puntos suspensivos */
 .mensualidades-table td {
-  text-align: left;
-  padding: 16px;
-  border-bottom: 1px solid #edf2f7;
-  font-size: 14px;
+    overflow: visible; 
+    text-overflow: clip; 
 }
 
-.mensualidades-table th {
-  color: #4a5568;
-  font-weight: 500;
+.form-control-input, 
+.form-control-select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box; /* Crucial para que el tamaño sea exacto */
+    display: block;
 }
 
-.mensualidades-table td {
-  color: #4a5568;
+.modal-actions {
+    display: flex;
+    gap: 10px; /* Espacio entre botones */
+    width: 100%;
 }
 
-.mensualidades-table td strong {
-  color: #1a202c;
+.modal form input, 
+.modal form select {
+    width: 100%;             /* Se expanden al 100% del modal */
+    padding: 12px;           /* Espacio interno uniforme */
+    margin-bottom: 15px;     /* Separación entre cada campo */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;  /* ¡Clave! Evita que el padding rompa el ancho */
+    display: block;          /* Obliga a que cada uno ocupe su propia línea */
 }
 
-/* Botón de acción (Ojo) */
-.btn-action-eye {
-  background: transparent;
-  border: none;
-  color: #718096;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.modal-btns {
+    display: flex;
+    gap: 10px;               /* Espacio entre el botón de guardar y cancelar */
+    width: 100%;
 }
 
-.btn-action-eye:hover {
-  color: #2b6cb0;
-  background-color: #ebf8ff;
+.btn-comun {
+    flex: 1;                 /* Hace que ambos botones midan lo mismo */
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Colores */
+.btn-actualizar { background-color: #059669; color: white; }
+.btn-cancelar { background-color: #e5e7eb; color: #374151; }
+
+.toast-oculto {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #00a844; /* Verde */
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transform: translateY(-100px);
+    transition: transform 0.3s ease;
+    z-index: 9999;
+}
+.fecha-row {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 15px !important;
+    width: 100% !important;
+    margin-bottom: 15px !important;
+}
+
+.fecha-col {
+    flex: 1 !important;
+    min-width: 0 !important; /* Vital para que el flexbox no se rompa */
+}
+
+.fecha-input {
+    width: 100% !important;
+    display: block !important;
+    box-sizing: border-box !important;
 }

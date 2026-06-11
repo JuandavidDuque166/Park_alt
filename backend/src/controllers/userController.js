@@ -88,7 +88,7 @@ const UserController = {
 
             res.status(httpStatus.OK).json({
                 status: 'success',
-                message: 'Usuario eliminado correctamente'
+                message: 'Usuario inhabilitado correctamente'
             });
         } catch (error) {
             next(error);

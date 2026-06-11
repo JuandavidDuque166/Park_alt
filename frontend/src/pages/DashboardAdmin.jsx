@@ -6,12 +6,14 @@ const DashboardAdmin = () => {
   // 2. ESTADO INICIAL
   // Iniciamos los contadores en 0 y las listas vacías para que la pantalla no falle mientras carga
   const [data, setData] = useState({
-    vehiculosActivos: 0,
-    espaciosDisponibles: 0,
-    espaciosTotales: 0,
-    recaudoDia: 0,
-    entradasDia: 0,
-    ultimosIngresos: []
+    vehiculosActivos: [],
+    espaciosDisponibles: [],
+    espaciosTotales: [],
+    recaudoDia: [],
+    entradasDia: [],
+    ultimosIngresos: [],
+    vehiculosportipo: [],
+    ocupacion: []
   });
   const [error, setError] = useState('');
 
@@ -56,7 +58,7 @@ const DashboardAdmin = () => {
               <p className="big-number">{data.vehiculosActivos}</p>
               <span className="subtitle">En el parqueadero</span>
             </div>
-            <div className="icon blue">🚘</div>
+            <div className="icon blue"></div>
           </div>
           <div className="metric-card">
             <div className="card-info">
@@ -64,7 +66,7 @@ const DashboardAdmin = () => {
               <p className="big-number">{data.espaciosDisponibles}</p>
               <span className="subtitle">de {data.espaciosTotales} totales</span>
             </div>
-            <div className="icon green">🅿️</div>
+            <div className="icon green"></div>
           </div>
           <div className="metric-card">
             <div className="card-info">
@@ -72,7 +74,7 @@ const DashboardAdmin = () => {
               <p className="big-number">${data.recaudoDia}</p>
               <span className="subtitle">0 salidas</span>
             </div>
-            <div className="icon purple">💲</div>
+            <div className="icon purple"></div>
           </div>
           <div className="metric-card">
             <div className="card-info">
@@ -80,34 +82,7 @@ const DashboardAdmin = () => {
               <p className="big-number">{data.entradasDia}</p>
               <span className="subtitle">Ingresos registrados</span>
             </div>
-            <div className="icon orange">↪️</div>
-          </div>
-        </section>
-
-        {/* CHARTS SECTION (Simulada con CSS) */}
-        <section className="charts-grid">
-          <div className="chart-card">
-            <h3>Vehículos por Tipo</h3>
-            <div className="bar-chart-placeholder">
-              <div className="bar-group">
-                <div className="bar" style={{height: '100%'}}></div>
-                <span>Carros</span>
-              </div>
-              <div className="bar-group">
-                <div className="bar" style={{height: '100%'}}></div>
-                <span>Motos</span>
-              </div>
-              <div className="bar-group">
-                <div className="bar" style={{height: '10%'}}></div>
-                <span>Bicicletas</span>
-              </div>
-            </div>
-          </div>
-          <div className="chart-card">
-            <h3>Ocupación del Parqueadero</h3>
-            <div className="pie-chart-placeholder">
-              <div className="pie"></div>
-            </div>
+            <div className="icon orange"></div>
           </div>
         </section>
 

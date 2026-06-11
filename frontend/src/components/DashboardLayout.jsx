@@ -3,6 +3,14 @@ import { NavLink, useNavigate, Outlet } from 'react-router-dom';
 import { authService } from '../services/authService';
 import './DashboardLayout.css';
 
+// Importación de iconos de FontAwesome
+import { 
+    FaCar, FaParking, FaUser, FaClipboardList, 
+    FaMoneyBillWave, FaChartLine, FaSignOutAlt, 
+    FaHome, FaSignInAlt, FaSignOutAlt as FaSignOut, 
+    FaCalendarAlt, FaUsers 
+} from 'react-icons/fa';
+
 const Sidebar = ({ role }) => {
     const navigate = useNavigate();
     const handleLogout = () => {
@@ -16,7 +24,7 @@ const Sidebar = ({ role }) => {
         <aside className="sidebar">
             <div className="sidebar-header">
                 <div className="brand">
-                    <span className="brand-icon">🚘</span>
+                    <span className="brand-icon"><FaCar /></span>
                     <div>
                         <h2>Sistema Parqueadero</h2>
                         <p>{role || 'Usuario'}</p>
@@ -26,23 +34,23 @@ const Sidebar = ({ role }) => {
 
             <nav className="sidebar-nav">
                 <NavLink to={currentRole === 'ADMINISTRADOR' ? '/DashboardAdmin' : '/DashboardOperario'} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-                    <p>🏠 Inicio</p>
+                    <p><FaHome /> Inicio</p>
                 </NavLink>
 
-                {/* MENÚ OPERARIO: Incluye acceso a Control y Mensualidades */}
+                {/* MENÚ OPERARIO */}
                 {currentRole === 'OPERARIO' && (
                     <>
                         <NavLink to="/ingreso-vehiculos" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-                            <p>➔ Ingreso Vehículos</p>
+                            <p><FaSignInAlt /> Ingreso Vehículos</p>
                         </NavLink>
                         <NavLink to="/salida-vehiculos" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-                            <p>➔ Salida Vehículos</p>
+                            <p><FaSignOut /> Salida Vehículos</p>
                         </NavLink>
                         <NavLink to="/control-parqueadero" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-                            <p>🅿️ Control Parqueadero</p>
+                            <p><FaParking /> Control Parqueadero</p>
                         </NavLink>
                         <NavLink to="/mensualidades" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-                            <p>💳 Mensualidades</p>
+                            <p><FaCalendarAlt /> Mensualidades</p>
                         </NavLink>
                     </>
                 )}
@@ -51,19 +59,19 @@ const Sidebar = ({ role }) => {
                 {currentRole === 'ADMINISTRADOR' && (
                     <>
                         <NavLink to="/control-parqueadero" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-                            <p>🅿️ Control Parqueadero</p>
+                            <p><FaParking /> Control Parqueadero</p>
                         </NavLink>
                         <NavLink to="/tarifas" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-                            <p>💲 Tarifas</p>
+                            <p><FaMoneyBillWave /> Tarifas</p>
                         </NavLink>
                         <NavLink to="/mensualidades" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-                            <p>📅 Mensualidades</p>
+                            <p><FaCalendarAlt /> Mensualidades</p>
                         </NavLink>
                         <NavLink to="/usuarios" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-                            <p>👥 Usuarios</p>
+                            <p><FaUsers /> Usuarios</p>
                         </NavLink>
                         <NavLink to="/reportes" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-                            <p>📊 Reportes</p>
+                            <p><FaChartLine /> Reportes</p>
                         </NavLink>
                     </>
                 )}
@@ -75,7 +83,7 @@ const Sidebar = ({ role }) => {
                     <p className="name-text">{authService.obtenerUsuario()?.nombre || 'Usuario'}</p>
                 </div>
                 <button className="btn-logout" onClick={handleLogout}>
-                    ↪️ Cerrar Sesión
+                Cerrar Sesión
                 </button>
             </div>
         </aside>

@@ -4,15 +4,17 @@ import { ProtectedRoute } from './guards/ProtectedRoute';
 import Login from './pages/Login';
 import DashboardAdmin from './pages/DashboardAdmin';
 import DashboardOperario from './pages/DashboardOperario';
+import Tarifas from './pages/tarifas';
+import Mensualidades from './pages/Mensualidades';
 import Perfil from './pages/Perfil';
 import Permisos from './pages/Permisos';
 import Usuarios from './pages/Usuarios';
+import Roles from './pages/Roles';
 import IngresoVehiculosOperario from './pages/IngresovehiculosOperario';
 import Reportes from './pages/Reportes';
 import DashboardLayout from './components/DashboardLayout';
 import ControlParqueadero from './pages/ControlParqueadero';
 import SalidaVehiculo from './pages/SalidaVehiculo';
-import Mensualidades from './pages/Mensualidades';
 
 // Nota: Asegúrate de tener importado PlaceholderPage si lo vas a usar en Tarifas
 // import PlaceholderPage from './pages/PlaceholderPage'; 
@@ -37,16 +39,12 @@ function App() {
             <Route path="/usuarios" element={<Usuarios />} />
             <Route path="/permisos" element={<Permisos />} />
             <Route path="/perfil" element={<Perfil />} />
-            <Route path="/ingreso-vehiculos" element={<IngresoVehiculosOperario />} />
-            <Route path="/salida-vehiculos" element={<SalidaVehiculo />} />
-            <Route path="/control-parqueadero" element={<ControlParqueadero />} />
-            
-            {/* Aquí dejamos Tarifas como Placeholder hasta que lo diseñemos */}
-            
-            
-            {/* LIMPIEZA: Quitamos las props de placeholder de Mensualidades y Reportes */}
+            <Route path="/tarifas" element={<Tarifas />} />
             <Route path="/mensualidades" element={<Mensualidades />} />
-            <Route path="/reportes" element={<Reportes />} />
+            <Route path="/ingreso-vehiculos" element={<IngresoVehiculosOperario />} />
+            <Route path="/salida-vehiculos" element={<SalidaVehiculo title="Salida Vehículos" description="Funcionalidad pendiente de implementación." />} />
+            <Route path="/control-parqueadero" element={<ControlParqueadero title="Control Parqueadero" description="Funcionalidad pendiente de implementación." />} />
+            <Route path="/reportes" element={<Reportes title="Reportes" description="Funcionalidad pendiente de implementación." />} />
           </Route>
         </Route>
 

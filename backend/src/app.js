@@ -35,8 +35,8 @@ const roleRoutes = require('./routes/rolesRoutes');
 const permisoRoutes = require('./routes/permisosRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
-const ingresoVehiculoRoutes = require('./routes/ingresoVehiculoRoutes');
-
+const tarifasRoutes = require('./routes/tarifasRoutes');
+const mensualidadesRoutes = require('./routes/mensualidadesRoutes');
 
 // Rutas de autenticación y usuarios
 app.use('/api/auth', authRoutes);
@@ -45,7 +45,9 @@ app.use('/api/roles', roleRoutes);
 app.use('/api/permisos', permisoRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/ingresos', ingresoVehiculoRoutes);
+app.use('/api/tarifas', tarifasRoutes);
+app.use('/api', mensualidadesRoutes);
+
 // Manejo de rutas no encontradas (404)
 app.all(/(.*)/, (req, res, next) => {
     next(new AppError(`No se pudo encontrar ${req.originalUrl} en este servidor`, 404));

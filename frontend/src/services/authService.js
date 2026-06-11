@@ -15,7 +15,13 @@ export const authService = {
       const response = await axios.post(`${API_URL}/auth/login`, { email, clave });
 
       if (response.data.status === 'success' && response.data.token) {
-        localStorage.setItem('token', response.data.token);
+        const token = String(response.data.token || '').trim();
+        if (token && token !== 'null' && token !== 'undefined') {
+          localStorage.setItem('token', token);
+        } else {
+          throw new Error('Token inválido recibido del servidor');
+        }
+
         if (response.data.data) {
           localStorage.setItem('usuario', JSON.stringify(response.data.data));
         }
