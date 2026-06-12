@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // 1. Importamos el hook de navegación
 import { authService } from '../services/authService';
 import './Login.css';
 
 export const Login = () => {
     const [formData, setFormData] = useState({ email: '', clave: '' });
     const [error, setError] = useState('');
+    const navigate = useNavigate(); // 2. Inicializamos el hook
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -16,11 +18,13 @@ export const Login = () => {
 
         try {
             console.log('Intentando login...', formData);
+            // El componente llama al servicio, y el servicio habla con el backend
             const response = await authService.login(formData.email, formData.clave);
 
             if (response.status === 'success') {
-                console.log('Login exitoso, redirigiendo a /DashboardAdmin...');
-                window.location.href = '/DashboardAdmin';
+                console.log('Login exitoso, redirigiendo...');
+                // 3. Usamos navigate para cambiar de vista sin recargar la página
+                navigate('/DashboardAdmin'); 
             } else {
                 setError(response.message || 'No se pudo iniciar sesión');
             }
@@ -34,18 +38,18 @@ export const Login = () => {
         <div className="login-container">
             <div className="login-card">
                 <div className="login-header">
-                    <h2>Iniciar Sesión</h2>
-                    <p>Sistema de Gestión</p>
+                    <h2>Sistema de Parqueadero</h2>
+                    <p>Gestión en altura y subterráneo</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="login-form">
                     <div className="form-group">
-                        <label htmlFor="email">Correo Electrónico</label>
+                        <label htmlFor="email">Usuario</label>
                         <input 
                             type="email" 
                             id="email"
                             name="email" 
-                            placeholder="correo@ejemplo.com" 
+                            placeholder="Ingrese su usuario" 
                             onChange={handleChange} 
                             required 
                         />
@@ -57,7 +61,7 @@ export const Login = () => {
                             type="password" 
                             id="clave"
                             name="clave" 
-                            placeholder="Tu contraseña" 
+                            placeholder="Ingrese su contraseña" 
                             onChange={handleChange} 
                             required 
                         />

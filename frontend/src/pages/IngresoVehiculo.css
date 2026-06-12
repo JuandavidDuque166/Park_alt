@@ -1,0 +1,214 @@
+/* Contenedor principal */
+.ingreso-container {
+  padding: 32px;
+  background-color: #f8f9fc;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #1a202c;
+}
+
+.ingreso-header-page h2 {
+  margin: 0 0 4px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.ingreso-header-page p {
+  margin: 0 0 24px 0;
+  font-size: 14px;
+  color: #718096;
+}
+
+/* Tarjeta principal */
+.ingreso-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #edf2f7;
+  max-width: 900px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  border-bottom: 1px solid ñ#edf2f7;
+  padding-bottom: 16px;
+}
+
+.card-header h3 {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.card-header p {
+  margin: 0;
+  font-size: 14px;
+  color: #718096;
+}
+
+/* Badge de espacios */
+.espacios-badge {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+}
+
+.espacios-badge span {
+  font-size: 12px;
+  color: #718096;
+}
+
+.espacios-badge strong {
+  font-size: 24px;
+  color: #38a169; /* Verde para disponibilidad */
+}
+
+/* Mensajes de alerta */
+.alert-message {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.alert-message.success {
+  background-color: #f0fff4;
+  color: #2f855a;
+  border: 1px solid #c6f6d5;
+}
+
+.alert-message.error {
+  background-color: #fff5f5;
+  color: #c53030;
+  border: 1px solid #fed7d7;
+}
+
+/* Grilla del formulario */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.form-group input[type="text"],
+.form-group select {
+  padding: 12px 16px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 15px;
+  color: #2d3748;
+  outline: none;
+  transition: border-color 0.2s ease;
+  background-color: #fff;
+}
+
+.form-group input[type="text"]:focus,
+.form-group select:focus {
+  border-color: #2b6cb0;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+}
+
+/* Estilo para el input tipo archivo */
+.file-input {
+  padding: 9px 12px;
+  border: 1px dashed #cbd5e0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #4a5568;
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+.file-input::file-selector-button {
+  background-color: #e2e8f0;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  color: #2d3748;
+  font-weight: 500;
+  cursor: pointer;
+  margin-right: 12px;
+  transition: background-color 0.2s;
+}
+
+.file-input::file-selector-button:hover {
+  background-color: #cbd5e0;
+}
+
+/* Caja de información inferior */
+.info-box {
+  background-color: #f7fafc;
+  border: 1px solid #edf2f7;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.info-box p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #4a5568;
+}
+
+/* Botones de acción */
+.form-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.btn-primary {
+  background-color: #1a56db;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #1e4ebb;
+}
+
+.btn-primary:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: #e2e8f0;
+  color: #4a5568;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #cbd5e0;
+}

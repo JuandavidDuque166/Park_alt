@@ -3,7 +3,7 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #e0f7fa 0%, #f0f9f9 100%);
+    background: linear-gradient(135deg, #1f4cb5 0%, #0d2a75 50%, #0a193f 100%);
     padding: 2rem;
     }
 
@@ -23,7 +23,7 @@
     }
 
     .login-header h2 {
-    color: teal;
+    color: rgb(0, 0, 0);
     font-size: 1.8rem;
     margin: 0 0 0.5rem 0;
     }
@@ -63,7 +63,7 @@
     .form-group input:focus {
     outline: none;
     border-color: teal;
-    box-shadow: 0 0 3px rgba(0, 128, 128, 0.1);
+    box-shadow: 0 0 3px rgba(128, 0, 87, 0.1);
     }
 
     .error-message {
@@ -76,7 +76,7 @@
     }
 
     .btn-login {
-    background: linear-gradient(135deg, teal 0%, #006666 100%);
+    background-color: #0F62FE;
     color: white;
     border: none;
     padding: 1rem;

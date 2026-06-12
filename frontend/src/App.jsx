@@ -11,8 +11,13 @@ import Permisos from './pages/Permisos';
 import Usuarios from './pages/Usuarios';
 import Roles from './pages/Roles';
 import IngresoVehiculosOperario from './pages/IngresovehiculosOperario';
-import PlaceholderPage from './pages/PlaceholderPage';
+import Reportes from './pages/Reportes';
 import DashboardLayout from './components/DashboardLayout';
+import ControlParqueadero from './pages/ControlParqueadero';
+import SalidaVehiculo from './pages/SalidaVehiculo';
+
+// Nota: Asegúrate de tener importado PlaceholderPage si lo vas a usar en Tarifas
+// import PlaceholderPage from './pages/PlaceholderPage'; 
 
 import './App.css';
 
@@ -32,15 +37,14 @@ function App() {
             <Route path="/DashboardOperario" element={<DashboardOperario />} />
 
             <Route path="/usuarios" element={<Usuarios />} />
-            <Route path="/roles" element={<Roles />} />
             <Route path="/permisos" element={<Permisos />} />
             <Route path="/perfil" element={<Perfil />} />
             <Route path="/tarifas" element={<Tarifas />} />
             <Route path="/mensualidades" element={<Mensualidades />} />
             <Route path="/ingreso-vehiculos" element={<IngresoVehiculosOperario />} />
-            <Route path="/salida-vehiculos" element={<PlaceholderPage title="Salida Vehículos" description="Funcionalidad pendiente de implementación." />} />
-            <Route path="/control-parqueadero" element={<PlaceholderPage title="Control Parqueadero" description="Funcionalidad pendiente de implementación." />} />
-            <Route path="/reportes" element={<PlaceholderPage title="Reportes" description="Funcionalidad pendiente de implementación." />} />
+            <Route path="/salida-vehiculos" element={<SalidaVehiculo title="Salida Vehículos" description="Funcionalidad pendiente de implementación." />} />
+            <Route path="/control-parqueadero" element={<ControlParqueadero title="Control Parqueadero" description="Funcionalidad pendiente de implementación." />} />
+            <Route path="/reportes" element={<Reportes title="Reportes" description="Funcionalidad pendiente de implementación." />} />
           </Route>
         </Route>
 
