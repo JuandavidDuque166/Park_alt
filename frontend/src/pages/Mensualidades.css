@@ -72,19 +72,6 @@
 .btn-actualizar { background-color: #059669; color: white; }
 .btn-cancelar { background-color: #e5e7eb; color: #374151; }
 
-.toast-oculto {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #00a844; /* Verde */
-    color: white;
-    padding: 15px 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    transform: translateY(-100px);
-    transition: transform 0.3s ease;
-    z-index: 9999;
-}
 .fecha-row {
     display: flex !important;
     flex-direction: row !important;
@@ -103,4 +90,41 @@
     width: 100% !important;
     display: block !important;
     box-sizing: border-box !important;
+}
+
+#toast-alerta {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    left: auto !important; /* IMPORTANTE: Asegura que no se estire a la izquierda */
+    bottom: auto !important;
+    
+    /* Forzamos tamaño compacto */
+    width: fit-content !important; 
+    min-width: 250px !important;
+    height: auto !important;
+    
+    /* Estilos */
+    background-color: #059669 !important;
+    color: white !important;
+    padding: 15px 25px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    z-index: 9999999 !important;
+    
+    /* Animación */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s;
+    
+    /* Reseteo total de márgenes y transformaciones */
+    margin: 0 !important;
+    transform: none !important;
+    pointer-events: none; /* Para que no interfiera con clicks */
+}
+
+#toast-alerta.toast-visible {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto;
 }

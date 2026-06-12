@@ -113,3 +113,175 @@
     cursor: pointer;
 }
 
+.modal-btns {
+    display: flex;
+    gap: 10px; /* Espacio entre botones */
+    margin-top: 20px;
+    width: 100%;
+}
+
+.btn-comun {
+    flex: 1; /* Esto hace que ocupen el 50% cada uno */
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.btn-actualizar {
+    background-color: #059669; /* Verde */
+    color: white;
+}
+
+.btn-cancelar {
+    background-color: #e5e7eb; /* Gris claro */
+    color: #374151;
+}
+
+/* Efectos hover para que se vea más profesional */
+.btn-actualizar:hover { background-color: #047857; }
+.btn-cancelar:hover { background-color: #d1d5db; }
+
+/* --- ESTILOS PARA LA ALERTA (TOAST) --- */
+#toast-alerta {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #059669; /* Mismo verde que el botón guardar */
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    transition: visibility 0s, opacity 0.3s linear;
+    opacity: 0;
+    visibility: hidden;
+}
+
+#toast-alerta.toast-visible {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* --- ESTILOS PARA LOS BOTONES DEL MODAL --- */
+.modal-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+    width: 100%;
+}
+
+.btn-comun {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.btn-actualizar {
+    background-color: #059669;
+    color: white;
+}
+
+.btn-actualizar:hover {
+    background-color: #047857;
+}
+
+.btn-cancelar {
+    background-color: #e5e7eb;
+    color: #374151;
+}
+
+.btn-cancelar:hover {
+    background-color: #d1d5db;
+}
+
+/* Backdrop y Modal centrado */
+.modal-backdrop {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+}
+
+/* Inputs bonitos dentro del modal */
+.modal input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0 15px 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    box-sizing: border-box; /* Esto evita que el input se salga del ancho */
+}
+
+/* Botones iguales */
+.modal-btns {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn-comun {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-actualizar { background-color: #059669; color: white; }
+.btn-actualizar:hover { background-color: #047857; }
+
+.btn-cancelar { background-color: #e5e7eb; color: #374151; }
+.btn-cancelar:hover { background-color: #d1d5db; }
+
+.alerta-personalizada {
+    /* Posicionamiento fijo */
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    
+    /* ESTO ES LO QUE OBLIGA AL ELEMENTO A ENCOGERSE */
+    display: inline-block !important; 
+    width: fit-content !important; 
+    
+    /* Estilos */
+    background-color: #059669 !important;
+    color: white !important;
+    padding: 15px 25px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    z-index: 999999 !important;
+    
+    /* Animación */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s;
+}
+
+.alerta-personalizada.toast-visible {
+    opacity: 1 !important;
+    visibility: visible !important;
+}

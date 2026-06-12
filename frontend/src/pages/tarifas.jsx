@@ -17,6 +17,16 @@ const Tarifas = () => {
         valor_mensual: ''
     });
 
+    const mostrarAlerta = (mensaje) => {
+        // Usamos querySelector para buscar la clase
+        const toastElement = document.querySelector('.alerta-personalizada');
+        if (toastElement) {
+            toastElement.innerText = mensaje;
+            toastElement.classList.add('toast-visible');
+            setTimeout(() => toastElement.classList.remove('toast-visible'), 3000);
+        }
+    };
+
     const cargarTarifas = async () => {
         try {
             const response = await api.get('/tarifas');
@@ -69,6 +79,7 @@ const Tarifas = () => {
             console.log('Enviando payload:', payload);
 
             await api.put(`/tarifas/${tarifaSeleccionada.id_tipo}`, payload);
+            mostrarAlerta('Tarifa actualizada correctamente');
             toast.success('Tarifa actualizada correctamente');
 
             cargarTarifas();
@@ -135,13 +146,18 @@ const Tarifas = () => {
                             <input type="text" value={formData.valor_mensual} onChange={e => setFormData({...formData, valor_mensual: e.target.value.replace(/\D/g, '')})} required />
 
                             <div className="modal-btns">
-                                <button type="submit" className="btn-submit">Guardar</button>
-                                <button type="button" className="btn-cancel" onClick={() => setModalAbierto(false)}>Cancelar</button>
-                            </div>
+                            <button type="submit" className="btn-comun btn-actualizar">
+                                {modoEdicion ? 'Actualizar' : 'Guardar'}
+                            </button>
+                            <button type="button" className="btn-comun btn-cancelar" onClick={() => setModalAbierto(false)}>
+                                Cancelar
+                            </button>
+                        </div>
                         </form>
                     </div>
                 </div>
             )}
+            <div className="alerta-personalizada">Tarifa actualizada correctamente</div>
         </div>
     );
 };
