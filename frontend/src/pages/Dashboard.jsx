@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { FaCar, FaParking, FaMoneyBillWave, FaArrowDown } from 'react-icons/fa';
-import './Dashboard.css'; // Asegúrate de unificar tus estilos aquí
+import { 
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
+  PieChart, Pie, Cell 
+} from 'recharts';
+import './Dashboard.css';
+
+const COLORS = ['#3b82f6', '#10b981']; // Colores para los gráficos
 
 const Dashboard = () => {
   const [data, setData] = useState({
@@ -11,8 +17,8 @@ const Dashboard = () => {
     recaudoDia: 0,
     entradasDia: 0,
     ultimosIngresos: [],
-    vehiculosportipo: [], // Asumiendo que tu API devuelve esto
-    ocupacion: []         // Asumiendo que tu API devuelve esto
+    vehiculosportipo: [], 
+    ocupacion: [] 
   });
 
   useEffect(() => {
@@ -45,14 +51,38 @@ const Dashboard = () => {
 
         {/* CHARTS SECTION */}
         <section className="charts-grid">
+          {/* Bar Chart */}
           <div className="chart-card">
             <h3>Vehículos por Tipo</h3>
-            {/* Aquí iría tu lógica de gráfica real */}
-            <div className="bar-chart-placeholder">...</div>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={data.vehiculosportipo || []}>
+                <XAxis dataKey="nombre" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="cantidad" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
+
+          {/* Pie Chart */}
           <div className="chart-card">
             <h3>Ocupación del Parqueadero</h3>
-            <div className="pie-chart-placeholder">...</div>
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie
+                  data={data.ocupacion || []}
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="valor"
+                >
+                  {(data.ocupacion || []).map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
         </section>
 
@@ -64,7 +94,8 @@ const Dashboard = () => {
               <tr><th>Placa</th><th>Tipo</th><th>Nivel/Zona</th><th>Hora Ingreso</th><th>Estado</th></tr>
             </thead>
             <tbody>
-              {data.ultimosIngresos.map((v, i) => (
+              {/* Uso de ?. para evitar errores de renderizado inicial */}
+              {data.ultimosIngresos?.map((v, i) => (
                 <tr key={i}>
                   <td className="bold">{v.placa}</td>
                   <td>{v.tipo}</td>
@@ -81,7 +112,6 @@ const Dashboard = () => {
   );
 };
 
-// Sub-componente para limpiar el código
 const MetricCard = ({ title, value, sub, icon, color }) => (
   <div className="metric-card">
     <div className="card-info">
