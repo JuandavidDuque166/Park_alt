@@ -65,7 +65,7 @@ const SalidaVehiculo = () => {
             className="search-input"
           />
           <button type="submit" className="btn-search">
-            <span className="icon-search">🔍</span> Buscar
+             Buscar
           </button>
         </form>
       </div>
@@ -166,7 +166,7 @@ const SalidaVehiculo = () => {
                       className="btn-exit" 
                       onClick={() => seleccionarVehiculo(vehiculo)}
                     >
-                      <span className="icon-exit">↪</span> Salida
+                     Salida
                     </button>
                   </td>
                 </tr>

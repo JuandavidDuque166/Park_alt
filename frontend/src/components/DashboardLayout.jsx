@@ -33,7 +33,7 @@ const Sidebar = ({ role }) => {
             </div>
 
             <nav className="sidebar-nav">
-                <NavLink to={currentRole === 'ADMINISTRADOR' ? '/DashboardAdmin' : '/DashboardOperario'} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+                <NavLink to={currentRole === 'ADMINISTRADOR' ? '/Dashboard' : '/Dashboard'} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
                     <p><FaHome /> Inicio</p>
                 </NavLink>
 

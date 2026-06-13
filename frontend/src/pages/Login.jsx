@@ -24,7 +24,7 @@ export const Login = () => {
             if (response.status === 'success') {
                 console.log('Login exitoso, redirigiendo...');
                 // 3. Usamos navigate para cambiar de vista sin recargar la página
-                navigate('/DashboardAdmin'); 
+                navigate('/Dashboard'); 
             } else {
                 setError(response.message || 'No se pudo iniciar sesión');
             }
