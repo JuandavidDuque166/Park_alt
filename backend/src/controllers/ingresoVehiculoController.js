@@ -1,48 +1,56 @@
 const IngresoService = require('../services/ingresoVehiculoService');
 
 class IngresoVehiculoController {
-  static async registrar(req, res, next) {
-    try {
-      // 1. Extraemos los datos exactos que requiere nuestro nuevo script SQL
-      const { placa, id_tipo } = req.body;
-      const archivoFoto = req.file;
+    static async registrar(req, res, next) {
+        try {
+            // Recibimos 'nivel' desde el cliente
+            const { placa, id_tipo, nivel } = req.body;
+            const archivoFoto = req.file;
+            
+            // Si tu middleware de autenticación inyecta al usuario en req.user:
+            const idUsuario = req.user?.id_usuario || req.body.idUsuario;
 
-      // 2. Validación actualizada: Verificamos que lleguen las llaves foráneas necesarias
-      if (!placa || !id_tipo) {
-        return res.status(400).json({
-          success: false,
-          error: 'Faltan datos obligatorios (placa, id_tipo)'
-        });
-      }
+            if (!placa || !id_tipo || !nivel) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Faltan datos obligatorios (placa, id_tipo, nivel)'
+                });
+            }
 
-      // 3. Llamar al servicio asegurando que los IDs sean números y la placa mayúscula
-      const resultado = await IngresoService.procesarIngreso(
-        { 
-          placa: placa.trim().toUpperCase(), 
-          id_tipo: parseInt(id_tipo, 10), 
-        }, 
-        archivoFoto
-      );
+            const resultado = await IngresoService.procesarIngreso(
+                { 
+                    placa: placa.trim().toUpperCase(), 
+                    id_tipo: parseInt(id_tipo, 10),
+                    nivel: nivel,
+                    idUsuario: idUsuario
+                }, 
+                archivoFoto
+            );
 
-      // 4. Respuesta exitosa (201 Created)
-      res.status(201).json({
-        success: true,
-        data: resultado
-      });
-
-    } catch (error) {
-      // Manejo del error específico de negocio (Ej: Vehículo ya adentro)
-      if (error.message.includes('ya se encuentra ocupando')) {
-         return res.status(409).json({ 
-           success: false, 
-           error: error.message 
-         });
-      }
-      
-      // Si es un error de base de datos o servidor, pasa al middleware global
-      next(error); 
+            res.status(201).json({
+                success: true,
+                data: resultado
+            });
+        } catch (error) {
+            if (error.message.includes('ya se encuentra ocupando') || error.message.includes('No hay espacios')) {
+                return res.status(409).json({ 
+                    success: false, 
+                    error: error.message 
+                });
+            }
+            next(error); 
+        }
     }
-  }
+
+    // Nuevo método para consultar cupos desde el Front
+    static async obtenerCupos(req, res, next) {
+        try {
+            const cupos = await IngresoService.obtenerCupos();
+            res.status(200).json({ success: true, ...cupos });
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = IngresoVehiculoController;

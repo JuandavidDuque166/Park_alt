@@ -234,3 +234,29 @@ VALUES
 (1, 1, '2026-06-01', '2026-07-01', 149500.00, 'ACTIVA', 'Subterraneo'),
 (2, 2, '2026-05-15', '2026-06-15', 61500.00, 'ACTIVA', 'Subterraneo'),
 (3, 3, '2026-04-01', '2026-05-01', 149500.00, 'VENCIDA', 'Subterraneo');
+
+
+USE parqueadero;
+
+-- Limpiamos los espacios de prueba anteriores
+DELETE FROM espacio;
+ALTER TABLE espacio AUTO_INCREMENT = 1;
+
+-- Insertamos 5 espacios para el nivel SUBTERRANEO
+INSERT INTO espacio (numero, nivel, estado) VALUES 
+(101, 'SUBTERRANEO', 'DISPONIBLE'),
+(102, 'SUBTERRANEO', 'DISPONIBLE'),
+(103, 'SUBTERRANEO', 'DISPONIBLE'),
+(104, 'SUBTERRANEO', 'DISPONIBLE'),
+(105, 'SUBTERRANEO', 'DISPONIBLE');
+
+-- Insertamos 5 espacios para el nivel ALTURA
+INSERT INTO espacio (numero, nivel, estado) VALUES 
+(201, 'ALTURA', 'DISPONIBLE'),
+(202, 'ALTURA', 'DISPONIBLE'),
+(203, 'ALTURA', 'DISPONIBLE'),
+(204, 'ALTURA', 'DISPONIBLE'),
+(205, 'ALTURA', 'DISPONIBLE');
+
+SELECT COUNT(*) as disponibles FROM espacio WHERE estado = 'DISPONIBLE'
+SELECT COUNT(*) as total FROM espacio WHERE estado != 'INACTIVO'

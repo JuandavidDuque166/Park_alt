@@ -1,45 +1,48 @@
 const IngresoVehiculoModel = require('../models/ingresoVehiculoModel');
 
 class IngresoVehiculoService {
-  static async procesarIngreso(datosIngreso, archivoFoto) {
-    // Estos nombres de variables asumen lo que viene de req.body en el Controlador
-    const { placa, id_tipo } = datosIngreso;
+    static async procesarIngreso(datosIngreso, archivoFoto) {
+        const { placa, id_tipo, nivel, idUsuario } = datosIngreso;
 
-    // 1. Verificar si el vehículo existe en la DB; si no, crearlo.
-    let vehiculo = await IngresoVehiculoModel.buscarVehiculo(placa);
-    let idVehiculo;
+        let vehiculo = await IngresoVehiculoModel.buscarVehiculo(placa);
+        let idVehiculo;
 
-    if (vehiculo) {
-      idVehiculo = vehiculo.id_vehiculo;
-    } else {
-      idVehiculo = await IngresoVehiculoModel.registrarVehiculoNuevo(placa, id_tipo);
+        if (vehiculo) {
+            idVehiculo = vehiculo.id_vehiculo;
+        } else {
+            idVehiculo = await IngresoVehiculoModel.registrarVehiculoNuevo(placa, id_tipo);
+        }
+
+        const estaAdentro = await IngresoVehiculoModel.verificarVehiculoDentro(idVehiculo);
+        if (estaAdentro) {
+            throw new Error(`El vehículo con placa ${placa} ya se encuentra ocupando un espacio en el parqueadero.`);
+        }
+
+        let urlImagen = null;
+        if (archivoFoto) {
+            urlImagen = `/uploads/${archivoFoto.filename}`;
+        }
+
+        // Enviamos los nuevos parámetros requeridos
+        const resultadoRegistro = await IngresoVehiculoModel.registrarIngreso({
+            idVehiculo,
+            urlImagen,
+            nivel,
+            idUsuario
+        });
+
+        return {
+            idIngreso: resultadoRegistro.idIngreso,
+            espacioAsignado: resultadoRegistro.espacioAsignado,
+            placa,
+            mensaje: "Ingreso registrado exitosamente",
+            urlImagen
+        };
     }
 
-    // 2. Validar si el vehículo ya está adentro (control_i_s sin fecha_hora_salida)
-    const estaAdentro = await IngresoVehiculoModel.verificarVehiculoDentro(idVehiculo);
-    if (estaAdentro) {
-      throw new Error(`El vehículo con placa ${placa} ya se encuentra ocupando un espacio en el parqueadero.`);
+    static async obtenerCupos() {
+        return await IngresoVehiculoModel.obtenerEspaciosDisponibles();
     }
-
-    // 3. Construir la URL de la foto (si se subió una con multer)
-    let urlImagen = null;
-    if (archivoFoto) {
-      urlImagen = `/uploads/${archivoFoto.filename}`; // Se guardará en url_imagen
-    }
-
-    // 4. Registrar en control_i_s y ocupar el espacio
-    const idIngreso = await IngresoVehiculoModel.registrarIngreso({
-      idVehiculo,
-      urlImagen
-    });
-
-    return {
-      idIngreso,
-      placa,
-      mensaje: "Ingreso registrado exitosamente",
-      urlImagen
-    };
-  }
 }
 
 module.exports = IngresoVehiculoService;

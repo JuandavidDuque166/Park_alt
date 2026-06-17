@@ -1,92 +1,106 @@
-import React, { useState } from 'react';
-import './IngresoVehiculo.css';
+import React, { useState, useEffect } from "react";
+import { api } from "../services/api"; 
+import { authService } from "../services/authService";
+import "./IngresoVehiculo.css";
 
 const IngresoVehiculo = () => {
-  // Estado inicial del formulario
   const [formData, setFormData] = useState({
-    placa: '',
-    idTipo: '',
-    nivel: '',
-    foto: null // Objeto File
+    placa: "",
+    idTipo: "",
+    nivel: "",
+    foto: null,
   });
-
-  // Estados para UI (Mensajes y carga)
+  
   const [isLoading, setIsLoading] = useState(false);
-  const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
+  const [cupos, setCupos] = useState({ disponibles: 0, total: 0 });
+  const [usuarioActual, setUsuarioActual] = useState(null);
+  const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
 
-  // Manejador para inputs de texto y selects
+  // 1. Cargar datos del operario y consultar cupos iniciales
+  useEffect(() => {
+    const user = authService.obtenerUsuario();
+    if (user) setUsuarioActual(user);
+    cargarCupos();
+  }, []);
+
+  const cargarCupos = async () => {
+    try {
+      const response = await api.get("/ingresos/cupos");
+      if (response.data) {
+        setCupos({
+          disponibles: response.data.disponibles,
+          total: response.data.total,
+        });
+      }
+    } catch (error) {
+      console.error("Error cargando cupos del parqueadero:", error);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: name === 'placa' ? value.toUpperCase() : value,
+      [name]: name === "placa" ? value.toUpperCase() : value,
     });
   };
 
-  // Manejador específico para el archivo (foto)
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setFormData({
       ...formData,
-      foto: file || null
+      foto: file || null,
     });
   };
 
-  // Limpiar el formulario
   const handleLimpiar = () => {
-    setFormData({ placa: '', idTipo: '', nivel: '', foto: null });
-    // Nota: No limpiamos el mensaje aquí para que el usuario pueda leer el éxito después de limpiar los campos
-    const fileInput = document.getElementById('foto-input');
-    if (fileInput) fileInput.value = '';
+    setFormData({
+      placa: "",
+      idTipo: "",
+      nivel: "",
+      foto: null,
+    });
+    const fileInput = document.getElementById("foto-input");
+    if (fileInput) fileInput.value = "";
   };
 
-  // Envío del formulario al Backend REAL
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setMensaje({ tipo: '', texto: '' });
+    setMensaje({ tipo: "", texto: "" });
 
-    // 1. Construir el FormData con los nombres EXACTOS que espera el backend
+    // Preparar el FormData para enviar archivos multimedia (Multer)
     const dataToSend = new FormData();
-    dataToSend.append('placa', formData.placa);
-    dataToSend.append('id_tipo', formData.idTipo); // Cambiado a id_tipo
-    
+    dataToSend.append("placa", formData.placa);
+    dataToSend.append("id_tipo", formData.idTipo);
+    dataToSend.append("nivel", formData.nivel);
+    if (usuarioActual) {
+      dataToSend.append("idUsuario", usuarioActual.id_usuario);
+    }
     if (formData.foto) {
-      dataToSend.append('foto', formData.foto);
+      dataToSend.append("foto", formData.foto);
     }
 
     try {
-      // 2. Petición HTTP al Backend
-      // Asegúrate de que la URL coincida con el puerto de tu backend (ej. http://localhost:3000)
-      const response = await fetch('http://localhost:3000/api/ingresos', {
-        method: 'POST',
-        body: dataToSend, // NO usar Content-Type manual con FormData
+      // Usamos la instancia 'api' de axios en vez de fetch nativo
+      const response = await api.post("/ingresos", dataToSend, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
-      const result = await response.json();
-
-      // 3. Evaluar la respuesta del servidor
-      if (response.ok && result.success) {
-        // ÉXITO: El backend nos devuelve el espacio asignado
-        setMensaje({ 
-          tipo: 'success', 
-          texto: `¡Ingreso exitoso! Asigne al conductor el espacio #${result.data.espacioAsignado}` 
+      if (response.data.success) {
+        setMensaje({
+          tipo: "success",
+          texto: `¡Ingreso exitoso! Asigne al conductor el espacio #${response.data.data.espacioAsignado}`,
         });
-        handleLimpiar(); // Limpiamos el formulario para el siguiente vehículo
-      } else {
-        // ERROR DEL NEGOCIO (Ej: Ya está adentro, no hay cupos)
-        setMensaje({ 
-          tipo: 'error', 
-          texto: result.error || 'Ocurrió un error al registrar el ingreso.' 
-        });
+        handleLimpiar();
+        cargarCupos(); // Actualiza el contador de la esquina superior derecha
       }
-
     } catch (error) {
-      // ERROR DE RED (Backend apagado, problemas de CORS)
-      console.error('Error de red al registrar ingreso:', error);
-      setMensaje({ 
-        tipo: 'error', 
-        texto: 'Error de conexión. Verifique que el servidor backend esté en ejecución.' 
+      console.error(error);
+      const errorMsg = error.response?.data?.error || "Ocurrió un error al registrar el ingreso.";
+      setMensaje({
+        tipo: "error",
+        texto: errorMsg,
       });
     } finally {
       setIsLoading(false);
@@ -100,88 +114,110 @@ const IngresoVehiculo = () => {
         <p>Gestión en altura y subterráneo</p>
       </div>
 
-      <div className="ingreso-card">
-        <div className="card-header">
-          <div>
-            <h3>Registro de Ingreso de Vehículos</h3>
-            <p>Complete los datos del vehículo que ingresa</p>
+      <div className="content-body">
+        <div className="ingreso-card">
+          <div className="card-header">
+            <div>
+              <h3>Registro de Ingreso de Vehículos</h3>
+              <p>Complete los datos del vehículo que ingresa</p>
+            </div>
+
+            <div className="espacios-badge">
+              <span>Espacios disponibles</span>
+              <strong>{cupos.disponibles} / {cupos.total}</strong>
+            </div>
           </div>
-          <div className="espacios-badge">
-            <span>Espacios disponibles</span>
-            <strong>98 / 100</strong>
-          </div>
+
+          {mensaje.texto && (
+            <div className={`alert-message ${mensaje.tipo}`}>
+              {mensaje.texto}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Placa *</label>
+                <input
+                  type="text"
+                  name="placa"
+                  placeholder="ABC123"
+                  value={formData.placa}
+                  onChange={handleInputChange}
+                  maxLength={6}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Tipo de Vehículo *</label>
+                <select
+                  name="idTipo"
+                  value={formData.idTipo}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="">Seleccione</option>
+                  <option value="1">Automóvil</option>
+                  <option value="6">Motocicleta</option>
+                  <option value="7">Bicicleta</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Nivel / Zona *</label>
+                <select
+                  name="nivel"
+                  value={formData.nivel}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="">Seleccione</option>
+                  <option value="ALTURA">Nivel Altura</option>
+                  <option value="SUBTERRANEO">Subterráneo</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Foto Evidencia</label>
+                <input
+                  id="foto-input"
+                  type="file"
+                  name="foto"
+                  accept="image/png,image/jpeg,image/jpg"
+                  onChange={handleFileChange}
+                />
+              </div>
+            </div>
+
+            <div className="info-box">
+              <p>
+                <strong>Fecha y hora:</strong> Se registrarán automáticamente al ingresar.
+              </p>
+              <p>
+                <strong>Operario en turno:</strong> {usuarioActual?.nombre || "Cargando..."}
+              </p>
+            </div>
+
+            <div className="form-actions">
+              <button type="submit" className="btn-primary" disabled={isLoading}>
+                {isLoading ? "Guardando..." : "Registrar Ingreso"}
+              </button>
+
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => {
+                  handleLimpiar();
+                  setMensaje({ tipo: "", texto: "" });
+                }}
+                disabled={isLoading}
+              >
+                Limpiar
+              </button>
+            </div>
+          </form>
         </div>
-
-        {mensaje.texto && (
-          <div className={`alert-message ${mensaje.tipo}`}>
-            {mensaje.texto}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit}>
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Placa *</label>
-              <input
-                type="text"
-                name="placa"
-                placeholder="Ej: ABC123"
-                value={formData.placa}
-                onChange={handleInputChange}
-                maxLength={6}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Tipo de Vehículo *</label>
-              <select name="idTipo" value={formData.idTipo} onChange={handleInputChange} required>
-                <option value="">Seleccione</option>
-                <option value="1">Automovil/Camioneta/Camperos/Motobuses/Motocarros</option>
-                <option value="2">Moto</option>
-                <option value="3">Bicicleta</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>Nivel / Zona *</label>
-              <select name="nivel" value={formData.nivel} onChange={handleInputChange} required>
-                <option value="">Seleccione</option>
-                <option value="NIVEL 1">Nivel 1</option>
-                <option value="NIVEL 2">Nivel 2</option>
-                <option value="NIVEL 3">Nivel 3</option>
-                <option value="SUBTERRANEO">Subterraneo</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>Foto (Evidencia) *</label>
-              <input
-                id="foto-input"
-                type="file"
-                name="foto"
-                accept="image/png, image/jpeg, image/jpg"
-                onChange={handleFileChange}
-                className="file-input"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="info-box">
-            <p><strong>Fecha y hora:</strong> Se registrarán automáticamente al momento del ingreso</p>
-            <p><strong>Vigilante:</strong> Juan Vigilante (Operario)</p>
-          </div>
-
-          <div className="form-actions">
-            <button type="submit" className="btn-primary" disabled={isLoading}>
-              {isLoading ? 'Guardando en BD...' : 'Registrar Ingreso'}
-            </button>
-            <button type="button" className="btn-secondary" onClick={() => { handleLimpiar(); setMensaje({tipo: '', texto: ''}); }} disabled={isLoading}>
-              Limpiar
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   );
