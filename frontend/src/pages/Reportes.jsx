@@ -68,7 +68,9 @@ const Reportes = () => {
     <div className="reportes-container">
       <div className="report-card mb-24">
         <div className="filters-row">
+          <span>Fecha inicio</span>
             <input type="date" name="fechaInicio" onChange={handleFilterChange} />
+            <span>Fecha inicio</span>
             <input type="date" name="fechaFin" onChange={handleFilterChange} />
             <button className="btn-export pdf" onClick={handleExportPDF}><Download size={18}/> Exportar PDF</button>
         </div>

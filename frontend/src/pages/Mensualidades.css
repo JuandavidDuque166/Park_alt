@@ -1,130 +1,325 @@
-/* Contenedor principal que permite scroll si el contenido es muy ancho */
+.mensualidades-page {
+    width: 100%;
+}
+
+.mensualidades-card {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    padding: 24px;
+}
+
+.mensualidades-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.mensualidades-header h2 {
+    color: #111827;
+    font-size: 1.45rem;
+    font-weight: 700;
+}
+
+.btn-add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 8px;
+    background: #2168ff;
+    color: #ffffff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-add:hover {
+    background: #1857d6;
+    transform: translateY(-1px);
+}
+
 .table-container {
     width: 100%;
-    overflow-x: auto; /* ¡Esto es lo que hace que la info no se pierda! */
-    margin-top: 20px;
+    overflow-x: auto;
 }
 
 .mensualidades-table {
     width: 100%;
-    min-width: 900px; /* Asegura que la tabla no se aplaste en pantallas pequeñas */
+    min-width: 920px;
     border-collapse: collapse;
 }
 
-.mensualidades-table th, .mensualidades-table td {
-    padding: 15px;
-    text-align: left;
-    white-space: normal; /* Permite que el texto ocupe espacio y no se corte */
-    word-wrap: break-word; /* Si una palabra es muy larga, baja a la siguiente línea */
-    font-size: 0.9rem;
-}
-
-/* Eliminar el corte con puntos suspensivos */
+.mensualidades-table th,
 .mensualidades-table td {
-    overflow: visible; 
-    text-overflow: clip; 
+    padding: 14px 16px;
+    border-bottom: 1px solid #eef2f7;
+    text-align: left;
+    vertical-align: middle;
+    color: #374151;
+    font-size: 0.92rem;
 }
 
-.form-control-input, 
-.form-control-select {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-sizing: border-box; /* Crucial para que el tamaño sea exacto */
-    display: block;
+.mensualidades-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
 }
 
-.modal-actions {
+.mensualidades-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+.mensualidades-actions {
     display: flex;
-    gap: 10px; /* Espacio entre botones */
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #dbe4f0;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #2168ff;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-icon:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.btn-view {
+    color: #0f766e;
+}
+
+.btn-view:hover {
+    background: #ecfdf5;
+    border-color: #99f6e4;
+}
+
+.btn-delete {
+    color: #dc2626;
+}
+
+.btn-delete:hover {
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+.empty-state {
+    padding: 28px 16px !important;
+    color: #64748b !important;
+    text-align: center !important;
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.55);
+}
+
+.modal {
+    width: min(620px, 100%);
+    max-height: min(90vh, 760px);
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.28);
+}
+
+.mensualidades-modal {
+    padding: 24px;
+}
+
+.modal-header {
+    margin-bottom: 18px;
+}
+
+.modal-header h3 {
+    color: #111827;
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+.mensualidades-modal label,
+.details-grid label {
+    display: block;
+    color: #374151;
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.mensualidades-modal input,
+.mensualidades-modal select,
+.readonly-input {
+    display: block;
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+    margin-top: 6px;
+    margin-bottom: 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #111827;
+    font: inherit;
+}
+
+.mensualidades-modal input:focus,
+.mensualidades-modal select:focus {
+    border-color: #2168ff;
+    box-shadow: 0 0 0 3px rgba(33, 104, 255, 0.12);
+    outline: none;
+}
+
+.mensualidades-modal input:disabled,
+.readonly-input,
+.mensualidades-modal input[readonly] {
+    border-color: #d9dee8;
+    background: #f3f4f6;
+    color: #6b7280;
+    cursor: default;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 16px;
+}
+
+.fecha-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
     width: 100%;
 }
 
-.modal form input, 
-.modal form select {
-    width: 100%;             /* Se expanden al 100% del modal */
-    padding: 12px;           /* Espacio interno uniforme */
-    margin-bottom: 15px;     /* Separación entre cada campo */
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-sizing: border-box;  /* ¡Clave! Evita que el padding rompa el ancho */
-    display: block;          /* Obliga a que cada uno ocupe su propia línea */
+.fecha-col {
+    min-width: 0;
+}
+
+.fecha-input {
+    width: 100%;
 }
 
 .modal-btns {
     display: flex;
-    gap: 10px;               /* Espacio entre el botón de guardar y cancelar */
+    gap: 10px;
     width: 100%;
+    margin-top: 4px;
 }
 
 .btn-comun {
-    flex: 1;                 /* Hace que ambos botones midan lo mismo */
-    padding: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-height: 42px;
+    padding: 0 16px;
     border: none;
     border-radius: 8px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
+    transition: background 0.2s ease;
 }
 
-/* Colores */
-.btn-actualizar { background-color: #059669; color: white; }
-.btn-cancelar { background-color: #e5e7eb; color: #374151; }
-
-.fecha-row {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    gap: 15px !important;
-    width: 100% !important;
-    margin-bottom: 15px !important;
+.btn-actualizar {
+    background-color: #059669;
+    color: #ffffff;
 }
 
-.fecha-col {
-    flex: 1 !important;
-    min-width: 0 !important; /* Vital para que el flexbox no se rompa */
+.btn-actualizar:hover {
+    background-color: #047857;
 }
 
-.fecha-input {
-    width: 100% !important;
-    display: block !important;
-    box-sizing: border-box !important;
+.btn-cancelar {
+    background-color: #e5e7eb;
+    color: #374151;
+}
+
+.btn-cancelar:hover {
+    background-color: #d1d5db;
 }
 
 #toast-alerta {
     position: fixed !important;
     top: 20px !important;
     right: 20px !important;
-    left: auto !important; /* IMPORTANTE: Asegura que no se estire a la izquierda */
+    left: auto !important;
     bottom: auto !important;
-    
-    /* Forzamos tamaño compacto */
-    width: fit-content !important; 
+    z-index: 9999999 !important;
+    width: fit-content !important;
     min-width: 250px !important;
     height: auto !important;
-    
-    /* Estilos */
-    background-color: #059669 !important;
-    color: white !important;
+    margin: 0 !important;
     padding: 15px 25px !important;
     border-radius: 8px !important;
+    background-color: #059669 !important;
+    color: #ffffff !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-    z-index: 9999999 !important;
-    
-    /* Animación */
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.4s ease, visibility 0.4s;
-    
-    /* Reseteo total de márgenes y transformaciones */
-    margin: 0 !important;
     transform: none !important;
-    pointer-events: none; /* Para que no interfiera con clicks */
+    pointer-events: none;
+    transition: opacity 0.4s ease, visibility 0.4s;
 }
 
 #toast-alerta.toast-visible {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+    .mensualidades-card {
+        padding: 18px;
+    }
+
+    .mensualidades-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .btn-add {
+        width: 100%;
+    }
+
+    .details-grid,
+    .fecha-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .modal-backdrop {
+        align-items: flex-start;
+        padding: 12px;
+    }
+
+    .mensualidades-modal {
+        padding: 18px;
+    }
 }

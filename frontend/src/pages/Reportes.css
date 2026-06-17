@@ -80,7 +80,7 @@
 .filters-row {
   display: flex;
   gap: 15px;
-  align-items: center;
+  align-items: flex;
 }
 
 .filters-row input {
