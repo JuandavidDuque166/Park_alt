@@ -44,12 +44,12 @@ export const Login = () => {
 
                 <form onSubmit={handleSubmit} className="login-form">
                     <div className="form-group">
-                        <label htmlFor="email">Usuario</label>
+                        <label htmlFor="email">Correo electronico</label>
                         <input 
                             type="email" 
                             id="email"
                             name="email" 
-                            placeholder="Ingrese su usuario" 
+                            placeholder="Ingrese su correo" 
                             onChange={handleChange} 
                             required 
                         />
