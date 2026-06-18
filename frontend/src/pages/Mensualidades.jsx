@@ -1,9 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { FaPlus } from 'react-icons/fa';
-import { FiEdit2, FiEye, FiTrash2 } from 'react-icons/fi';
+import { useEffect, useMemo, useState } from 'react';
+import { FaPlus, FaEdit } from 'react-icons/fa';
+import { FiEye, FiTrash2 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { api } from '../services/api';
 import './Mensualidades.css';
+
+
 
 const camposIniciales = {
     id: null,
@@ -310,14 +312,9 @@ const Mensualidades = () => {
                                                     </button>
                                                 ) : (
                                                     <>
-                                                        <button
-                                                            className="btn-icon"
-                                                            type="button"
-                                                            aria-label="Editar mensualidad"
-                                                            onClick={() => abrirEditarModal(mensualidad)}
-                                                        >
-                                                            <FiEdit2 />
-                                                        </button>
+                                                        <button className="edit-icon" type="button" onClick={() => abrirEditarModal(mensualidad)}>
+    <FaEdit />
+</button>
                                                         <button
                                                             className="btn-icon btn-delete"
                                                             type="button"

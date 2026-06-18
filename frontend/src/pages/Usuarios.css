@@ -1,4 +1,4 @@
-/* Tarjeta principal */
+/* --- Estilos Generales --- */
 .card {
     background: white;
     padding: 25px;
@@ -14,10 +14,10 @@
     margin-bottom: 25px;
 }
 
-/* Tabla */
+/* --- Tabla --- */
 .tabla-sistema {
     width: 100%;
-    min-width: 600px;          /* Ajusta esto si la tabla sigue viéndose apretada */
+    min-width: 600px;
     border-collapse: collapse;
 }
 
@@ -26,12 +26,46 @@
     padding: 12px;
     border-bottom: 1px solid #eee;
     text-align: left;
-    white-space: nowrap;       /* Evita que el texto se rompa en dos líneas */
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;   /* Pone '...' si el texto es muy largo */
+    text-overflow: ellipsis;
 }
 
-/* Botón principal */
+.tabla-sistema .actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    width: 120px;
+}
+
+/* --- Botones de Acción (Iconos Redondeados) --- */
+.edit-icon, .delete-icon, .activate-icon {
+    border: none !important;
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: background-color 0.2s ease !important;
+}
+
+/* Colores específicos */
+.edit-icon { background-color: #eff6ff !important; color: #3b82f6 !important; }
+.edit-icon:hover { background-color: #dbeafe !important; }
+
+.delete-icon { background-color: #fef2f2 !important; color: #ef4444 !important; }
+.delete-icon:hover { background-color: #fee2e2 !important; }
+
+.activate-icon { background-color: #f0fdf4 !important; color: #22c55e !important; }
+.activate-icon:hover { background-color: #dcfce7 !important; }
+
+/* Tamaño de los iconos SVG dentro de los botones */
+.edit-icon svg, .delete-icon svg, .activate-icon svg { width: 16px !important; height: 16px !important; }
+
+/* --- Otros Botones --- */
 .btn-add {
     background-color: #2168ff !important;
     color: white;
@@ -45,141 +79,123 @@
     gap: 8px;
 }
 
-/* Badges */
+/* --- Badges --- */
 .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
-.Administrador { background-color: #e0d7ff; color: #5a32a3; }
-.Vigilante { background-color: #d1ecf1; color: #0c5460; }
-.info-badge { background-color: #d4edda; color: #155724; padding: 4px 12px; border-radius: 20px; }
+.badge.activa { background-color: #dcfce7; color: #166534; }
+.badge.inactiva { background-color: #fee2e2; color: #991b1b; }
 
-/* Acciones */
-.actions { display: flex; gap: 10px; }
-.actions button { background: none; border: none; cursor: pointer; color: #2168ff; }
-.actions button.delete { color: #dc3545; }
+/* --- Modal --- */
+.modal-backdrop {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 1000;
+}
 
-/* Estilos para el formulario del modal */
-.modal-form { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+.modal, .modal-confirm {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
 
-.form-group { display: flex; flex-direction: column; gap: 5px; }
+.modal-confirm {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
 
-.form-group input, .form-group select {
+.modal-confirm h3 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 1.25rem;
+}
+
+.modal-confirm p {
+    color: #64748b;
+    margin: 0 0 10px 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Contenedor de botones del modal */
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Botones específicos del modal */
+.btn-confirm, .btn-cancel {
+    flex: 1;
     padding: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-}
-
-.checkbox-group { flex-direction: row !important; align-items: center; gap: 10px; }
-
-/* Botones del modal */
-.modal-btns { display: flex; gap: 10px; margin-top: 10px; }
-
-.btn-crear {
-    background-color: #00a844 !important; /* Verde exacto */
-    color: white;
-    flex: 1;
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    font-weight: 600;
-}
-
-.btn-cancelar {
-    background-color: #e9ecef !important;
-    color: #495057;
-    flex: 1;
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    font-weight: 600;
-}
-
-.modal-header { display: flex; justify-content: space-between; align-items: center; }
-
-.toast-oculto {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #00a844; /* Verde */
-    color: white;
-    padding: 15px 25px;
     border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-confirm {
+    background-color: #ef4444; /* Rojo profesional para acciones críticas */
+    color: white;
+}
+
+.btn-confirm:hover {
+    background-color: #dc2626;
+}
+
+.btn-cancel {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.btn-cancel:hover {
+    background-color: #e2e8f0;
+}
+
+.modal input, .modal select {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0 15px 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.modal-btns { display: flex; gap: 10px; margin-top: 10px; width: 100%; }
+
+.btn-comun {
+    flex: 1; padding: 12px; border: none; border-radius: 6px;
+    cursor: pointer; font-weight: 600;
+}
+
+.btn-actualizar { background-color: #059669; color: white; }
+.btn-actualizar:hover { background-color: #047857; }
+
+.btn-cancelar { background-color: #e5e7eb; color: #374151; }
+.btn-cancelar:hover { background-color: #d1d5db; }
+
+/* --- Toast (Alerta) --- */
+.toast-oculto {
+    position: fixed; top: 20px; right: 20px;
+    background: #00a844; color: white;
+    padding: 15px 25px; border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     transform: translateY(-100px);
     transition: transform 0.3s ease;
     z-index: 9999;
 }
-
-.toast-visible {
-    transform: translateY(0);
-}
-
-.tabla-sistema .actions {
-    text-align: center;
-    width: 100px;            
-}
-
-/* Estilos para el contenedor del Modal */
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-/* Estilo específico para el cuadro de confirmación */
-.modal-confirm {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.modal-confirm h3 {
-  margin-top: 0;
-  color: #333;
-}
-
-.modal-confirm p {
-  color: #666;
-  font-size: 1.1rem;
-}
-
-/* Acciones (Botones) */
-.modal-actions {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  margin-top: 25px;
-}
-
-.btn-confirm {
-  background: #059669; /* Verde profesional */
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.btn-confirm:hover { background: #047857; }
-
-.btn-cancel {
-  background: #e5e7eb;
-  color: #374151;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.btn-cancel:hover { background: #d1d5db; }
+.toast-visible { transform: translateY(0); }

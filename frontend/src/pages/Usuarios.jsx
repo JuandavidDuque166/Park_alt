@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { usuariosService } from '../services/usuariosService';
 import { rolesService } from '../services/rolesService';
-import { FiEdit2 } from 'react-icons/fi';
+import { FaPlus, FaEdit, FaUserSlash, FaUserCheck } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import './Usuarios.css';
 
-// --- COMPONENTE DE CONFIRMACIÓN PERSONALIZADO ---
+// --- COMPONENTE DE CONFIRMACIÓN ---
 const ModalConfirmacion = ({ mostrar, mensaje, onConfirmar, onCancelar }) => {
   if (!mostrar) return null;
   return (
@@ -25,20 +25,12 @@ const ModalConfirmacion = ({ mostrar, mensaje, onConfirmar, onCancelar }) => {
 export const Usuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [roles, setRoles] = useState([]);
-  const [mostrarModal, setMostrarModal] = useState(false);
   const [modoEdicion, setModoEdicion] = useState(false);
-  
-  // Estado para el modal personalizado
+  const [mostrarModal, setMostrarModal] = useState(false);
   const [confirmarAction, setConfirmarAction] = useState({ mostrar: false, usuario: null });
-
   const [usuarioForm, setUsuarioForm] = useState({
     id_usuario: null, nombre: '', email: '', clave: '', id_rol: ''
   });
-
-  useEffect(() => {
-    cargarUsuarios();
-    cargarRoles();
-  }, []);
 
   const mostrarAlerta = (mensaje) => {
     const toastElement = document.getElementById('toast-alerta');
@@ -53,37 +45,84 @@ export const Usuarios = () => {
     try {
       const data = await usuariosService.obtenerUsuarios();
       setUsuarios(data);
-    } catch (error) { console.error('Error al cargar usuarios', error); }
+    } catch (e) { console.error('Error al cargar usuarios', e); }
   };
 
   const cargarRoles = async () => {
     try {
       const data = await rolesService.obtenerRoles();
       setRoles(Array.isArray(data) ? data : data?.data || []);
-    } catch (error) { setRoles([]); }
+    } catch { setRoles([]); }
   };
+
+  // Carga inicial de datos remotos al montar la vista.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    cargarUsuarios();
+    cargarRoles();
+  }, []);
 
   const abrirModalEditar = (usuario) => {
     setModoEdicion(true);
-    setUsuarioForm({ id_usuario: usuario.id_usuario, nombre: usuario.nombre, email: usuario.email, clave: '', id_rol: usuario.id_rol });
+    setUsuarioForm({ 
+      id_usuario: usuario.id_usuario, 
+      nombre: usuario.nombre, 
+      email: usuario.email, 
+      clave: '', 
+      id_rol: usuario.id_rol 
+    });
     setMostrarModal(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const nombre = usuarioForm.nombre.trim();
+    const email = usuarioForm.email.trim();
+    const clave = usuarioForm.clave.trim();
+    const idRol = Number(usuarioForm.id_rol);
+
+    if (nombre.length < 3) {
+      alert('Error: El nombre debe tener al menos 3 caracteres');
+      return;
+    }
+
+    if (!Number.isInteger(idRol) || idRol <= 0) {
+      alert('Error: Selecciona un rol válido');
+      return;
+    }
+
+    if (!modoEdicion && clave.length < 6) {
+      alert('Error: La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+
+    if (modoEdicion && clave && clave.length < 6) {
+      alert('Error: La nueva clave debe tener al menos 6 caracteres');
+      return;
+    }
+
+    const usuarioData = { 
+      nombre, 
+      email, 
+      id_rol: idRol 
+    };
+
     try {
-      const usuarioData = { nombre: usuarioForm.nombre, email: usuarioForm.email, id_rol: Number(usuarioForm.id_rol) };
       if (modoEdicion) {
-        if (usuarioForm.clave) usuarioData.clave = usuarioForm.clave;
+        if (clave) usuarioData.clave = clave;
         await usuariosService.actualizarUsuario(usuarioForm.id_usuario, usuarioData);
       } else {
-        usuarioData.clave = usuarioForm.clave;
+        usuarioData.clave = clave;
         await usuariosService.agregarUsuario(usuarioData);
       }
       mostrarAlerta("¡Guardado exitosamente!");
       cargarUsuarios();
       setMostrarModal(false);
-    } catch (error) { alert('Error: ' + (error.response?.data?.message || 'Error desconocido')); }
+    } catch (error) { 
+      // El alert ahora mostrará el error específico del servidor
+      const mensaje = error.response?.data?.message || 'Error al procesar el usuario';
+      alert('Error: ' + mensaje); 
+    }
   };
 
   const isActivo = (estado) => estado === true || estado === 1 || estado === '1' || estado === 'ACTIVO';
@@ -97,7 +136,7 @@ export const Usuarios = () => {
       await usuariosService.actualizarUsuario(usuario.id_usuario, { estado: nuevoEstado });
       await cargarUsuarios();
       mostrarAlerta(`Estado actualizado a ${nuevoEstado}`);
-    } catch (error) {
+    } catch {
       toast.error("Error al actualizar estado");
     }
     setConfirmarAction({ mostrar: false, usuario: null });
@@ -108,7 +147,9 @@ export const Usuarios = () => {
       <div className="card">
         <div className="header-actions">
           <h2>Gestión de Usuarios</h2>
-          <button className="btn-add" onClick={() => { setModoEdicion(false); setUsuarioForm({ id_usuario: null, nombre: '', email: '', clave: '', id_rol: '' }); setMostrarModal(true); }}>+ Nuevo Usuario</button>
+          <button className="btn-add" onClick={() => { setModoEdicion(false); setUsuarioForm({ id_usuario: null, nombre: '', email: '', clave: '', id_rol: '' }); setMostrarModal(true); }}>
+            <FaPlus /> Nuevo Usuario
+          </button>
         </div>
 
         <div className="table-container">
@@ -119,13 +160,20 @@ export const Usuarios = () => {
             <tbody>
               {usuarios.map(u => (
                 <tr key={u.id_usuario}>
-                  <td>{u.nombre}</td><td>{u.email}</td><td>{u.rol}</td>
+                  <td>{u.nombre}</td>
+                  <td>{u.email}</td>
+                  <td>{u.rol}</td>
                   <td><span className={`badge ${isActivo(u.estado) ? 'activa' : 'inactiva'}`}>{isActivo(u.estado) ? 'ACTIVO' : 'INACTIVO'}</span></td>
                   <td className="actions">
-                    <button onClick={() => abrirModalEditar(u)}><FiEdit2 /></button>
+                    <button className="edit-icon" type="button" onClick={() => abrirModalEditar(u)}>
+                      <FaEdit />
+                    </button>
                     {Number(u.id_rol) !== 1 && (
-                      <button className={isActivo(u.estado) ? 'delete' : ''} onClick={() => setConfirmarAction({ mostrar: true, usuario: u })}>
-                        {isActivo(u.estado) ? 'Desactivar' : 'Activar'}
+                      <button 
+                        className={`edit-icon ${isActivo(u.estado) ? 'delete-icon' : 'activate-icon'}`} 
+                        onClick={() => setConfirmarAction({ mostrar: true, usuario: u })}
+                      >
+                        {isActivo(u.estado) ? <FaUserSlash /> : <FaUserCheck />}
                       </button>
                     )}
                   </td>
@@ -141,35 +189,32 @@ export const Usuarios = () => {
           <div className="modal">
             <h2>{modoEdicion ? 'Editar' : 'Crear'} Usuario</h2>
             <form onSubmit={handleSubmit}>
-              <input name="nombre" value={usuarioForm.nombre} onChange={(e) => setUsuarioForm({...usuarioForm, nombre: e.target.value})} placeholder="Nombre completo" required />
-              <input name="email" value={usuarioForm.email} onChange={(e) => setUsuarioForm({...usuarioForm, email: e.target.value})} placeholder="Email" required />
-              <input name="clave" type="password" placeholder={modoEdicion ? "Nueva contraseña (vacío para mantener)" : "Contraseña"} required={!modoEdicion} onChange={(e) => setUsuarioForm({...usuarioForm, clave: e.target.value})} />
-              <select name="id_rol" value={usuarioForm.id_rol} onChange={(e) => setUsuarioForm({...usuarioForm, id_rol: e.target.value})} required>
+              <input value={usuarioForm.nombre} onChange={(e) => setUsuarioForm({...usuarioForm, nombre: e.target.value})} placeholder="Nombre" required />
+              <input value={usuarioForm.email} onChange={(e) => setUsuarioForm({...usuarioForm, email: e.target.value})} placeholder="Email" required />
+              <input type="password" placeholder={modoEdicion ? "Nueva clave (opcional)" : "Contraseña"} onChange={(e) => setUsuarioForm({...usuarioForm, clave: e.target.value})} required={!modoEdicion} />
+              <select value={usuarioForm.id_rol} onChange={(e) => setUsuarioForm({...usuarioForm, id_rol: e.target.value})} required>
                 <option value="">Selecciona un rol</option>
-                {roles.map(r => (
-                  <option key={r.id_rol} value={r.id_rol}>{r.nombre}</option>
-                ))}
+                {roles.map(r => <option key={r.id_rol} value={r.id_rol}>{r.nombre}</option>)}
               </select>
-              <button type="submit">Guardar</button>
-              <button type="button" onClick={() => setMostrarModal(false)}>Cancelar</button>
+              <div className="modal-btns">
+                <button type="submit" className="btn-comun btn-actualizar">Guardar</button>
+                <button type="button" className="btn-comun btn-cancelar" onClick={() => setMostrarModal(false)}>Cancelar</button>
+              </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* MODAL DE CONFIRMACIÓN CUSTOM - CORREGIDO */}
       {confirmarAction.usuario && (
         <ModalConfirmacion 
           mostrar={confirmarAction.mostrar}
-          mensaje={`¿Deseas ${isActivo(confirmarAction.usuario.estado) ? 'desactivar' : 'activar'} al usuario ${confirmarAction.usuario.nombre}?`}
+          mensaje={`¿Deseas ${isActivo(confirmarAction.usuario.estado) ? 'desactivar' : 'activar'} a ${confirmarAction.usuario.nombre}?`}
           onConfirmar={ejecutarCambioEstado}
           onCancelar={() => setConfirmarAction({ mostrar: false, usuario: null })}
         />
       )}
-
       <div id="toast-alerta" className="toast-oculto">Operación realizada</div>
     </>
   );
 };
-
 export default Usuarios;
