@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import Webcam from "react-webcam"; // IMPORTANTE: Nueva librería para la cámara
 import { api } from "../services/api"; 
 import { authService } from "../services/authService";
 import "./IngresoVehiculo.css";
@@ -12,11 +13,21 @@ const IngresoVehiculo = () => {
   });
   
   const [isLoading, setIsLoading] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const [isCameraOpen, setIsCameraOpen] = useState(false); // Nuevo estado para controlar si la cámara está abierta
   const [cupos, setCupos] = useState({ disponibles: 0, total: 0 });
   const [usuarioActual, setUsuarioActual] = useState(null);
   const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
 
-  // 1. Cargar datos del operario y consultar cupos iniciales
+  const webcamRef = useRef(null);
+
+  // Configuración para que intente abrir la cámara trasera en celulares
+  const videoConstraints = {
+    width: 1280,
+    height: 720,
+    facingMode: "environment" 
+  };
+
   useEffect(() => {
     const user = authService.obtenerUsuario();
     if (user) setUsuarioActual(user);
@@ -45,13 +56,58 @@ const IngresoVehiculo = () => {
     });
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setFormData({
-      ...formData,
-      foto: file || null,
-    });
+  // Función auxiliar para convertir la foto tomada (base64) a un Archivo normal (File)
+  const dataURLtoFile = (dataurl, filename) => {
+    let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, {type:mime});
   };
+
+  // Lógica para capturar la foto de la cámara y enviarla a la IA
+  const captureAndScan = useCallback(async () => {
+    if (!webcamRef.current) return;
+    
+    // 1. Tomamos la foto de la cámara
+    const imageSrc = webcamRef.current.getScreenshot();
+    if (!imageSrc) return;
+
+    // 2. La convertimos a archivo para guardarla en el form y enviarla
+    const imageFile = dataURLtoFile(imageSrc, 'placa_capturada.jpg');
+    setFormData(prev => ({ ...prev, foto: imageFile }));
+
+    // 3. Iniciamos el proceso de IA
+    setIsScanning(true);
+    setMensaje({ tipo: "", texto: "" });
+
+    try {
+      const dataToScan = new FormData();
+      dataToScan.append("imagen", imageFile); 
+
+      // Cambia "/leer-placa" por tu endpoint real
+      const response = await api.post("/ingresos/leer-placa", dataToScan, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (response.data.success && response.data.placa) {
+        setFormData(prev => ({
+          ...prev,
+          placa: response.data.placa.toUpperCase()
+        }));
+        setMensaje({ tipo: "success", texto: "¡Placa detectada y autocompletada por IA!" });
+        setIsCameraOpen(false); // Cerramos la cámara al tener éxito
+      } else {
+        setMensaje({ tipo: "error", texto: "La IA no pudo detectar una placa clara. Intenta acercar la cámara." });
+      }
+    } catch (error) {
+      console.error("Error en la lectura de placa con IA:", error);
+      setMensaje({ tipo: "error", texto: "Error al comunicarse con el servicio de IA." });
+    } finally {
+      setIsScanning(false);
+    }
+  }, [webcamRef]);
 
   const handleLimpiar = () => {
     setFormData({
@@ -60,8 +116,7 @@ const IngresoVehiculo = () => {
       nivel: "",
       foto: null,
     });
-    const fileInput = document.getElementById("foto-input");
-    if (fileInput) fileInput.value = "";
+    setIsCameraOpen(false); // También cerramos la cámara al limpiar
   };
 
   const handleSubmit = async (e) => {
@@ -69,7 +124,6 @@ const IngresoVehiculo = () => {
     setIsLoading(true);
     setMensaje({ tipo: "", texto: "" });
 
-    // Preparar el FormData para enviar archivos multimedia (Multer)
     const dataToSend = new FormData();
     dataToSend.append("placa", formData.placa);
     dataToSend.append("id_tipo", formData.idTipo);
@@ -82,7 +136,6 @@ const IngresoVehiculo = () => {
     }
 
     try {
-      // Usamos la instancia 'api' de axios en vez de fetch nativo
       const response = await api.post("/ingresos", dataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -93,7 +146,7 @@ const IngresoVehiculo = () => {
           texto: `¡Ingreso exitoso! Asigne al conductor el espacio #${response.data.data.espacioAsignado}`,
         });
         handleLimpiar();
-        cargarCupos(); // Actualiza el contador de la esquina superior derecha
+        cargarCupos(); 
       }
     } catch (error) {
       console.error(error);
@@ -134,8 +187,56 @@ const IngresoVehiculo = () => {
             </div>
           )}
 
+          {/* --- SECCIÓN DE LA CÁMARA (Reemplaza al input file) --- */}
+          <div className="form-group" style={{ marginBottom: '20px', border: '1px solid #ddd', padding: '15px', borderRadius: '8px' }}>
+            <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
+              Lector Automático de Placas (IA) 📷
+            </label>
+            
+            {!isCameraOpen ? (
+              <button 
+                type="button" 
+                className="btn-secondary" 
+                onClick={() => setIsCameraOpen(true)}
+                style={{ width: '100%', padding: '10px' }}
+              >
+                Abrir Cámara para Leer Placa
+              </button>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+                <Webcam
+                  audio={false}
+                  ref={webcamRef}
+                  screenshotFormat="image/jpeg"
+                  videoConstraints={videoConstraints}
+                  style={{ width: '100%', maxWidth: '400px', borderRadius: '8px' }}
+                />
+                <div style={{ display: 'flex', gap: '10px', width: '100%', justifyContent: 'center' }}>
+                  <button 
+                    type="button" 
+                    className="btn-primary" 
+                    onClick={captureAndScan}
+                    disabled={isScanning}
+                  >
+                    {isScanning ? "Analizando... ⏳" : "Escanear Placa"}
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn-secondary" 
+                    onClick={() => setIsCameraOpen(false)}
+                    disabled={isScanning}
+                  >
+                    Cerrar Cámara
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+          {/* --------------------------------------------------- */}
+
           <form onSubmit={handleSubmit}>
             <div className="form-grid">
+              
               <div className="form-group">
                 <label>Placa *</label>
                 <input
@@ -178,16 +279,6 @@ const IngresoVehiculo = () => {
                 </select>
               </div>
 
-              <div className="form-group">
-                <label>Foto Evidencia</label>
-                <input
-                  id="foto-input"
-                  type="file"
-                  name="foto"
-                  accept="image/png,image/jpeg,image/jpg"
-                  onChange={handleFileChange}
-                />
-              </div>
             </div>
 
             <div className="info-box">
@@ -200,7 +291,7 @@ const IngresoVehiculo = () => {
             </div>
 
             <div className="form-actions">
-              <button type="submit" className="btn-primary" disabled={isLoading}>
+              <button type="submit" className="btn-primary" disabled={isLoading || isScanning}>
                 {isLoading ? "Guardando..." : "Registrar Ingreso"}
               </button>
 
@@ -211,7 +302,7 @@ const IngresoVehiculo = () => {
                   handleLimpiar();
                   setMensaje({ tipo: "", texto: "" });
                 }}
-                disabled={isLoading}
+                disabled={isLoading || isScanning}
               >
                 Limpiar
               </button>

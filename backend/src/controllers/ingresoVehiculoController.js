@@ -1,4 +1,5 @@
 const IngresoService = require('../services/ingresoVehiculoService');
+const AIService = require('../services/aiService'); // <-- ¡ESTA ES LA LÍNEA QUE FALTA, MANITO!
 
 class IngresoVehiculoController {
     static async registrar(req, res, next) {
@@ -41,6 +42,29 @@ class IngresoVehiculoController {
             next(error); 
         }
     }
+
+static async leerPlaca(req, res, next) {
+    try {
+        const archivoImagen = req.file;
+        if (!archivoImagen) {
+            return res.status(400).json({ success: false, error: 'No se recibió imagen' });
+        }
+
+        const placaDetectada = await AIService.reconocerPlaca(archivoImagen.path);
+
+        if (placaDetectada) {
+            return res.status(200).json({ success: true, placa: placaDetectada });
+        } else {
+            return res.status(200).json({ 
+                success: false, 
+                error: 'No se detectó ninguna placa en la imagen. Intente enfocar mejor.' 
+            });
+        }
+    } catch (error) {
+        console.error("Error en el controlador leerPlaca:", error);
+        res.status(500).json({ success: false, error: 'Error interno en el servidor.' });
+    }
+}
 
     // Nuevo método para consultar cupos desde el Front
     static async obtenerCupos(req, res, next) {
