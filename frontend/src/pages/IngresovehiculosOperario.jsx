@@ -173,8 +173,10 @@ const IngresoVehiculo = () => {
                   required
                 >
                   <option value="">Seleccione</option>
-                  <option value="ALTURA">Nivel Altura</option>
-                  <option value="SUBTERRANEO">Subterráneo</option>
+                  <option value="NIVEL 1">Nivel 1</option>
+                  <option value="NIVEL 2">Nivel 2</option>
+                  <option value="NIVEL 3">Nivel 3</option>
+                  <option value="SUBTERRANEO  ">Subterráneo</option>
                 </select>
               </div>
 

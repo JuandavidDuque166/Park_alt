@@ -1,8 +1,9 @@
-DROP DATABASE IF EXISTS parqueadero;
 CREATE DATABASE parqueadero;
 USE parqueadero;
 
--- 1. TABLAS INDEPENDIENTES (No dependen de otras)
+-- =========================================================================
+-- 1. TABLAS INDEPENDIENTES
+-- =========================================================================
 CREATE TABLE cliente (
     id_cliente INT AUTO_INCREMENT PRIMARY KEY,
     nombre_completo VARCHAR(100) NOT NULL,
@@ -29,30 +30,26 @@ CREATE TABLE permisos (
 CREATE TABLE espacio (
     id_espacio INT AUTO_INCREMENT PRIMARY KEY,
     numero INT NOT NULL,
-    nivel VARCHAR(20) NOT NULL,
+    nivel VARCHAR(50) NOT NULL,
     estado ENUM('DISPONIBLE', 'OCUPADO', 'INACTIVO') DEFAULT 'DISPONIBLE'
 );
 
--- 2. TABLAS DEPENDIENTES (Tienen llaves foráneas)
+-- =========================================================================
+-- 2. TABLAS DEPENDIENTES
+-- =========================================================================
 CREATE TABLE vehiculo (
     id_vehiculo INT AUTO_INCREMENT PRIMARY KEY,
     placa VARCHAR(10) UNIQUE NOT NULL,
     id_tipo INT NOT NULL,
-    CONSTRAINT fk_vehiculo_tipo
-    FOREIGN KEY (id_tipo)
-    REFERENCES tipo_vehiculo(id_tipo)
+    CONSTRAINT fk_vehiculo_tipo FOREIGN KEY (id_tipo) REFERENCES tipo_vehiculo(id_tipo)
 );
 
 CREATE TABLE rol_permiso (
     id_rol INT NOT NULL,
     id_permiso INT NOT NULL,
     PRIMARY KEY (id_rol, id_permiso),
-    CONSTRAINT fk_rol_permiso_rol
-    FOREIGN KEY (id_rol)
-    REFERENCES roles(id_rol),
-    CONSTRAINT fk_rol_permiso_permiso
-    FOREIGN KEY (id_permiso)
-    REFERENCES permisos(id_permiso)
+    CONSTRAINT fk_rol_permiso_rol FOREIGN KEY (id_rol) REFERENCES roles(id_rol),
+    CONSTRAINT fk_rol_permiso_permiso FOREIGN KEY (id_permiso) REFERENCES permisos(id_permiso)
 );
 
 CREATE TABLE usuario (
@@ -63,9 +60,7 @@ CREATE TABLE usuario (
     id_rol INT NOT NULL,
     estado ENUM('ACTIVO','INACTIVO') DEFAULT 'ACTIVO',
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_usuario_rol
-    FOREIGN KEY (id_rol)
-    REFERENCES roles(id_rol)
+    CONSTRAINT fk_usuario_rol FOREIGN KEY (id_rol) REFERENCES roles(id_rol)
 );
 
 CREATE TABLE tarifa (
@@ -82,30 +77,22 @@ CREATE TABLE control_i_s (
     id_ingreso INT AUTO_INCREMENT PRIMARY KEY,
     fecha_hora_entrada DATETIME NOT NULL,
     fecha_hora_salida DATETIME,
-    url_imagen VARCHAR(255), -- Evidencia fotográfica (CU04)
+    url_imagen VARCHAR(255), 
     id_vehiculo INT NULL,
     id_espacio INT NULL,
     id_usuario INT NULL,
-    CONSTRAINT fk_control_vehiculo
-    FOREIGN KEY (id_vehiculo)
-    REFERENCES vehiculo(id_vehiculo),
-    CONSTRAINT fk_control_espacio
-    FOREIGN KEY (id_espacio)
-    REFERENCES espacio(id_espacio),
-    CONSTRAINT fk_control_usuario
-    FOREIGN KEY (id_usuario)
-    REFERENCES usuario(id_usuario)
+    CONSTRAINT fk_control_vehiculo FOREIGN KEY (id_vehiculo) REFERENCES vehiculo(id_vehiculo),
+    CONSTRAINT fk_control_espacio FOREIGN KEY (id_espacio) REFERENCES espacio(id_espacio),
+    CONSTRAINT fk_control_usuario FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 );
 
 CREATE TABLE pago (
     id_pago INT AUTO_INCREMENT PRIMARY KEY,
-    metodo_pago ENUM('EFECTIVO', 'TRASNFERENCIA') NOT NULL,
+    metodo_pago ENUM('EFECTIVO', 'TRANSFERENCIA') NOT NULL, 
     valor_total DECIMAL(10,2) NOT NULL,
     fecha_pago DATETIME NOT NULL,
     id_ingreso INT NOT NULL,
-    CONSTRAINT fk_pago_ingreso
-    FOREIGN KEY (id_ingreso)
-    REFERENCES control_i_s(id_ingreso)
+    CONSTRAINT fk_pago_ingreso FOREIGN KEY (id_ingreso) REFERENCES control_i_s(id_ingreso)
 );
 
 CREATE TABLE recibo (
@@ -113,9 +100,7 @@ CREATE TABLE recibo (
     fecha_emision DATETIME NOT NULL,
     numero_factura VARCHAR(50) UNIQUE NOT NULL,
     id_pago INT NOT NULL,
-    CONSTRAINT fk_recibo_pago
-    FOREIGN KEY (id_pago)
-    REFERENCES pago(id_pago)
+    CONSTRAINT fk_recibo_pago FOREIGN KEY (id_pago) REFERENCES pago(id_pago)
 );
 
 CREATE TABLE mensualidad (
@@ -126,137 +111,90 @@ CREATE TABLE mensualidad (
     fecha_fin DATE NOT NULL,
     valor DECIMAL(10,2) NOT NULL,
     estado ENUM('ACTIVA','VENCIDA') DEFAULT 'ACTIVA',
-    nivel_servicio varchar (100),
-    CONSTRAINT fk_mensualidad_cliente
-    FOREIGN KEY (id_cliente)
-    REFERENCES cliente(id_cliente),
-    CONSTRAINT fk_mensualidad_vehiculo
-    FOREIGN KEY (id_vehiculo)
-    REFERENCES vehiculo(id_vehiculo)
+    nivel_servicio VARCHAR(100),
+    CONSTRAINT fk_mensualidad_cliente FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente),
+    CONSTRAINT fk_mensualidad_vehiculo FOREIGN KEY (id_vehiculo) REFERENCES vehiculo(id_vehiculo)
 );
 
-INSERT INTO cliente (nombre_completo, documento, telefono) VALUES 
+-- =========================================================================
+-- 3. INSERCIÓN DE DATOS INICIALES (Usuarios, Roles, Tarifas)
+-- =========================================================================
+INSERT INTO cliente (nombre_completo, documento, telefono) VALUES  
 ('Juan Pérez', '1001234567', '3001112233'),
 ('María García', '1007654321', '3104445566'),
 ('Carlos López', '1009876543', '3207778899');
 
--- 3. INSERCIÓN DE DATOS INICIALES (Semillas)
+INSERT INTO tipo_vehiculo(nombre) VALUES
+('AUTOMOVIL'), ('CAMPERO'), ('CAMIONETA'), ('MICROBUS'), ('MOTOCARRO'), ('MOTOCICLETA'), ('BICICLETA');
 
-INSERT INTO tipo_vehiculo(nombre)
-VALUES
-('AUTOMOVIL'),
-('CAMPERO'), 
-('CAMIONETA'), 
-('MICROBUS'), 
-('MOTOCARRO'), 
-('MOTOCICLETA'), 
-('BICICLETA');
+INSERT INTO roles (nombre) VALUES ('Administrador'), ('Operario');
 
-INSERT INTO roles (nombre) 
-VALUES 
-('Administrador'),
-('Operario');
+INSERT INTO permisos (nombre, descripcion) VALUES
+('Crear','Permite crear nuevos registros'), ('Leer','Permite visualizar el registro'),
+('Actualizar','Permite modificar registros existentes'), ('Eliminar','Permite eliminar registros');
 
-INSERT INTO permisos (nombre, descripcion)
-VALUES
-('Crear','Permite crear nuevos registros'),
-('Leer','Permite visualizar el registro'),
-('Actualizar','Permite modificar registros existentes'),
-('Eliminar','Permite eliminar registros');
+INSERT INTO rol_permiso (id_rol, id_permiso) VALUES  
+(1, 1), (1, 2), (1, 3), (1, 4), (2, 1), (2, 2), (2, 3);         
 
-INSERT INTO rol_permiso (id_rol, id_permiso) 
-VALUES 
-(1, 1), (1, 2), (1, 3), (1, 4), -- Permisos de Administrador
-(2, 1), (2, 2), (2, 3);         -- Permisos de Operario
-
-INSERT INTO usuario(nombre, email, clave, id_rol,  fecha_creacion)
-VALUES
+INSERT INTO usuario(nombre, email, clave, id_rol, fecha_creacion) VALUES
 ('admin', 'juandaduque880@gmail.com','123456', 1, '2026-06-03'),
 ('operario1', 'empleado@gmail.com', '123456', 2, '2026-06-03');
 
-INSERT INTO espacio(numero, nivel)
-VALUES
-(1, 'SUBTERRANEO'),
-(2, 'ALTURA');
+INSERT INTO tarifa (id_tipo, valor_hora, valor_fraccion, valor_dia, valor_mensual) VALUES  
+(1, 5000, 1100, 37600, 160000), (2, 5000, 1100, 37600, 160000), (3, 5000, 1100, 37600, 160000), 
+(4, 5000, 1100, 37600, 160000), (5, 5000, 1100, 37600, 160000), (6, 2400, 750, 16400, 65800),    
+(7, 750, 200, 3750, 25600);     
 
-INSERT INTO tarifa (id_tipo, valor_hora, valor_fraccion, valor_dia, valor_mensual) VALUES 
--- Automóviles, Camperos, Camionetas, Microbuses, Motocarros
-(1, 5000, 1100, 37600, 160000), -- Automóvil
-(2, 5000, 1100, 37600, 160000), -- Campero
-(3, 5000, 1100, 37600, 160000), -- Camioneta
-(4, 5000, 1100, 37600, 160000), -- Microbus
-(5, 5000, 1100, 37600, 160000), -- Motocarro
+-- =========================================================================
+-- 4. INSERCIÓN DE LOS 100 ESPACIOS REQUERIDOS EXACTOS
+-- =========================================================================
+-- Nivel 1: 30 Espacios (Del 101 al 130)
+INSERT INTO espacio (numero, nivel, estado) VALUES
+(101, 'Nivel 1', 'DISPONIBLE'), (102, 'Nivel 1', 'DISPONIBLE'), (103, 'Nivel 1', 'DISPONIBLE'), (104, 'Nivel 1', 'DISPONIBLE'), (105, 'Nivel 1', 'DISPONIBLE'),
+(106, 'Nivel 1', 'DISPONIBLE'), (107, 'Nivel 1', 'DISPONIBLE'), (108, 'Nivel 1', 'DISPONIBLE'), (109, 'Nivel 1', 'DISPONIBLE'), (110, 'Nivel 1', 'DISPONIBLE'),
+(111, 'Nivel 1', 'DISPONIBLE'), (112, 'Nivel 1', 'DISPONIBLE'), (113, 'Nivel 1', 'DISPONIBLE'), (114, 'Nivel 1', 'DISPONIBLE'), (115, 'Nivel 1', 'DISPONIBLE'),
+(116, 'Nivel 1', 'DISPONIBLE'), (117, 'Nivel 1', 'DISPONIBLE'), (118, 'Nivel 1', 'DISPONIBLE'), (119, 'Nivel 1', 'DISPONIBLE'), (120, 'Nivel 1', 'DISPONIBLE'),
+(121, 'Nivel 1', 'DISPONIBLE'), (122, 'Nivel 1', 'DISPONIBLE'), (123, 'Nivel 1', 'DISPONIBLE'), (124, 'Nivel 1', 'DISPONIBLE'), (125, 'Nivel 1', 'DISPONIBLE'),
+(126, 'Nivel 1', 'DISPONIBLE'), (127, 'Nivel 1', 'DISPONIBLE'), (128, 'Nivel 1', 'DISPONIBLE'), (129, 'Nivel 1', 'DISPONIBLE'), (130, 'Nivel 1', 'DISPONIBLE');
 
--- Motocicletas
-(6, 2400, 750, 16400, 65800),   -- Motocicleta
+-- Nivel 2: 25 Espacios (Del 201 al 225)
+INSERT INTO espacio (numero, nivel, estado) VALUES
+(201, 'Nivel 2', 'DISPONIBLE'), (202, 'Nivel 2', 'DISPONIBLE'), (203, 'Nivel 2', 'DISPONIBLE'), (204, 'Nivel 2', 'DISPONIBLE'), (205, 'Nivel 2', 'DISPONIBLE'),
+(206, 'Nivel 2', 'DISPONIBLE'), (207, 'Nivel 2', 'DISPONIBLE'), (208, 'Nivel 2', 'DISPONIBLE'), (209, 'Nivel 2', 'DISPONIBLE'), (210, 'Nivel 2', 'DISPONIBLE'),
+(211, 'Nivel 2', 'DISPONIBLE'), (212, 'Nivel 2', 'DISPONIBLE'), (213, 'Nivel 2', 'DISPONIBLE'), (214, 'Nivel 2', 'DISPONIBLE'), (215, 'Nivel 2', 'DISPONIBLE'),
+(216, 'Nivel 2', 'DISPONIBLE'), (217, 'Nivel 2', 'DISPONIBLE'), (218, 'Nivel 2', 'DISPONIBLE'), (219, 'Nivel 2', 'DISPONIBLE'), (220, 'Nivel 2', 'DISPONIBLE'),
+(221, 'Nivel 2', 'DISPONIBLE'), (222, 'Nivel 2', 'DISPONIBLE'), (223, 'Nivel 2', 'DISPONIBLE'), (224, 'Nivel 2', 'DISPONIBLE'), (225, 'Nivel 2', 'DISPONIBLE');
 
--- Bicicletas
-(7, 750, 200, 3750, 25600);     -- Bicicleta
+-- Nivel 3: 25 Espacios (Del 301 al 325)
+INSERT INTO espacio (numero, nivel, estado) VALUES
+(301, 'Nivel 3', 'DISPONIBLE'), (302, 'Nivel 3', 'DISPONIBLE'), (303, 'Nivel 3', 'DISPONIBLE'), (304, 'Nivel 3', 'DISPONIBLE'), (305, 'Nivel 3', 'DISPONIBLE'),
+(306, 'Nivel 3', 'DISPONIBLE'), (307, 'Nivel 3', 'DISPONIBLE'), (308, 'Nivel 3', 'DISPONIBLE'), (309, 'Nivel 3', 'DISPONIBLE'), (310, 'Nivel 3', 'DISPONIBLE'),
+(311, 'Nivel 3', 'DISPONIBLE'), (312, 'Nivel 3', 'DISPONIBLE'), (313, 'Nivel 3', 'DISPONIBLE'), (314, 'Nivel 3', 'DISPONIBLE'), (315, 'Nivel 3', 'DISPONIBLE'),
+(316, 'Nivel 3', 'DISPONIBLE'), (317, 'Nivel 3', 'DISPONIBLE'), (318, 'Nivel 3', 'DISPONIBLE'), (319, 'Nivel 3', 'DISPONIBLE'), (320, 'Nivel 3', 'DISPONIBLE'),
+(321, 'Nivel 3', 'DISPONIBLE'), (322, 'Nivel 3', 'DISPONIBLE'), (323, 'Nivel 3', 'DISPONIBLE'), (324, 'Nivel 3', 'DISPONIBLE'), (325, 'Nivel 3', 'DISPONIBLE');
 
+-- Subterráneo: 20 Espacios (Del 401 al 420)
+INSERT INTO espacio (numero, nivel, estado) VALUES
+(401, 'Subterráneo', 'DISPONIBLE'), (402, 'Subterráneo', 'DISPONIBLE'), (403, 'Subterráneo', 'DISPONIBLE'), (404, 'Subterráneo', 'DISPONIBLE'), (405, 'Subterráneo', 'DISPONIBLE'),
+(406, 'Subterráneo', 'DISPONIBLE'), (407, 'Subterráneo', 'DISPONIBLE'), (408, 'Subterráneo', 'DISPONIBLE'), (409, 'Subterráneo', 'DISPONIBLE'), (410, 'Subterráneo', 'DISPONIBLE'),
+(411, 'Subterráneo', 'DISPONIBLE'), (412, 'Subterráneo', 'DISPONIBLE'), (413, 'Subterráneo', 'DISPONIBLE'), (414, 'Subterráneo', 'DISPONIBLE'), (415, 'Subterráneo', 'DISPONIBLE'),
+(416, 'Subterráneo', 'DISPONIBLE'), (417, 'Subterráneo', 'DISPONIBLE'), (418, 'Subterráneo', 'DISPONIBLE'), (419, 'Subterráneo', 'DISPONIBLE'), (420, 'Subterráneo', 'DISPONIBLE');
 
--- 4. CONSULTAS Y REPORTES DE PRUEBA
+-- =========================================================================
+-- 5. SIMULACIÓN DE DATOS (Para que el contador muestre 98 disponibles)
+-- =========================================================================
+INSERT INTO vehiculo (placa, id_tipo) VALUES ('DEF456', 1), ('GHI789', 6), ('XYZ123', 2), ('ABC-001', 1);
 
--- VEHÍCULOS ACTUALMENTE DENTRO DEL PARQUEADERO
-SELECT v.placa, c.fecha_hora_entrada
-FROM control_i_s c
-INNER JOIN vehiculo v
-ON c.id_vehiculo = v.id_vehiculo
-WHERE c.fecha_hora_salida IS NULL;
+INSERT INTO mensualidad (id_cliente, id_vehiculo, fecha_inicio, fecha_fin, valor, estado, nivel_servicio) VALUES 
+(1, 4, '2026-05-15', '2026-06-15', 61500.00, 'ACTIVA', 'Subterraneo'),  
+(2, 2, '2026-04-01', '2026-05-01', 149500.00, 'VENCIDA', 'Subterraneo'), 
+(3, 3, '2026-06-01', '2026-07-01', 149500.00, 'ACTIVA', 'Subterraneo');  
 
--- ESPACIOS OCUPADOS
-SELECT e.numero, e.nivel, e.estado
-FROM espacio e
-INNER JOIN control_i_s c
-ON e.id_espacio = c.id_espacio
-WHERE c.fecha_hora_salida IS NULL;
-
--- TOTAL RECAUDADO
-SELECT SUM(valor_total) AS total_recaudado
-FROM pago;
-
--- Insertar un vehículo de prueba (Moto)
-INSERT INTO vehiculo (placa, id_tipo) VALUES ('XYZ123', 2);
-
--- Registrar un ingreso simulando al operario
+-- Simulamos que entran 2 vehículos y ocupan 2 espacios (ID 1 y ID 31)
 INSERT INTO control_i_s (fecha_hora_entrada, url_imagen, id_vehiculo, id_espacio, id_usuario) 
-VALUES (NOW(), 'http://ruta-a-imagen.com/xyz123.jpg', 1, 1, 2);
-
--- Marcar el espacio como OCUPADO
+VALUES (NOW(), 'http://evidencia.com/def456.jpg', 1, 1, 2);
 UPDATE espacio SET estado = 'OCUPADO' WHERE id_espacio = 1;
 
-INSERT INTO vehiculo (placa, id_tipo) VALUES 
-('ABC-001', 1), -- ID 1 (Automóvil)
-('XYZ-002', 6), -- ID 2 (Motocicleta)
-('LMN-003', 3); -- ID 3 (Camioneta)
-
-INSERT INTO mensualidad (id_cliente, id_vehiculo, fecha_inicio, fecha_fin, valor, estado, nivel_servicio) 
-VALUES 
-(1, 1, '2026-06-01', '2026-07-01', 149500.00, 'ACTIVA', 'Subterraneo'),
-(2, 2, '2026-05-15', '2026-06-15', 61500.00, 'ACTIVA', 'Subterraneo'),
-(3, 3, '2026-04-01', '2026-05-01', 149500.00, 'VENCIDA', 'Subterraneo');
-
-
-USE parqueadero;
-
--- Limpiamos los espacios de prueba anteriores
-DELETE FROM espacio;
-ALTER TABLE espacio AUTO_INCREMENT = 1;
-
--- Insertamos 5 espacios para el nivel SUBTERRANEO
-INSERT INTO espacio (numero, nivel, estado) VALUES 
-(101, 'SUBTERRANEO', 'DISPONIBLE'),
-(102, 'SUBTERRANEO', 'DISPONIBLE'),
-(103, 'SUBTERRANEO', 'DISPONIBLE'),
-(104, 'SUBTERRANEO', 'DISPONIBLE'),
-(105, 'SUBTERRANEO', 'DISPONIBLE');
-
--- Insertamos 5 espacios para el nivel ALTURA
-INSERT INTO espacio (numero, nivel, estado) VALUES 
-(201, 'ALTURA', 'DISPONIBLE'),
-(202, 'ALTURA', 'DISPONIBLE'),
-(203, 'ALTURA', 'DISPONIBLE'),
-(204, 'ALTURA', 'DISPONIBLE'),
-(205, 'ALTURA', 'DISPONIBLE');
-
-SELECT COUNT(*) as disponibles FROM espacio WHERE estado = 'DISPONIBLE'
-SELECT COUNT(*) as total FROM espacio WHERE estado != 'INACTIVO'
+INSERT INTO control_i_s (fecha_hora_entrada, url_imagen, id_vehiculo, id_espacio, id_usuario) 
+VALUES (NOW(), 'http://evidencia.com/ghi789.jpg', 2, 31, 2);
+UPDATE espacio SET estado = 'OCUPADO' WHERE id_espacio = 31;
