@@ -121,8 +121,7 @@ const SalidaVehiculo = () => {
               onChange={(e) => setMetodoPago(e.target.value)}
             >
               <option value="Efectivo">Efectivo</option>
-              <option value="Transferencia">Transferencia (Nequi/Daviplata)</option>
-              <option value="Tarjeta">Tarjeta Débito/Crédito</option>
+              <option value="Transferencia">Transferencia</option>
             </select>
           </div>
 
