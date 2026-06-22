@@ -1,4 +1,3 @@
-DROP DATABASE IF EXISTS parqueadero;
 CREATE DATABASE parqueadero;
 USE parqueadero;
 
@@ -135,12 +134,12 @@ CREATE TABLE mensualidad (
     REFERENCES vehiculo(id_vehiculo)
 );
 
+-- 3. INSERCIÓN DE DATOS INICIALES (Semillas)
+
 INSERT INTO cliente (nombre_completo, documento, telefono) VALUES 
 ('Juan Pérez', '1001234567', '3001112233'),
 ('María García', '1007654321', '3104445566'),
 ('Carlos López', '1009876543', '3207778899');
-
--- 3. INSERCIÓN DE DATOS INICIALES (Semillas)
 
 INSERT INTO tipo_vehiculo(nombre)
 VALUES
@@ -167,96 +166,60 @@ VALUES
 INSERT INTO rol_permiso (id_rol, id_permiso) 
 VALUES 
 (1, 1), (1, 2), (1, 3), (1, 4), -- Permisos de Administrador
-(2, 1), (2, 2), (2, 3);         -- Permisos de Operario
+(2, 1), (2, 2), (2, 3);          -- Permisos de Operario
 
 INSERT INTO usuario(nombre, email, clave, id_rol,  fecha_creacion)
 VALUES
 ('admin', 'juandaduque880@gmail.com','123456', 1, '2026-06-03'),
 ('operario1', 'empleado@gmail.com', '123456', 2, '2026-06-03');
 
-INSERT INTO espacio(numero, nivel)
-VALUES
-(1, 'SUBTERRANEO'),
-(2, 'ALTURA');
-
 INSERT INTO tarifa (id_tipo, valor_hora, valor_fraccion, valor_dia, valor_mensual) VALUES 
--- Automóviles, Camperos, Camionetas, Microbuses, Motocarros
 (1, 5000, 1100, 37600, 160000), -- Automóvil
 (2, 5000, 1100, 37600, 160000), -- Campero
 (3, 5000, 1100, 37600, 160000), -- Camioneta
 (4, 5000, 1100, 37600, 160000), -- Microbus
 (5, 5000, 1100, 37600, 160000), -- Motocarro
-
--- Motocicletas
 (6, 2400, 750, 16400, 65800),   -- Motocicleta
-
--- Bicicletas
 (7, 750, 200, 3750, 25600);     -- Bicicleta
 
+-- POBLACIÓN DE LOS 100 ESPACIOS DEL PARQUEADERO
+-- Nivel 1: 30 espacios (101 al 130)
+INSERT INTO espacio (numero, nivel, estado) VALUES 
+(101, 'Nivel 1', 'DISPONIBLE'), (102, 'Nivel 1', 'DISPONIBLE'), (103, 'Nivel 1', 'DISPONIBLE'), (104, 'Nivel 1', 'DISPONIBLE'), (105, 'Nivel 1', 'DISPONIBLE'),
+(106, 'Nivel 1', 'DISPONIBLE'), (107, 'Nivel 1', 'DISPONIBLE'), (108, 'Nivel 1', 'DISPONIBLE'), (109, 'Nivel 1', 'DISPONIBLE'), (110, 'Nivel 1', 'DISPONIBLE'),
+(111, 'Nivel 1', 'DISPONIBLE'), (112, 'Nivel 1', 'DISPONIBLE'), (113, 'Nivel 1', 'DISPONIBLE'), (114, 'Nivel 1', 'DISPONIBLE'), (115, 'Nivel 1', 'DISPONIBLE'),
+(116, 'Nivel 1', 'DISPONIBLE'), (117, 'Nivel 1', 'DISPONIBLE'), (118, 'Nivel 1', 'DISPONIBLE'), (119, 'Nivel 1', 'DISPONIBLE'), (120, 'Nivel 1', 'DISPONIBLE'),
+(121, 'Nivel 1', 'DISPONIBLE'), (122, 'Nivel 1', 'DISPONIBLE'), (123, 'Nivel 1', 'DISPONIBLE'), (124, 'Nivel 1', 'DISPONIBLE'), (125, 'Nivel 1', 'DISPONIBLE'),
+(126, 'Nivel 1', 'DISPONIBLE'), (127, 'Nivel 1', 'DISPONIBLE'), (128, 'Nivel 1', 'DISPONIBLE'), (129, 'Nivel 1', 'DISPONIBLE'), (130, 'Nivel 1', 'DISPONIBLE');
+
+-- Nivel 2: 25 espacios (201 al 225)
+INSERT INTO espacio (numero, nivel, estado) VALUES 
+(201, 'Nivel 2', 'DISPONIBLE'), (202, 'Nivel 2', 'DISPONIBLE'), (203, 'Nivel 2', 'DISPONIBLE'), (204, 'Nivel 2', 'DISPONIBLE'), (205, 'Nivel 2', 'DISPONIBLE'),
+(206, 'Nivel 2', 'DISPONIBLE'), (207, 'Nivel 2', 'DISPONIBLE'), (208, 'Nivel 2', 'DISPONIBLE'), (209, 'Nivel 2', 'DISPONIBLE'), (210, 'Nivel 2', 'DISPONIBLE'),
+(211, 'Nivel 2', 'DISPONIBLE'), (212, 'Nivel 2', 'DISPONIBLE'), (213, 'Nivel 2', 'DISPONIBLE'), (214, 'Nivel 2', 'DISPONIBLE'), (215, 'Nivel 2', 'DISPONIBLE'),
+(216, 'Nivel 2', 'DISPONIBLE'), (217, 'Nivel 2', 'DISPONIBLE'), (218, 'Nivel 2', 'DISPONIBLE'), (219, 'Nivel 2', 'DISPONIBLE'), (220, 'Nivel 2', 'DISPONIBLE'),
+(221, 'Nivel 2', 'DISPONIBLE'), (222, 'Nivel 2', 'DISPONIBLE'), (223, 'Nivel 2', 'DISPONIBLE'), (224, 'Nivel 2', 'DISPONIBLE'), (225, 'Nivel 2', 'DISPONIBLE');
+
+-- Nivel 3: 25 espacios (301 al 325)
+INSERT INTO espacio (numero, nivel, estado) VALUES 
+(301, 'Nivel 3', 'DISPONIBLE'), (302, 'Nivel 3', 'DISPONIBLE'), (303, 'Nivel 3', 'DISPONIBLE'), (304, 'Nivel 3', 'DISPONIBLE'), (305, 'Nivel 3', 'DISPONIBLE'),
+(306, 'Nivel 3', 'DISPONIBLE'), (307, 'Nivel 3', 'DISPONIBLE'), (308, 'Nivel 3', 'DISPONIBLE'), (309, 'Nivel 3', 'DISPONIBLE'), (310, 'Nivel 3', 'DISPONIBLE'),
+(311, 'Nivel 3', 'DISPONIBLE'), (312, 'Nivel 3', 'DISPONIBLE'), (313, 'Nivel 3', 'DISPONIBLE'), (314, 'Nivel 3', 'DISPONIBLE'), (315, 'Nivel 3', 'DISPONIBLE'),
+(316, 'Nivel 3', 'DISPONIBLE'), (317, 'Nivel 3', 'DISPONIBLE'), (318, 'Nivel 3', 'DISPONIBLE'), (319, 'Nivel 3', 'DISPONIBLE'), (320, 'Nivel 3', 'DISPONIBLE'),
+(321, 'Nivel 3', 'DISPONIBLE'), (322, 'Nivel 3', 'DISPONIBLE'), (323, 'Nivel 3', 'DISPONIBLE'), (324, 'Nivel 3', 'DISPONIBLE'), (325, 'Nivel 3', 'DISPONIBLE');
+
+-- Subterráneo: 20 espacios (1 al 20)
+INSERT INTO espacio (numero, nivel, estado) VALUES 
+(1, 'Subterráneo', 'DISPONIBLE'), (2, 'Subterráneo', 'DISPONIBLE'), (3, 'Subterráneo', 'DISPONIBLE'), (4, 'Subterráneo', 'DISPONIBLE'), (5, 'Subterráneo', 'DISPONIBLE'),
+(6, 'Subterráneo', 'DISPONIBLE'), (7, 'Subterráneo', 'DISPONIBLE'), (8, 'Subterráneo', 'DISPONIBLE'), (9, 'Subterráneo', 'DISPONIBLE'), (10, 'Subterráneo', 'DISPONIBLE'),
+(11, 'Subterráneo', 'DISPONIBLE'), (12, 'Subterráneo', 'DISPONIBLE'), (13, 'Subterráneo', 'DISPONIBLE'), (14, 'Subterráneo', 'DISPONIBLE'), (15, 'Subterráneo', 'DISPONIBLE'),
+(16, 'Subterráneo', 'DISPONIBLE'), (17, 'Subterráneo', 'DISPONIBLE'), (18, 'Subterráneo', 'DISPONIBLE'), (19, 'Subterráneo', 'DISPONIBLE'), (20, 'Subterráneo', 'DISPONIBLE');
 
 -- 4. CONSULTAS Y REPORTES DE PRUEBA
-
--- VEHÍCULOS ACTUALMENTE DENTRO DEL PARQUEADERO
-SELECT v.placa, c.fecha_hora_entrada
-FROM control_i_s c
-INNER JOIN vehiculo v
-ON c.id_vehiculo = v.id_vehiculo
-WHERE c.fecha_hora_salida IS NULL;
-
--- ESPACIOS OCUPADOS
-SELECT e.numero, e.nivel, e.estado
-FROM espacio e
-INNER JOIN control_i_s c
-ON e.id_espacio = c.id_espacio
-WHERE c.fecha_hora_salida IS NULL;
-
--- TOTAL RECAUDADO
-SELECT SUM(valor_total) AS total_recaudado
-FROM pago;
-
--- Insertar un vehículo de prueba (Moto)
-INSERT INTO vehiculo (placa, id_tipo) VALUES ('XYZ123', 2);
-
--- Registrar un ingreso simulando al operario
-INSERT INTO control_i_s (fecha_hora_entrada, url_imagen, id_vehiculo, id_espacio, id_usuario) 
-VALUES (NOW(), 'http://ruta-a-imagen.com/xyz123.jpg', 1, 1, 2);
-
--- Marcar el espacio como OCUPADO
-UPDATE espacio SET estado = 'OCUPADO' WHERE id_espacio = 1;
-
-INSERT INTO vehiculo (placa, id_tipo) VALUES 
-('ABC-001', 1), -- ID 1 (Automóvil)
-('XYZ-002', 6), -- ID 2 (Motocicleta)
-('LMN-003', 3); -- ID 3 (Camioneta)
+INSERT INTO vehiculo (placa, id_tipo) VALUES ('ABC-001', 1), ('XYZ-002', 6), ('LMN-003', 3);
 
 INSERT INTO mensualidad (id_cliente, id_vehiculo, fecha_inicio, fecha_fin, valor, estado, nivel_servicio) 
 VALUES 
-(1, 1, '2026-06-01', '2026-07-01', 149500.00, 'ACTIVA', 'Subterraneo'),
-(2, 2, '2026-05-15', '2026-06-15', 61500.00, 'ACTIVA', 'Subterraneo'),
-(3, 3, '2026-04-01', '2026-05-01', 149500.00, 'VENCIDA', 'Subterraneo');
-
-
-USE parqueadero;
-
--- Limpiamos los espacios de prueba anteriores
-DELETE FROM espacio;
-ALTER TABLE espacio AUTO_INCREMENT = 1;
-
--- Insertamos 5 espacios para el nivel SUBTERRANEO
-INSERT INTO espacio (numero, nivel, estado) VALUES 
-(101, 'SUBTERRANEO', 'DISPONIBLE'),
-(102, 'SUBTERRANEO', 'DISPONIBLE'),
-(103, 'SUBTERRANEO', 'DISPONIBLE'),
-(104, 'SUBTERRANEO', 'DISPONIBLE'),
-(105, 'SUBTERRANEO', 'DISPONIBLE');
-
--- Insertamos 5 espacios para el nivel ALTURA
-INSERT INTO espacio (numero, nivel, estado) VALUES 
-(201, 'ALTURA', 'DISPONIBLE'),
-(202, 'ALTURA', 'DISPONIBLE'),
-(203, 'ALTURA', 'DISPONIBLE'),
-(204, 'ALTURA', 'DISPONIBLE'),
-(205, 'ALTURA', 'DISPONIBLE');
-
-SELECT COUNT(*) as disponibles FROM espacio WHERE estado = 'DISPONIBLE'
-SELECT COUNT(*) as total FROM espacio WHERE estado != 'INACTIVO'
+(1, 1, '2026-06-01', '2026-07-01', 149500.00, 'ACTIVA', 'Subterráneo'),
+(2, 2, '2026-05-15', '2026-06-15', 61500.00, 'ACTIVA', 'Subterráneo'),
+(3, 3, '2026-04-01', '2026-05-01', 149500.00, 'VENCIDA', 'Subterráneo');

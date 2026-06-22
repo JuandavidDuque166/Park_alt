@@ -38,6 +38,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const tarifasRoutes = require('./routes/tarifasRoutes');
 const mensualidadesRoutes = require('./routes/mensualidadesRoutes');
 const ingresoVehiculoRoutes = require('./routes/ingresoVehiculoRoutes');
+const salidaVehiculoRoutes = require('./routes/salidaVehiculoRoutes');
 
 // Rutas de autenticación y usuarios
 app.use('/api/auth', authRoutes);
@@ -49,6 +50,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/tarifas', tarifasRoutes);
 app.use('/api', mensualidadesRoutes);
+app.use('/api/salidas', salidaVehiculoRoutes);
 
 // Manejo de rutas no encontradas (404)
 app.all(/(.*)/, (req, res, next) => {

@@ -260,6 +260,10 @@ const IngresoVehiculo = () => {
                 >
                   <option value="">Seleccione</option>
                   <option value="1">Automóvil</option>
+                  <option value="2">Campero</option>
+                  <option value="3">Camioneta</option>
+                  <option value="4">MicroBus</option>
+                  <option value="5">Motocarro</option>
                   <option value="6">Motocicleta</option>
                   <option value="7">Bicicleta</option>
                 </select>
@@ -274,8 +278,10 @@ const IngresoVehiculo = () => {
                   required
                 >
                   <option value="">Seleccione</option>
-                  <option value="ALTURA">Nivel Altura</option>
-                  <option value="SUBTERRANEO">Subterráneo</option>
+                  <option value="NIVEL 1">Nivel 1</option>
+                  <option value="NIVEL 2">Nivel 2</option>
+                  <option value="NIVEL 3">Nivel 3</option>
+                  <option value="SUBTERRÁNEO">Subterráneo</option>
                 </select>
               </div>
 
