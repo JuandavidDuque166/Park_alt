@@ -1,25 +1,46 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './ControlParqueadero.css';
 
 const ControlParqueadero = () => {
-  // Estado simulado basado en tu Figma (idealmente esto vendrá del Backend)
+  // Inicializamos los estados limpios para recibir la data real del backend
   const [stats, setStats] = useState({
-    total: 100,
-    ocupados: 2,
-    disponibles: 98
+    total: 0,
+    ocupados: 0,
+    disponibles: 0
   });
 
-  const [niveles, setNiveles] = useState([
-    { nombre: 'Nivel 1', total: 30, ocupados: 1, disponibles: 29, porcentaje: 3 },
-    { nombre: 'Nivel 2', total: 25, ocupados: 1, disponibles: 24, porcentaje: 4 },
-    { nombre: 'Nivel 3', total: 25, ocupados: 0, disponibles: 25, porcentaje: 0 },
-    { nombre: 'Subterráneo', total: 20, ocupados: 0, disponibles: 20, porcentaje: 0 }
-  ]);
+  const [niveles, setNiveles] = useState([]);
+  const [vehiculos, setVehiculos] = useState([]);
+  const [filtroNivel, setFiltroNivel] = useState('Todos los niveles');
 
-  const [vehiculos, setVehiculos] = useState([
-    { placa: 'DEF456', tipo: 'Carro', nivel: 'Nivel 1', horaIngreso: '08:30 a. m.', tiempo: '1200h 54m', estado: 'Temporal' },
-    { placa: 'GHI789', tipo: 'Moto', nivel: 'Nivel 2', horaIngreso: '10:15 a. m.', tiempo: '1199h 9m', estado: 'Temporal' }
-  ]);
+  // Petición al backend al cargar la pantalla
+  useEffect(() => {
+    const cargarDatos = async () => {
+      try {
+        const respuesta = await axios.get('http://localhost:3000/api/control/datos');
+        if (respuesta.data.success) {
+          const { stats, niveles, vehiculos } = respuesta.data.data;
+          setStats(stats);
+          setNiveles(niveles);
+          setVehiculos(vehiculos);
+        }
+      } catch (error) {
+        console.error("Error al conectar con la API de control:", error);
+      }
+    };
+
+    cargarDatos();
+
+    // Actualiza la información en segundo plano cada 60 segundos
+    const intervalo = setInterval(cargarDatos, 60000);
+    return () => clearInterval(intervalo);
+  }, []);
+
+  // Filtrado reactivo según la opción que elija el usuario en el select
+  const vehiculosFiltrados = filtroNivel === 'Todos los niveles'
+    ? vehiculos
+    : vehiculos.filter(veh => veh.nivel === filtroNivel);
 
   return (
     <div className="control-container">
@@ -78,12 +99,16 @@ const ControlParqueadero = () => {
       <div className="table-section section-card">
         <div className="table-header">
           <h3>Vehículos en el Parqueadero</h3>
-          <select className="level-filter">
-            <option>Todos los niveles</option>
-            <option>Nivel 1</option>
-            <option>Nivel 2</option>
-            <option>Nivel 3</option>
-            <option>Subterráneo</option>
+          <select 
+            className="level-filter"
+            value={filtroNivel}
+            onChange={(e) => setFiltroNivel(e.target.value)}
+          >
+            <option value="Todos los niveles">Todos los niveles</option>
+            <option value="Nivel 1">Nivel 1</option>
+            <option value="Nivel 2">Nivel 2</option>
+            <option value="Nivel 3">Nivel 3</option>
+            <option value="Subterráneo">Subterráneo</option>
           </select>
         </div>
         <table className="vehicles-table">
@@ -98,7 +123,7 @@ const ControlParqueadero = () => {
             </tr>
           </thead>
           <tbody>
-            {vehiculos.map((veh, index) => (
+            {vehiculosFiltrados.map((veh, index) => (
               <tr key={index}>
                 <td><strong>{veh.placa}</strong></td>
                 <td>{veh.tipo}</td>

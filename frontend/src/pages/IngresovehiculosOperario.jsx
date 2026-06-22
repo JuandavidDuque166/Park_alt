@@ -138,7 +138,7 @@ const IngresoVehiculo = () => {
     try {
       const response = await api.post("/ingresos", dataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
-      });
+      }); 
 
       if (response.data.success) {
         setMensaje({
