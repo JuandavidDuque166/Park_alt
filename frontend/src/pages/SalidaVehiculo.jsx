@@ -1,10 +1,16 @@
+<<<<<<< HEAD
 import React, { useState } from 'react';
+=======
+import React, { useState, useEffect } from 'react';
+import { api } from '../services/api'; // Importamos tu conexión al backend
+>>>>>>> origin/alex
 import './SalidaVehiculo.css';
 
 const SalidaVehiculo = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [vehiculoSeleccionado, setVehiculoSeleccionado] = useState(null);
   const [metodoPago, setMetodoPago] = useState('Efectivo');
+<<<<<<< HEAD
 
   // Datos mockeados basados en tu diseño
   const [vehiculos] = useState([
@@ -28,6 +34,51 @@ const SalidaVehiculo = () => {
     const encontrado = vehiculos.find(v => v.placa.includes(searchTerm.toUpperCase()));
     if (encontrado) {
       setVehiculoSeleccionado(encontrado);
+=======
+  
+  // Iniciamos el estado vacío, ya no hay datos quemados
+  const [vehiculos, setVehiculos] = useState([]);
+
+  // Se ejecuta al cargar la pantalla para traer los carros parqueados
+  useEffect(() => {
+    cargarVehiculos();
+  }, []);
+
+  const cargarVehiculos = async () => {
+    try {
+      const response = await api.get('/salidas/activos');
+      if (response.data.success) {
+        // Formateamos los datos del backend para que encajen EXACTAMENTE con tu diseño JSX
+        const vehiculosFormateados = response.data.data.map(v => ({
+          id_ingreso: v.id_ingreso,
+          placa: v.placa,
+          tipo: v.tipo_vehiculo || 'No definido',
+          servicioBase: 'Descubierto', // O el campo que uses en BD
+          tipoServicio: 'Temporal', 
+          nivel: v.nivel || 'Nivel 1',
+          // Damos formato a la hora
+          horaIngresoCorta: new Date(v.hora_ingreso).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+          horaIngresoLarga: new Date(v.hora_ingreso).toLocaleString(),
+          tiempo: v.tiempo_formateado || 'Calculando...',
+          estado: v.estado || 'Activo',
+          valorEstimado: `$${v.valor_estimado || 0}`
+        }));
+        setVehiculos(vehiculosFormateados);
+      }
+    } catch (error) {
+      console.error("Error al cargar vehículos:", error);
+    }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    // Busca en los vehículos reales traídos de la base de datos
+    const encontrado = vehiculos.find(v => v.placa.includes(searchTerm.toUpperCase()));
+    if (encontrado) {
+      setVehiculoSeleccionado(encontrado);
+    } else {
+      alert("Vehículo no encontrado en el parqueadero");
+>>>>>>> origin/alex
     }
   };
 
@@ -35,6 +86,7 @@ const SalidaVehiculo = () => {
     setVehiculoSeleccionado(vehiculo);
   };
 
+<<<<<<< HEAD
   const registrarSalida = () => {
     alert(`Salida registrada para ${vehiculoSeleccionado.placa} con pago en ${metodoPago}`);
     // Aquí iría la lógica para enviar al backend y limpiar el estado
@@ -42,6 +94,32 @@ const SalidaVehiculo = () => {
     setSearchTerm('');
   };
 
+=======
+  const registrarSalida = async () => {
+    try {
+      // Enviamos la petición de salida al backend con el ID y método de pago
+      const response = await api.post('/salidas/procesar', {
+        id_ingreso: vehiculoSeleccionado.id_ingreso,
+        metodo_pago: metodoPago
+      });
+
+      if (response.data.success) {
+        alert(`¡Salida exitosa!\nPlaca: ${vehiculoSeleccionado.placa}\nCobrado: $${response.data.total_pagar}\nPago en: ${metodoPago}`);
+        // Limpiamos los estados y recargamos la tabla para que el carro desaparezca
+        setVehiculoSeleccionado(null);
+        setSearchTerm('');
+        cargarVehiculos();
+      }
+    } catch (error) {
+      console.error("Error al procesar la salida:", error);
+      alert(error.response?.data?.error || "Ocurrió un error al intentar procesar la salida.");
+    }
+  };
+
+  // =======================================================================
+  // DE AQUÍ HACIA ABAJO TU JSX QUEDA INTACTO, NO SE CAMBIÓ NI UNA SOLA LÍNEA
+  // =======================================================================
+>>>>>>> origin/alex
   return (
     <div className="salida-container">
       {/* Cabecera */}
@@ -65,7 +143,11 @@ const SalidaVehiculo = () => {
             className="search-input"
           />
           <button type="submit" className="btn-search">
+<<<<<<< HEAD
              Buscar
+=======
+            <span className="icon-search">🔍</span> Buscar
+>>>>>>> origin/alex
           </button>
         </form>
       </div>
@@ -121,7 +203,12 @@ const SalidaVehiculo = () => {
               onChange={(e) => setMetodoPago(e.target.value)}
             >
               <option value="Efectivo">Efectivo</option>
+<<<<<<< HEAD
               <option value="Transferencia">Transferencia</option>
+=======
+              <option value="Transferencia">Transferencia (Nequi/Daviplata)</option>
+              <option value="Tarjeta">Tarjeta Débito/Crédito</option>
+>>>>>>> origin/alex
             </select>
           </div>
 
@@ -165,7 +252,11 @@ const SalidaVehiculo = () => {
                       className="btn-exit" 
                       onClick={() => seleccionarVehiculo(vehiculo)}
                     >
+<<<<<<< HEAD
                      Salida
+=======
+                      <span className="icon-exit">↪</span> Salida
+>>>>>>> origin/alex
                     </button>
                   </td>
                 </tr>
