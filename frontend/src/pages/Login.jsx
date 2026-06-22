@@ -24,11 +24,7 @@ export const Login = () => {
             if (response.status === 'success') {
                 console.log('Login exitoso, redirigiendo...');
                 // 3. Usamos navigate para cambiar de vista sin recargar la página
-<<<<<<< HEAD
-                navigate('/Dashboard'); 
-=======
                 navigate('/DashboardAdmin'); 
->>>>>>> origin/alex
             } else {
                 setError(response.message || 'No se pudo iniciar sesión');
             }
@@ -48,20 +44,12 @@ export const Login = () => {
 
                 <form onSubmit={handleSubmit} className="login-form">
                     <div className="form-group">
-<<<<<<< HEAD
-                        <label htmlFor="email">Correo electronico</label>
-=======
                         <label htmlFor="email">Usuario</label>
->>>>>>> origin/alex
                         <input 
                             type="email" 
                             id="email"
                             name="email" 
-<<<<<<< HEAD
-                            placeholder="Ingrese su correo" 
-=======
                             placeholder="Ingrese su usuario" 
->>>>>>> origin/alex
                             onChange={handleChange} 
                             required 
                         />

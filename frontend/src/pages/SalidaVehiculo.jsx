@@ -1,40 +1,11 @@
-<<<<<<< HEAD
-import React, { useState } from 'react';
-=======
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api'; // Importamos tu conexión al backend
->>>>>>> origin/alex
 import './SalidaVehiculo.css';
 
 const SalidaVehiculo = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [vehiculoSeleccionado, setVehiculoSeleccionado] = useState(null);
   const [metodoPago, setMetodoPago] = useState('Efectivo');
-<<<<<<< HEAD
-
-  // Datos mockeados basados en tu diseño
-  const [vehiculos] = useState([
-    {
-      placa: 'GHI789',
-      tipo: 'Motocicleta',
-      servicioBase: 'Descubierto',
-      tipoServicio: 'Temporal',
-      nivel: 'Nivel 2',
-      horaIngresoCorta: '10:15 a. m.',
-      horaIngresoLarga: '29/5/2026, 10:15:00 a. m.',
-      tiempo: '311h 30m',
-      estado: 'Temporal',
-      valorEstimado: '$15.300'
-    }
-  ]);
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    // Simulamos que encuentra el vehículo si la placa coincide o está vacía (para la demo)
-    const encontrado = vehiculos.find(v => v.placa.includes(searchTerm.toUpperCase()));
-    if (encontrado) {
-      setVehiculoSeleccionado(encontrado);
-=======
   
   // Iniciamos el estado vacío, ya no hay datos quemados
   const [vehiculos, setVehiculos] = useState([]);
@@ -78,7 +49,6 @@ const SalidaVehiculo = () => {
       setVehiculoSeleccionado(encontrado);
     } else {
       alert("Vehículo no encontrado en el parqueadero");
->>>>>>> origin/alex
     }
   };
 
@@ -86,15 +56,6 @@ const SalidaVehiculo = () => {
     setVehiculoSeleccionado(vehiculo);
   };
 
-<<<<<<< HEAD
-  const registrarSalida = () => {
-    alert(`Salida registrada para ${vehiculoSeleccionado.placa} con pago en ${metodoPago}`);
-    // Aquí iría la lógica para enviar al backend y limpiar el estado
-    setVehiculoSeleccionado(null);
-    setSearchTerm('');
-  };
-
-=======
   const registrarSalida = async () => {
     try {
       // Enviamos la petición de salida al backend con el ID y método de pago
@@ -119,7 +80,6 @@ const SalidaVehiculo = () => {
   // =======================================================================
   // DE AQUÍ HACIA ABAJO TU JSX QUEDA INTACTO, NO SE CAMBIÓ NI UNA SOLA LÍNEA
   // =======================================================================
->>>>>>> origin/alex
   return (
     <div className="salida-container">
       {/* Cabecera */}
@@ -143,11 +103,7 @@ const SalidaVehiculo = () => {
             className="search-input"
           />
           <button type="submit" className="btn-search">
-<<<<<<< HEAD
-             Buscar
-=======
             <span className="icon-search">🔍</span> Buscar
->>>>>>> origin/alex
           </button>
         </form>
       </div>
@@ -203,12 +159,8 @@ const SalidaVehiculo = () => {
               onChange={(e) => setMetodoPago(e.target.value)}
             >
               <option value="Efectivo">Efectivo</option>
-<<<<<<< HEAD
-              <option value="Transferencia">Transferencia</option>
-=======
               <option value="Transferencia">Transferencia (Nequi/Daviplata)</option>
               <option value="Tarjeta">Tarjeta Débito/Crédito</option>
->>>>>>> origin/alex
             </select>
           </div>
 
@@ -252,11 +204,7 @@ const SalidaVehiculo = () => {
                       className="btn-exit" 
                       onClick={() => seleccionarVehiculo(vehiculo)}
                     >
-<<<<<<< HEAD
-                     Salida
-=======
                       <span className="icon-exit">↪</span> Salida
->>>>>>> origin/alex
                     </button>
                   </td>
                 </tr>
