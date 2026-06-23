@@ -38,9 +38,10 @@ const ControlParqueadero = () => {
   }, []);
 
   // Filtrado reactivo según la opción que elija el usuario en el select
-  const vehiculosFiltrados = filtroNivel === 'Todos los niveles'
-    ? vehiculos
-    : vehiculos.filter(veh => veh.nivel === filtroNivel);
+  const vehiculosFiltrados =
+    filtroNivel === 'Todos los niveles'
+      ? vehiculos
+      : vehiculos.filter(veh => veh.nivel === filtroNivel);
 
   return (
     <div className="control-container">
@@ -58,6 +59,7 @@ const ControlParqueadero = () => {
             <div className="icon-badge blue">℗</div>
           </div>
         </div>
+
         <div className="card">
           <span>Espacios Ocupados</span>
           <div className="card-content">
@@ -65,6 +67,7 @@ const ControlParqueadero = () => {
             <div className="icon-badge orange">🚗</div>
           </div>
         </div>
+
         <div className="card">
           <span>Espacios Disponibles</span>
           <div className="card-content">
@@ -77,18 +80,35 @@ const ControlParqueadero = () => {
       {/* Ocupación por Nivel */}
       <div className="levels-section section-card">
         <h3>Ocupación por Nivel</h3>
+
         <div className="levels-grid">
           {niveles.map((nivel, index) => (
             <div className="level-card" key={index}>
               <h4>{nivel.nombre}</h4>
+
               <div className="level-stats">
-                <p>Total: <strong>{nivel.total}</strong></p>
-                <p>Ocupados: <strong className={nivel.ocupados > 0 ? "text-red" : "text-green"}>{nivel.ocupados}</strong></p>
-                <p>Disponibles: <strong className="text-green">{nivel.disponibles}</strong></p>
+                <p>
+                  Total: <strong>{nivel.total}</strong>
+                </p>
+                <p>
+                  Ocupados:{' '}
+                  <strong className={nivel.ocupados > 0 ? 'text-red' : 'text-green'}>
+                    {nivel.ocupados}
+                  </strong>
+                </p>
+                <p>
+                  Disponibles:{' '}
+                  <strong className="text-green">{nivel.disponibles}</strong>
+                </p>
               </div>
+
               <div className="progress-bar-container">
-                <div className="progress-bar" style={{ width: `${nivel.porcentaje}%` }}></div>
+                <div
+                  className="progress-bar"
+                  style={{ width: `${nivel.porcentaje}%` }}
+                ></div>
               </div>
+
               <p className="percentage-text">{nivel.porcentaje}% ocupado</p>
             </div>
           ))}
@@ -99,13 +119,9 @@ const ControlParqueadero = () => {
       <div className="table-section section-card">
         <div className="table-header">
           <h3>Vehículos en el Parqueadero</h3>
-          <select className="level-filter">
-            <option>Todos los niveles</option>
-            <option>Nivel 1</option>
-            <option>Nivel 2</option>
-            <option>Nivel 3</option>
-            <option>Subterráneo</option>
-          <select 
+
+          {/* ✅ SELECT CORREGIDO */}
+          <select
             className="level-filter"
             value={filtroNivel}
             onChange={(e) => setFiltroNivel(e.target.value)}
@@ -117,6 +133,7 @@ const ControlParqueadero = () => {
             <option value="Subterráneo">Subterráneo</option>
           </select>
         </div>
+
         <table className="vehicles-table">
           <thead>
             <tr>
@@ -128,15 +145,20 @@ const ControlParqueadero = () => {
               <th>Estado</th>
             </tr>
           </thead>
+
           <tbody>
             {vehiculosFiltrados.map((veh, index) => (
               <tr key={index}>
-                <td><strong>{veh.placa}</strong></td>
+                <td>
+                  <strong>{veh.placa}</strong>
+                </td>
                 <td>{veh.tipo}</td>
                 <td>{veh.nivel}</td>
                 <td>{veh.horaIngreso}</td>
                 <td>{veh.tiempo}</td>
-                <td><span className="badge-temporal">{veh.estado}</span></td>
+                <td>
+                  <span className="badge-temporal">{veh.estado}</span>
+                </td>
               </tr>
             ))}
           </tbody>

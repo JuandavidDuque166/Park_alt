@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // 1. Importamos el hook de navegación
+import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import './Login.css';
 
 export const Login = () => {
     const [formData, setFormData] = useState({ email: '', clave: '' });
     const [error, setError] = useState('');
-    const navigate = useNavigate(); // 2. Inicializamos el hook
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
     };
 
     const handleSubmit = async (e) => {
@@ -18,16 +21,36 @@ export const Login = () => {
 
         try {
             console.log('Intentando login...', formData);
-            // El componente llama al servicio, y el servicio habla con el backend
-            const response = await authService.login(formData.email, formData.clave);
+
+            const response = await authService.login(
+                formData.email,
+                formData.clave
+            );
+
+            console.log('RESPUESTA LOGIN:', response);
 
             if (response.status === 'success') {
-                console.log('Login exitoso, redirigiendo...');
-                // 3. Usamos navigate para cambiar de vista sin recargar la página
-                navigate('/DashboardAdmin'); 
+
+                console.log("RESPUESTA COMPLETA:", response);
+
+                const rol = response.data?.rol;
+
+                console.log("ROL DETECTADO:", rol);
+
+                if (rol === 1 || rol === 'admin') {
+                    navigate('/Dashboard');
+                } 
+                else if (rol === 2 || rol === 'operario') {
+                    navigate('/DashboardOperario');
+                } 
+                else {
+                    setError('Rol no reconocido');
+                }
+
             } else {
                 setError(response.message || 'No se pudo iniciar sesión');
             }
+
         } catch (error) {
             console.error('Error al iniciar sesión:', error);
             setError(error.message || 'Credenciales incorrectas');
@@ -43,32 +66,37 @@ export const Login = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="login-form">
+                    
                     <div className="form-group">
                         <label htmlFor="email">Usuario</label>
-                        <input 
-                            type="email" 
+                        <input
+                            type="email"
                             id="email"
-                            name="email" 
-                            placeholder="Ingrese su usuario" 
-                            onChange={handleChange} 
-                            required 
+                            name="email"
+                            placeholder="Ingrese su usuario"
+                            onChange={handleChange}
+                            required
                         />
                     </div>
-                    
+
                     <div className="form-group">
                         <label htmlFor="clave">Contraseña</label>
-                        <input 
-                            type="password" 
+                        <input
+                            type="password"
                             id="clave"
-                            name="clave" 
-                            placeholder="Ingrese su contraseña" 
-                            onChange={handleChange} 
-                            required 
+                            name="clave"
+                            placeholder="Ingrese su contraseña"
+                            onChange={handleChange}
+                            required
                         />
                     </div>
-                    
-                    {error && <div className="error-message">{error}</div>}
-                    
+
+                    {error && (
+                        <div className="error-message">
+                            {error}
+                        </div>
+                    )}
+
                     <button type="submit" className="btn-login">
                         Iniciar Sesión
                     </button>
