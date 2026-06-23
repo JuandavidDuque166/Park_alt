@@ -3,6 +3,7 @@ import { ProtectedRoute } from './guards/ProtectedRoute';
 
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import DashboardOperario from './pages/DashboardOperario';
 import Tarifas from './pages/tarifas';
 import Mensualidades from './pages/Mensualidades';
 import Perfil from './pages/Perfil';
@@ -32,7 +33,8 @@ function App() {
         {/* Rutas protegidas (con Layout persistente) */}
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
-            <Route path="/Dashboard" element={<Dashboard/>} />
+            <Route path="/Dashboard" element={<Dashboard />} />
+            <Route path="/DashboardOperario" element={<DashboardOperario />} />
 
             <Route path="/usuarios" element={<Usuarios />} />
             <Route path="/permisos" element={<Permisos />} />

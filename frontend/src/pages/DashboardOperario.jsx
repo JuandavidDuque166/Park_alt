@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
-import './DashboardOperario.css';
 
 const DashboardOperario = () => {
   // 2. ESTADO INICIAL COMPLETO
