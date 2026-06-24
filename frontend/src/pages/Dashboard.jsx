@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
-import { FaCar, FaParking, FaMoneyBillWave, FaArrowDown } from 'react-icons/fa';
-import './Dashboard.css'; // Asegúrate de unificar tus estilos aquí
+import { FaCar, FaParking, FaMoneyBillWave, FaSignInAlt } from 'react-icons/fa';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import './Dashboard.css';
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 const Dashboard = () => {
   const [data, setData] = useState({
@@ -11,15 +14,19 @@ const Dashboard = () => {
     recaudoDia: 0,
     entradasDia: 0,
     ultimosIngresos: [],
-    vehiculosportipo: [], // Asumiendo que tu API devuelve esto
-    ocupacion: []         // Asumiendo que tu API devuelve esto
+    vehiculosportipo: [], 
+    ocupacion: []         
   });
 
   useEffect(() => {
     const obtenerEstadisticas = async () => {
       try {
         const respuesta = await api.get('/dashboard/resumen');
-        setData(respuesta.data?.data || {});
+        // Imprimimos para ver qué nos manda la API y corregir los dataKey
+        console.log("DATOS BACKEND:", respuesta.data?.data);
+        if (respuesta.data?.data) {
+          setData(respuesta.data.data);
+        }
       } catch (error) {
         console.error('Error al cargar:', error);
       }
@@ -35,28 +42,51 @@ const Dashboard = () => {
           <p>Gestión en altura y subterráneo</p>
         </header>
 
-        {/* TOP CARDS */}
         <section className="metrics-grid">
           <MetricCard title="Vehículos Activos" value={data.vehiculosActivos} sub="En el parqueadero" icon={<FaCar />} color="blue" />
           <MetricCard title="Espacios Disponibles" value={data.espaciosDisponibles} sub={`de ${data.espaciosTotales} totales`} icon={<FaParking />} color="green" />
-          <MetricCard title="Recaudo del Día" value={`$${data.recaudoDia}`} sub="0 salidas" icon={<FaMoneyBillWave />} color="purple" />
-          <MetricCard title="Entradas del Día" value={data.entradasDia} sub="Ingresos registrados" icon={<FaArrowDown />} color="orange" />
+          <MetricCard title="Recaudo del Día" value={`$${data.recaudoDia}`} sub="Total recaudado" icon={<FaMoneyBillWave />} color="purple" />
+          <MetricCard title="Entradas del Día" value={data.entradasDia} sub="Ingresos registrados" icon={<FaSignInAlt />} color="orange" />
         </section>
 
-        {/* CHARTS SECTION */}
         <section className="charts-grid">
+          {/* GRÁFICO DE BARRAS */}
           <div className="chart-card">
             <h3>Vehículos por Tipo</h3>
-            {/* Aquí iría tu lógica de gráfica real */}
-            <div className="bar-chart-placeholder">...</div>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={data.vehiculosportipo || []}>
+                <XAxis dataKey="nombre" /> {/* CAMBIA 'nombre' SI TU API USA OTRO NOMBRE */}
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="total" fill="#8884d8" /> {/* CAMBIA 'total' SI TU API USA OTRO NOMBRE */}
+              </BarChart>
+            </ResponsiveContainer>
           </div>
+          
+          {/* GRÁFICO CIRCULAR */}
           <div className="chart-card">
             <h3>Ocupación del Parqueadero</h3>
-            <div className="pie-chart-placeholder">...</div>
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie 
+                  data={data.ocupacion || []} 
+                  dataKey="total" /* CAMBIA 'total' SEGÚN TU API */
+                  nameKey="nombre" /* CAMBIA 'nombre' SEGÚN TU API */
+                  cx="50%" 
+                  cy="50%" 
+                  outerRadius={80} 
+                  label
+                >
+                  {(data.ocupacion || []).map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
         </section>
 
-        {/* TABLE SECTION */}
         <section className="table-section">
           <h3>Últimos Vehículos Ingresados</h3>
           <table className="data-table">
@@ -64,7 +94,7 @@ const Dashboard = () => {
               <tr><th>Placa</th><th>Tipo</th><th>Nivel/Zona</th><th>Hora Ingreso</th><th>Estado</th></tr>
             </thead>
             <tbody>
-              {data.ultimosIngresos.map((v, i) => (
+              {data.ultimosIngresos?.map((v, i) => (
                 <tr key={i}>
                   <td className="bold">{v.placa}</td>
                   <td>{v.tipo}</td>
@@ -81,7 +111,6 @@ const Dashboard = () => {
   );
 };
 
-// Sub-componente para limpiar el código
 const MetricCard = ({ title, value, sub, icon, color }) => (
   <div className="metric-card">
     <div className="card-info">

@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS parqueadero;
 CREATE DATABASE parqueadero;
 USE parqueadero;
 

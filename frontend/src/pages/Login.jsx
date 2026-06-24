@@ -41,7 +41,7 @@ export const Login = () => {
                     navigate('/Dashboard');
                 } 
                 else if (rol === 2 || rol === 'operario') {
-                    navigate('/DashboardOperario');
+                    navigate('/Dashboard');
                 } 
                 else {
                     setError('Rol no reconocido');

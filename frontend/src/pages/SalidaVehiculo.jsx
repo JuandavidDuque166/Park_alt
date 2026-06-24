@@ -103,7 +103,7 @@ const SalidaVehiculo = () => {
             className="search-input"
           />
           <button type="submit" className="btn-search">
-            <span className="icon-search">🔍</span> Buscar
+            Buscar
           </button>
         </form>
       </div>
@@ -159,8 +159,7 @@ const SalidaVehiculo = () => {
               onChange={(e) => setMetodoPago(e.target.value)}
             >
               <option value="Efectivo">Efectivo</option>
-              <option value="Transferencia">Transferencia (Nequi/Daviplata)</option>
-              <option value="Tarjeta">Tarjeta Débito/Crédito</option>
+              <option value="Transferencia">Transferencia </option>
             </select>
           </div>
 
@@ -204,7 +203,7 @@ const SalidaVehiculo = () => {
                       className="btn-exit" 
                       onClick={() => seleccionarVehiculo(vehiculo)}
                     >
-                      <span className="icon-exit">↪</span> Salida
+                      Salida
                     </button>
                   </td>
                 </tr>

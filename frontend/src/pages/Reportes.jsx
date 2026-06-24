@@ -3,7 +3,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 import { Bar } from 'react-chartjs-2';
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable';
-import { Calendar, FileText, Download } from 'lucide-react'; // Iconos para el diseño
+import { Download, Wallet, LogIn, LogOut } from 'lucide-react'; // Iconos para el diseño
 import './Reportes.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -78,15 +78,15 @@ const Reportes = () => {
 
       <div className="stats-header-grid">
         <div className="report-card stat-box">
-            <div className="icon-wrapper blue"><Calendar size={24} /></div>
+            <div className="icon-wrapper blue"><LogIn size={24} /></div>
             <span>Total Ingresos</span><h3>{stats.totalIngresos}</h3>
         </div>
         <div className="report-card stat-box">
-            <div className="icon-wrapper green"><FileText size={24} /></div>
+            <div className="icon-wrapper green"><LogOut size={24} /></div>
             <span>Total Salidas</span><h3>{stats.totalSalidas}</h3>
         </div>
         <div className="report-card stat-box">
-            <div className="icon-wrapper purple"><Download size={24} /></div>
+            <div className="icon-wrapper purple"><Wallet size={24} /></div>
             <span>Total Recaudo</span><h3>{formatCurrency(stats.totalRecaudo)}</h3>
         </div>
       </div>

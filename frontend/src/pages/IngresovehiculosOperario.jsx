@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import Webcam from "react-webcam"; // IMPORTANTE: Nueva librería para la cámara
+import Webcam from "react-webcam";
 import { api } from "../services/api"; 
 import { authService } from "../services/authService";
 import "./IngresoVehiculo.css";
@@ -14,14 +14,13 @@ const IngresoVehiculo = () => {
   
   const [isLoading, setIsLoading] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
-  const [isCameraOpen, setIsCameraOpen] = useState(false); // Nuevo estado para controlar si la cámara está abierta
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [cupos, setCupos] = useState({ disponibles: 0, total: 0 });
   const [usuarioActual, setUsuarioActual] = useState(null);
   const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
 
   const webcamRef = useRef(null);
 
-  // Configuración para que intente abrir la cámara trasera en celulares
   const videoConstraints = {
     width: 1280,
     height: 720,
@@ -56,7 +55,6 @@ const IngresoVehiculo = () => {
     });
   };
 
-  // Función auxiliar para convertir la foto tomada (base64) a un Archivo normal (File)
   const dataURLtoFile = (dataurl, filename) => {
     let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
         bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
@@ -66,38 +64,28 @@ const IngresoVehiculo = () => {
     return new File([u8arr], filename, {type:mime});
   };
 
-  // Lógica para capturar la foto de la cámara y enviarla a la IA
   const captureAndScan = useCallback(async () => {
     if (!webcamRef.current) return;
-    
-    // 1. Tomamos la foto de la cámara
     const imageSrc = webcamRef.current.getScreenshot();
     if (!imageSrc) return;
 
-    // 2. La convertimos a archivo para guardarla en el form y enviarla
     const imageFile = dataURLtoFile(imageSrc, 'placa_capturada.jpg');
     setFormData(prev => ({ ...prev, foto: imageFile }));
 
-    // 3. Iniciamos el proceso de IA
     setIsScanning(true);
     setMensaje({ tipo: "", texto: "" });
 
     try {
       const dataToScan = new FormData();
       dataToScan.append("imagen", imageFile); 
-
-      // Cambia "/leer-placa" por tu endpoint real
       const response = await api.post("/ingresos/leer-placa", dataToScan, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       if (response.data.success && response.data.placa) {
-        setFormData(prev => ({
-          ...prev,
-          placa: response.data.placa.toUpperCase()
-        }));
+        setFormData(prev => ({ ...prev, placa: response.data.placa.toUpperCase() }));
         setMensaje({ tipo: "success", texto: "¡Placa detectada y autocompletada por IA!" });
-        setIsCameraOpen(false); // Cerramos la cámara al tener éxito
+        setIsCameraOpen(false);
       } else {
         setMensaje({ tipo: "error", texto: "La IA no pudo detectar una placa clara. Intenta acercar la cámara." });
       }
@@ -116,7 +104,7 @@ const IngresoVehiculo = () => {
       nivel: "",
       foto: null,
     });
-    setIsCameraOpen(false); // También cerramos la cámara al limpiar
+    setIsCameraOpen(false);
   };
 
   const handleSubmit = async (e) => {
@@ -146,7 +134,10 @@ const IngresoVehiculo = () => {
           texto: `¡Ingreso exitoso! Asigne al conductor el espacio #${response.data.data.espacioAsignado}`,
         });
         handleLimpiar();
-        cargarCupos(); 
+        cargarCupos();
+        
+        // --- AQUÍ ESTÁ LA SINCRONIZACIÓN ---
+        window.dispatchEvent(new Event("actualizar_datos_parqueadero"));
       }
     } catch (error) {
       console.error(error);
@@ -166,7 +157,6 @@ const IngresoVehiculo = () => {
         <h2>Ingreso Vehículos</h2>
         <p>Gestión en altura y subterráneo</p>
       </div>
-
       <div className="content-body">
         <div className="ingreso-card">
           <div className="card-header">
@@ -174,25 +164,20 @@ const IngresoVehiculo = () => {
               <h3>Registro de Ingreso de Vehículos</h3>
               <p>Complete los datos del vehículo que ingresa</p>
             </div>
-
             <div className="espacios-badge">
               <span>Espacios disponibles</span>
               <strong>{cupos.disponibles} / {cupos.total}</strong>
             </div>
           </div>
-
           {mensaje.texto && (
             <div className={`alert-message ${mensaje.tipo}`}>
               {mensaje.texto}
             </div>
           )}
-
-          {/* --- SECCIÓN DE LA CÁMARA (Reemplaza al input file) --- */}
           <div className="form-group" style={{ marginBottom: '20px', border: '1px solid #ddd', padding: '15px', borderRadius: '8px' }}>
             <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
               Lector Automático de Placas (IA) 📷
             </label>
-            
             {!isCameraOpen ? (
               <button 
                 type="button" 
@@ -232,32 +217,15 @@ const IngresoVehiculo = () => {
               </div>
             )}
           </div>
-          {/* --------------------------------------------------- */}
-
           <form onSubmit={handleSubmit}>
             <div className="form-grid">
-              
               <div className="form-group">
                 <label>Placa *</label>
-                <input
-                  type="text"
-                  name="placa"
-                  placeholder="ABC123"
-                  value={formData.placa}
-                  onChange={handleInputChange}
-                  maxLength={6}
-                  required
-                />
+                <input type="text" name="placa" placeholder="ABC123" value={formData.placa} onChange={handleInputChange} maxLength={6} required />
               </div>
-
               <div className="form-group">
                 <label>Tipo de Vehículo *</label>
-                <select
-                  name="idTipo"
-                  value={formData.idTipo}
-                  onChange={handleInputChange}
-                  required
-                >
+                <select name="idTipo" value={formData.idTipo} onChange={handleInputChange} required>
                   <option value="">Seleccione</option>
                   <option value="1">Automóvil</option>
                   <option value="2">Campero</option>
@@ -268,15 +236,9 @@ const IngresoVehiculo = () => {
                   <option value="7">Bicicleta</option>
                 </select>
               </div>
-
               <div className="form-group">
                 <label>Nivel / Zona *</label>
-                <select
-                  name="nivel"
-                  value={formData.nivel}
-                  onChange={handleInputChange}
-                  required
-                >
+                <select name="nivel" value={formData.nivel} onChange={handleInputChange} required>
                   <option value="">Seleccione</option>
                   <option value="NIVEL 1">Nivel 1</option>
                   <option value="NIVEL 2">Nivel 2</option>
@@ -284,32 +246,16 @@ const IngresoVehiculo = () => {
                   <option value="SUBTERRÁNEO">Subterráneo</option>
                 </select>
               </div>
-
             </div>
-
             <div className="info-box">
-              <p>
-                <strong>Fecha y hora:</strong> Se registrarán automáticamente al ingresar.
-              </p>
-              <p>
-                <strong>Operario en turno:</strong> {usuarioActual?.nombre || "Cargando..."}
-              </p>
+              <p><strong>Fecha y hora:</strong> Se registrarán automáticamente al ingresar.</p>
+              <p><strong>Operario en turno:</strong> {usuarioActual?.nombre || "Cargando..."}</p>
             </div>
-
             <div className="form-actions">
               <button type="submit" className="btn-primary" disabled={isLoading || isScanning}>
                 {isLoading ? "Guardando..." : "Registrar Ingreso"}
               </button>
-
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={() => {
-                  handleLimpiar();
-                  setMensaje({ tipo: "", texto: "" });
-                }}
-                disabled={isLoading || isScanning}
-              >
+              <button type="button" className="btn-secondary" onClick={() => { handleLimpiar(); setMensaje({ tipo: "", texto: "" }); }} disabled={isLoading || isScanning}>
                 Limpiar
               </button>
             </div>
