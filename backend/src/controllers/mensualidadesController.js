@@ -1,4 +1,5 @@
 const db = require('../config/conexion_db');
+const { normalizarNivelServicioParaGuardar, esNivelServicioValido } = require('../utils/nivelServicio');
 
 const normalizarTexto = (value) => String(value || '').trim();
 const campoVacio = (value) => value === undefined || value === null || String(value).trim() === '';
@@ -137,7 +138,7 @@ const crearMensualidad = async (req, res) => {
 
         const placaNormalizada = normalizarTexto(placa).toUpperCase();
         const tipoNormalizado = normalizarTipoVehiculo(tipo);
-        const nivelServicioNormalizado = normalizarNivelServicio(nivel_servicio);
+        const nivelServicioNormalizado = normalizarNivelServicioParaGuardar(nivel_servicio);
         const propietarioNormalizado = normalizarTexto(propietario);
         const telefonoNormalizado = normalizarTexto(telefono);
 
@@ -145,7 +146,7 @@ const crearMensualidad = async (req, res) => {
             `[Mensualidades] tipo recibido=${JSON.stringify(tipo)} | tipo normalizado=${JSON.stringify(tipoNormalizado)} | nivel_servicio recibido=${JSON.stringify(nivel_servicio)} | nivel_servicio normalizado=${JSON.stringify(nivelServicioNormalizado)}`
         );
 
-        if (!['ALTURA', 'SUBTERRANEO'].includes(nivelServicioNormalizado)) {
+        if (!esNivelServicioValido(nivel_servicio)) {
             await connection.rollback();
             return res.status(400).json({
                 status: 'fail',
@@ -355,7 +356,7 @@ const actualizarMensualidad = async (req, res) => {
 
         const placaNormalizada = normalizarTexto(placa).toUpperCase();
         const tipoNormalizado = normalizarTipoVehiculo(tipo);
-        const nivelServicioNormalizado = normalizarNivelServicio(nivel_servicio);
+        const nivelServicioNormalizado = normalizarNivelServicioParaGuardar(nivel_servicio);
         const propietarioNormalizado = normalizarTexto(propietario);
         const telefonoNormalizado = normalizarTexto(telefono);
 
@@ -363,7 +364,7 @@ const actualizarMensualidad = async (req, res) => {
             `[Mensualidades] tipo recibido=${JSON.stringify(tipo)} | tipo normalizado=${JSON.stringify(tipoNormalizado)} | nivel_servicio recibido=${JSON.stringify(nivel_servicio)} | nivel_servicio normalizado=${JSON.stringify(nivelServicioNormalizado)}`
         );
 
-        if (!['ALTURA', 'SUBTERRANEO'].includes(nivelServicioNormalizado)) {
+        if (!esNivelServicioValido(nivel_servicio)) {
             await connection.rollback();
             return res.status(400).json({
                 status: 'fail',
@@ -518,9 +519,74 @@ const eliminarMensualidad = async (req, res) => {
     }
 };
 
+const verificarMensualidad = async (req, res) => {
+    try {
+        const placa = String(req.params.placa || '').trim().toUpperCase();
+
+        if (!placa) {
+            return res.status(400).json({
+                success: false,
+                message: 'La placa es requerida'
+            });
+        }
+
+        const [rows] = await db.execute(
+            `
+                SELECT
+                    m.id_mensualidad,
+                    m.nivel_servicio,
+                    m.fecha_inicio,
+                    m.fecha_fin,
+                    v.id_tipo AS id_tipo,
+                    tv.nombre AS tipo_vehiculo
+                FROM mensualidad m
+                INNER JOIN vehiculo v ON m.id_vehiculo = v.id_vehiculo
+                INNER JOIN tipo_vehiculo tv ON v.id_tipo = tv.id_tipo
+                WHERE UPPER(TRIM(v.placa)) = ?
+                  AND m.estado = 'ACTIVA'
+                  AND CURDATE() BETWEEN m.fecha_inicio AND m.fecha_fin
+                ORDER BY m.fecha_fin DESC
+                LIMIT 1
+            `,
+            [placa]
+        );
+
+        if (rows.length === 0) {
+            return res.status(200).json({
+                success: true,
+                tieneMensualidad: false
+            });
+        }
+
+        const mensualidad = rows[0];
+
+        return res.status(200).json({
+            success: true,
+            tieneMensualidad: true,
+            tipo_vehiculo: mensualidad.tipo_vehiculo,
+            nivel_servicio: mensualidad.nivel_servicio,
+            fecha_inicio: mensualidad.fecha_inicio,
+            fecha_fin: mensualidad.fecha_fin
+        });
+    } catch (error) {
+        console.error('Error verificando mensualidad:', {
+            message: error.message,
+            code: error.code,
+            sqlMessage: error.sqlMessage,
+            stack: error.stack
+        });
+        return res.status(500).json({
+            success: false,
+            message: 'Error interno al verificar mensualidad',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     obtenerMensualidades,
     crearMensualidad,
     actualizarMensualidad,
-    eliminarMensualidad
+    eliminarMensualidad,
+    verificarMensualidad
 };

@@ -167,7 +167,7 @@ INSERT INTO rol_permiso (id_rol, id_permiso) VALUES
 (2, 1), (2, 2), (2, 3);
 
 INSERT INTO usuario (nombre, email, clave, id_rol, fecha_creacion) VALUES
-('admin', 'juandaduque880@gmail.com','123456', 1, '2026-06-03'),
+('admin', 'admin@parkalt.com','123456', 1, '2026-06-03'),
 ('operario1', 'empleado@gmail.com', '123456', 2, '2026-06-03');
 
 INSERT INTO tarifa (id_tipo, valor_hora, valor_fraccion, valor_dia, valor_mensual) VALUES 

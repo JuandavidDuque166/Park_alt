@@ -47,12 +47,38 @@ const IngresoVehiculo = () => {
     }
   };
 
-  const handleInputChange = (e) => {
+  const [vehicularMensualidad, setVehicularMensualidad] = useState(null);
+  const [camposBloqueados, setCamposBloqueados] = useState({ idTipo: false, nivel: false });
+
+  const handleInputChange = async (e) => {
     const { name, value } = e.target;
+    const nuevoValor = name === "placa" ? value.toUpperCase() : value;
+
     setFormData({
       ...formData,
-      [name]: name === "placa" ? value.toUpperCase() : value,
+      [name]: nuevoValor,
     });
+
+    if (name === 'placa' && nuevoValor.trim().length >= 4) {
+      try {
+        const response = await api.get(`/mensualidades/verificar/${encodeURIComponent(nuevoValor.trim())}`);
+        if (response.data.success && response.data.tieneMensualidad) {
+          setVehicularMensualidad(response.data);
+          setFormData((prev) => ({
+              ...prev,
+              idTipo: response.data.id_tipo ? String(response.data.id_tipo) : prev.idTipo,
+            nivel: response.data.nivel_servicio || prev.nivel,
+          }));
+          setCamposBloqueados({ idTipo: true, nivel: true });
+          setMensaje({ tipo: 'success', texto: 'Vehículo con mensualidad activa. Campos completados automáticamente.' });
+        } else {
+          setVehicularMensualidad(null);
+          setCamposBloqueados({ idTipo: false, nivel: false });
+        }
+      } catch (error) {
+        console.error('Error verificando mensualidad:', error);
+      }
+    }
   };
 
   const dataURLtoFile = (dataurl, filename) => {
@@ -104,6 +130,8 @@ const IngresoVehiculo = () => {
       nivel: "",
       foto: null,
     });
+    setVehicularMensualidad(null);
+    setCamposBloqueados({ idTipo: false, nivel: false });
     setIsCameraOpen(false);
   };
 
@@ -225,7 +253,7 @@ const IngresoVehiculo = () => {
               </div>
               <div className="form-group">
                 <label>Tipo de Vehículo *</label>
-                <select name="idTipo" value={formData.idTipo} onChange={handleInputChange} required>
+                <select name="idTipo" value={formData.idTipo} onChange={handleInputChange} required disabled={camposBloqueados.idTipo}>
                   <option value="">Seleccione</option>
                   <option value="1">Automóvil</option>
                   <option value="2">Campero</option>
@@ -238,12 +266,12 @@ const IngresoVehiculo = () => {
               </div>
               <div className="form-group">
                 <label>Nivel / Zona *</label>
-                <select name="nivel" value={formData.nivel} onChange={handleInputChange} required>
+                <select name="nivel" value={formData.nivel} onChange={handleInputChange} required disabled={camposBloqueados.nivel}>
                   <option value="">Seleccione</option>
-                  <option value="NIVEL 1">Nivel 1</option>
-                  <option value="NIVEL 2">Nivel 2</option>
-                  <option value="NIVEL 3">Nivel 3</option>
-                  <option value="SUBTERRÁNEO">Subterráneo</option>
+                  <option value="Nivel 1">Nivel 1</option>
+                  <option value="Nivel 2">Nivel 2</option>
+                  <option value="Nivel 3">Nivel 3</option>
+                  <option value="Subterráneo">Subterráneo</option>
                 </select>
               </div>
             </div>

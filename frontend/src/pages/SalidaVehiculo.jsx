@@ -6,6 +6,8 @@ const SalidaVehiculo = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [vehiculoSeleccionado, setVehiculoSeleccionado] = useState(null);
   const [metodoPago, setMetodoPago] = useState('Efectivo');
+  const [tipoServicioSalida, setTipoServicioSalida] = useState('Temporal');
+  const [valorPagar, setValorPagar] = useState(0);
   
   // Iniciamos el estado vacío, ya no hay datos quemados
   const [vehiculos, setVehiculos] = useState([]);
@@ -20,20 +22,29 @@ const SalidaVehiculo = () => {
       const response = await api.get('/salidas/activos');
       if (response.data.success) {
         // Formateamos los datos del backend para que encajen EXACTAMENTE con tu diseño JSX
-        const vehiculosFormateados = response.data.data.map(v => ({
-          id_ingreso: v.id_ingreso,
-          placa: v.placa,
-          tipo: v.tipo_vehiculo || 'No definido',
-          servicioBase: 'Descubierto', // O el campo que uses en BD
-          tipoServicio: 'Temporal', 
-          nivel: v.nivel || 'Nivel 1',
-          // Damos formato a la hora
-          horaIngresoCorta: new Date(v.hora_ingreso).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-          horaIngresoLarga: new Date(v.hora_ingreso).toLocaleString(),
-          tiempo: v.tiempo_formateado || 'Calculando...',
-          estado: v.estado || 'Activo',
-          valorEstimado: `$${v.valor_estimado || 0}`
-        }));
+        const vehiculosFormateados = response.data.data.map(v => {
+          const fechaIngreso = new Date(v.hora_ingreso);
+          const horaIngresoCorta = isNaN(fechaIngreso.getTime())
+            ? 'Fecha inválida'
+            : fechaIngreso.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const horaIngresoLarga = isNaN(fechaIngreso.getTime())
+            ? 'Fecha inválida'
+            : fechaIngreso.toLocaleString();
+
+          return {
+            id_ingreso: v.id_ingreso,
+            placa: v.placa,
+            tipo: v.tipo_vehiculo || 'No definido',
+            servicioBase: 'Descubierto',
+            tipoServicio: 'Temporal',
+            nivel: v.nivel || 'Nivel 1',
+            horaIngresoCorta,
+            horaIngresoLarga,
+            tiempo: v.tiempo_formateado || 'Calculando...',
+            estado: v.estado || 'Activo',
+            valorEstimado: `$${v.valor_estimado || 0}`
+          };
+        });
         setVehiculos(vehiculosFormateados);
       }
     } catch (error) {
@@ -54,21 +65,27 @@ const SalidaVehiculo = () => {
 
   const seleccionarVehiculo = (vehiculo) => {
     setVehiculoSeleccionado(vehiculo);
+    setTipoServicioSalida(vehiculo.tipoServicio || 'Temporal');
+    setValorPagar(Number(vehiculo.valorEstimado.replace(/[^0-9]/g, '')) || 0);
   };
 
   const registrarSalida = async () => {
     try {
-      // Enviamos la petición de salida al backend con el ID y método de pago
       const response = await api.post('/salidas/procesar', {
         id_ingreso: vehiculoSeleccionado.id_ingreso,
         metodo_pago: metodoPago
       });
 
       if (response.data.success) {
-        alert(`¡Salida exitosa!\nPlaca: ${vehiculoSeleccionado.placa}\nCobrado: $${response.data.total_pagar}\nPago en: ${metodoPago}`);
-        // Limpiamos los estados y recargamos la tabla para que el carro desaparezca
+        const servicioActiva = response.data.mensualidad_activa;
+        const totalCobrado = response.data.total_pagar;
+        const tipoServicioBackend = response.data.tipo_servicio || (servicioActiva ? 'Mensualidad' : 'Temporal');
+
+        alert(`¡Salida exitosa!\nPlaca: ${vehiculoSeleccionado.placa}\nServicio: ${tipoServicioBackend}\nCobrado: $${totalCobrado}\nPago en: ${metodoPago}`);
         setVehiculoSeleccionado(null);
         setSearchTerm('');
+        setTipoServicioSalida('Temporal');
+        setValorPagar(0);
         cargarVehiculos();
       }
     } catch (error) {
@@ -76,10 +93,6 @@ const SalidaVehiculo = () => {
       alert(error.response?.data?.error || "Ocurrió un error al intentar procesar la salida.");
     }
   };
-
-  // =======================================================================
-  // DE AQUÍ HACIA ABAJO TU JSX QUEDA INTACTO, NO SE CAMBIÓ NI UNA SOLA LÍNEA
-  // =======================================================================
   return (
     <div className="salida-container">
       {/* Cabecera */}
@@ -128,7 +141,7 @@ const SalidaVehiculo = () => {
             </div>
             <div className="detail-item">
               <span className="detail-label">Tipo de Servicio</span>
-              <span className="detail-value">{vehiculoSeleccionado.tipoServicio}</span>
+              <span className="detail-value">{tipoServicioSalida}</span>
             </div>
             <div className="detail-item">
               <span className="detail-label">Nivel / Zona</span>
@@ -147,7 +160,7 @@ const SalidaVehiculo = () => {
             </div>
             <div className="highlight-row">
               <span className="icon-blue">💲</span>
-              <span>Valor estimado a pagar: <strong>{vehiculoSeleccionado.valorEstimado}</strong></span>
+              <span>Valor estimado a pagar: <strong>{`$${valorPagar.toLocaleString('es-CO')}`}</strong></span>
             </div>
           </div>
 

@@ -5,8 +5,6 @@ import toast from 'react-hot-toast';
 import { api } from '../services/api';
 import './Mensualidades.css';
 
-
-
 const camposIniciales = {
     id: null,
     placa: '',
@@ -66,7 +64,7 @@ const formatearMoneda = (valor) => {
 const normalizarTextoRol = (valor) => String(valor || '').trim().toUpperCase();
 
 const obtenerRolUsuario = (usuario) => {
-    const idRol = Number(usuario?.id_rol ?? usuario?.rol);
+    const idRol = Number(usuario?.id_rol ?? usuario?.idRol ?? usuario?.rol);
     const nombreRol = normalizarTextoRol(
         usuario?.rol_nombre ?? usuario?.nombre_rol ?? usuario?.nombreRol ?? usuario?.role ?? usuario?.rol
     );
@@ -86,7 +84,11 @@ const Mensualidades = () => {
 
     const usuario = useMemo(() => obtenerUsuarioActual(), []);
     const { idRol, nombreRol } = useMemo(() => obtenerRolUsuario(usuario), [usuario]);
-    const puedeAdministrarMensualidades = idRol === 1 || nombreRol === 'ADMINISTRADOR';
+    
+    const puedeAdministrarMensualidades = useMemo(() => {
+        return idRol === 1 || nombreRol === 'ADMINISTRADOR' || nombreRol === 'ADMIN';
+    }, [idRol, nombreRol]);
+
     const regexPropietario = /^[\p{L}\s]+$/u;
     const propietarioValido = !formData.propietario || regexPropietario.test(formData.propietario);
 
@@ -145,7 +147,10 @@ const Mensualidades = () => {
     }, []);
 
     const abrirNuevoModal = () => {
-        if (!puedeAdministrarMensualidades) return;
+        if (!puedeAdministrarMensualidades) {
+            toast.error('No tienes permisos de Administrador para añadir.');
+            return;
+        }
 
         const hoyStr = new Date().toISOString().split('T')[0];
         setModoEdicion(false);
@@ -158,7 +163,10 @@ const Mensualidades = () => {
     };
 
     const abrirEditarModal = (mensualidad) => {
-        if (!puedeAdministrarMensualidades) return;
+        if (!puedeAdministrarMensualidades) {
+            toast.error('No tienes permisos de Administrador para editar.');
+            return;
+        }
 
         setModoEdicion(true);
         setFormData(normalizarMensualidad(mensualidad));
@@ -215,16 +223,20 @@ const Mensualidades = () => {
             return;
         }
 
+        // Payload optimizado con tipos de datos correctos y mapeos duales
         const payload = {
-            placa: formData.placa?.trim().toUpperCase(),
-            tipo: formData.tipo?.trim().toUpperCase(),
-            nivel_servicio: formData.nivel_servicio?.trim().toUpperCase(),
-            propietario: formData.propietario?.trim(),
-            telefono: formData.telefono,
-            fecha_inicio: formData.vigencia,
-            fecha_fin: formData.fecha_fin,
-            valor: formData.valor
-        };
+        placa: formData.placa?.trim().toUpperCase(),
+        tipo: formData.tipo?.trim().toUpperCase(),
+        nivel_servicio: formData.nivel_servicio?.trim(), 
+        propietario: formData.propietario?.trim(),
+        telefono: formData.telefono,
+        fecha_inicio: formData.vigencia, 
+        vigencia: formData.vigencia,      
+        fecha_fin: formData.fecha_fin,
+        valor: Number(formData.valor)
+    };
+
+        console.log("Payload enviado al backend:", payload);
 
         try {
             if (modoEdicion) {
@@ -237,8 +249,15 @@ const Mensualidades = () => {
 
             setModalAbierto(false);
             cargarMensualidades();
-        } catch {
-            toast.error('Error al guardar la mensualidad');
+        } catch (error) {
+            // Muestra la respuesta exacta que causó el error 400
+            if (error.response && error.response.data) {
+                console.error("Detalle del error del Backend:", error.response.data);
+                toast.error(`Error backend: ${JSON.stringify(error.response.data.message || error.response.data)}`);
+            } else {
+                console.error(error);
+                toast.error('Error al guardar la mensualidad');
+            }
         }
     };
 
@@ -248,7 +267,7 @@ const Mensualidades = () => {
             return;
         }
 
-        if (!window.confirm('Seguro que deseas eliminar esta mensualidad?')) return;
+        if (!window.confirm('¿Seguro que deseas eliminar esta mensualidad?')) return;
 
         try {
             await api.delete(`/mensualidades/${id}`);
@@ -263,7 +282,7 @@ const Mensualidades = () => {
         <div className="mensualidades-page">
             <section className="mensualidades-card">
                 <div className="mensualidades-header">
-                    <h2>Gestion de Mensualidades</h2>
+                    <h2>Gestión de Mensualidades</h2>
                     {puedeAdministrarMensualidades && (
                         <button className="btn-add" type="button" onClick={abrirNuevoModal}>
                             <FaPlus /> Nueva Mensualidad
@@ -279,7 +298,7 @@ const Mensualidades = () => {
                                 <th>Tipo</th>
                                 <th>Servicio</th>
                                 <th>Propietario</th>
-                                <th>Telefono</th>
+                                <th>Teléfono</th>
                                 <th>Vigencia</th>
                                 <th>Valor</th>
                                 <th>Acciones</th>
@@ -313,8 +332,8 @@ const Mensualidades = () => {
                                                 ) : (
                                                     <>
                                                         <button className="edit-icon" type="button" onClick={() => abrirEditarModal(mensualidad)}>
-    <FaEdit />
-</button>
+                                                            <FaEdit />
+                                                        </button>
                                                         <button
                                                             className="btn-icon btn-delete"
                                                             type="button"
@@ -357,11 +376,11 @@ const Mensualidades = () => {
                                 maxLength={6}
                             />
 
-                            <label>Tipo de Vehiculo *</label>
+                            <label>Tipo de Vehículo *</label>
                             <select value={formData.tipo} onChange={handleTipoVehiculoChange} required>
                                 <option value="">Seleccione...</option>
                                 {tarifas.map((tarifa) => (
-                                    <option key={tarifa.id_tipo} value={tarifa.tipo}>
+                                    <option key={tarifa.id_tipo || tarifa.id} value={tarifa.tipo}>
                                         {tarifa.tipo}
                                     </option>
                                 ))}
@@ -373,15 +392,24 @@ const Mensualidades = () => {
                                 onChange={(e) => setFormData((prev) => ({ ...prev, nivel_servicio: e.target.value }))}
                                 required
                             >
-                                <option value="">Seleccione...</option>
-                                <option value="ALTURA">Altura</option>
-                                <option value="SUBTERRANEO">Subterraneo</option>
+                                <option value="">Seleccione</option>
+                                {/* Ajustados con el formato exacto de tu base de datos */}
+                                <option value="Nivel 1">Nivel 1</option>
+                                <option value="Nivel 2">Nivel 2</option>
+                                <option value="Nivel 3">Nivel 3</option>
+                                <option value="Subterráneo">Subterráneo</option>
                             </select>
 
                             <label>Propietario *</label>
-                            <input value={formData.propietario} onChange={handlePropietarioChange} disabled={modoEdicion} required />
+                            <input 
+                                value={formData.propietario} 
+                                onChange={handlePropietarioChange} 
+                                readOnly={modoEdicion} 
+                                className={modoEdicion ? 'input-disabled-look' : ''} 
+                                required 
+                            />
 
-                            <label>Telefono *</label>
+                            <label>Teléfono *</label>
                             <input
                                 type="tel"
                                 value={formData.telefono}
@@ -454,7 +482,7 @@ const Mensualidades = () => {
                                 <input className="readonly-input" value={mensualidadDetalle.placa || ''} readOnly />
                             </label>
                             <label>
-                                Tipo de Vehiculo
+                                Tipo de Vehículo
                                 <input className="readonly-input" value={mensualidadDetalle.tipo || ''} readOnly />
                             </label>
                             <label>
@@ -466,7 +494,7 @@ const Mensualidades = () => {
                                 <input className="readonly-input" value={mensualidadDetalle.propietario || ''} readOnly />
                             </label>
                             <label>
-                                Telefono
+                                Teléfono
                                 <input className="readonly-input" value={mensualidadDetalle.telefono || ''} readOnly />
                             </label>
                             <label>
@@ -493,7 +521,7 @@ const Mensualidades = () => {
             )}
 
             <div id="toast-alerta" className="toast-oculto">
-                Operacion realizada
+                Operación realizada
             </div>
         </div>
     );
