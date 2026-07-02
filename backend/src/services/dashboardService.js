@@ -21,27 +21,47 @@ const DashboardService = {
         `SELECT IFNULL(SUM(valor_total), 0) AS total FROM pago WHERE DATE(fecha_pago) = CURDATE()`
       );
 
+      const [vehiculosPorTipoRows] = await db.execute(
+        `SELECT
+            tv.nombre AS tipo,
+            COUNT(c.id_ingreso) AS cantidad
+          FROM tipo_vehiculo tv
+          LEFT JOIN vehiculo v ON v.id_tipo = tv.id_tipo
+          LEFT JOIN control_i_s c ON c.id_vehiculo = v.id_vehiculo
+            AND c.fecha_hora_salida IS NULL
+          GROUP BY tv.id_tipo, tv.nombre
+          ORDER BY tv.nombre`
+      );
+
       const [ultimosIngresosRows] = await db.execute(
         `SELECT
             v.placa,
             tv.nombre AS tipo,
             e.nivel,
             DATE_FORMAT(c.fecha_hora_entrada, '%H:%i') AS hora,
-            IF(c.fecha_hora_salida IS NULL, 'En curso', 'Salido') AS estado
+            'En curso' AS estado
           FROM control_i_s c
           JOIN vehiculo v ON c.id_vehiculo = v.id_vehiculo
           JOIN tipo_vehiculo tv ON v.id_tipo = tv.id_tipo
           JOIN espacio e ON c.id_espacio = e.id_espacio
+          WHERE c.fecha_hora_salida IS NULL
           ORDER BY c.fecha_hora_entrada DESC
           LIMIT 10`
       );
 
+      const vehiculosActivos = vehiculosActivosRows[0]?.total || 0;
+      const espaciosTotales = espaciosTotalesRows[0]?.total || 0;
+      const espaciosDisponibles = Math.max(espaciosTotales - vehiculosActivos, 0);
+
       return {
-        vehiculosActivos: vehiculosActivosRows[0]?.total || 0,
-        espaciosTotales: espaciosTotalesRows[0]?.total || 0,
-        espaciosDisponibles: Math.max((espaciosTotalesRows[0]?.total || 0) - (vehiculosActivosRows[0]?.total || 0), 0),
+        vehiculosActivos,
+        espaciosTotales,
+        espaciosDisponibles,
+        ocupados: vehiculosActivos,
+        libres: espaciosDisponibles,
         recaudoDia: Number(recaudoDiaRows[0]?.total || 0),
         entradasDia: entradasDiaRows[0]?.total || 0,
+        vehiculosPorTipo: vehiculosPorTipoRows,
         ultimosIngresos: ultimosIngresosRows
       };
     } catch (error) {

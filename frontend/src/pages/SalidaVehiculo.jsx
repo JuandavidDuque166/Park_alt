@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { api } from '../services/api'; // Importamos tu conexión al backend
+import { api } from '../services/api'; 
 import './SalidaVehiculo.css';
 
 const SalidaVehiculo = () => {
@@ -8,41 +8,54 @@ const SalidaVehiculo = () => {
   const [metodoPago, setMetodoPago] = useState('Efectivo');
   const [tipoServicioSalida, setTipoServicioSalida] = useState('Temporal');
   const [valorPagar, setValorPagar] = useState(0);
-  
-  // Iniciamos el estado vacío, ya no hay datos quemados
   const [vehiculos, setVehiculos] = useState([]);
 
-  // Se ejecuta al cargar la pantalla para traer los carros parqueados
+  // Se ejecuta al cargar la pantalla y escucha el evento de sincronización
   useEffect(() => {
     cargarVehiculos();
+
+    const manejarActualizacion = () => {
+      cargarVehiculos();
+    };
+
+    window.addEventListener("actualizar_datos_parqueadero", manejarActualizacion);
+    return () => {
+      window.removeEventListener("actualizar_datos_parqueadero", manejarActualizacion);
+    };
   }, []);
 
   const cargarVehiculos = async () => {
     try {
       const response = await api.get('/salidas/activos');
       if (response.data.success) {
-        // Formateamos los datos del backend para que encajen EXACTAMENTE con tu diseño JSX
         const vehiculosFormateados = response.data.data.map(v => {
-          const fechaIngreso = new Date(v.hora_ingreso);
+          // Normalización para prevenir de raíz el Invalid Date
+const fechaString = v.hora_ingreso ? String(v.hora_ingreso).trim().replace(' ', 'T') : '';
+          const fechaIngreso = new Date(fechaString);
+          
           const horaIngresoCorta = isNaN(fechaIngreso.getTime())
-            ? 'Fecha inválida'
-            : fechaIngreso.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            ? '---'
+            : fechaIngreso.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
           const horaIngresoLarga = isNaN(fechaIngreso.getTime())
             ? 'Fecha inválida'
             : fechaIngreso.toLocaleString();
+
+          // Comprobación de mensualidad activa en base a los campos comunes que manda tu backend
+          const esMensual = v.tipo_servicio === 'Mensualidad' || v.tieneMensualidad === true || v.es_mensualidad === 1;
 
           return {
             id_ingreso: v.id_ingreso,
             placa: v.placa,
             tipo: v.tipo_vehiculo || 'No definido',
-            servicioBase: 'Descubierto',
-            tipoServicio: 'Temporal',
+            servicioBase: esMensual ? 'Mensualidad Activa' : 'Descubierto',
+            tipoServicio: esMensual ? 'Mensualidad' : 'Temporal',
             nivel: v.nivel || 'Nivel 1',
             horaIngresoCorta,
             horaIngresoLarga,
-            tiempo: v.tiempo_formateado || 'Calculando...',
+            tiempo: esMensual ? 'N/A (Mensualidad)' : (v.tiempo_formateado || 'Calculando...'),
             estado: v.estado || 'Activo',
-            valorEstimado: `$${v.valor_estimado || 0}`
+            valorEstimado: esMensual ? 0 : (v.valor_estimado || 0),
+            esMensualidad: esMensual
           };
         });
         setVehiculos(vehiculosFormateados);
@@ -54,34 +67,31 @@ const SalidaVehiculo = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // Busca en los vehículos reales traídos de la base de datos
-    const encontrado = vehiculos.find(v => v.placa.includes(searchTerm.toUpperCase()));
+    if (!searchTerm.trim()) return;
+    const encontrado = vehiculos.find(v => v.placa.includes(searchTerm.trim().toUpperCase()));
     if (encontrado) {
-      setVehiculoSeleccionado(encontrado);
+      seleccionarVehiculo(encontrado);
     } else {
-      alert("Vehículo no encontrado en el parqueadero");
+      alert("Vehículo no encontrado o no está registrado en el parqueadero actualmente.");
     }
   };
 
   const seleccionarVehiculo = (vehiculo) => {
     setVehiculoSeleccionado(vehiculo);
-    setTipoServicioSalida(vehiculo.tipoServicio || 'Temporal');
-    setValorPagar(Number(vehiculo.valorEstimado.replace(/[^0-9]/g, '')) || 0);
+    setTipoServicioSalida(vehiculo.tipoServicio);
+    setValorPagar(vehiculo.esMensualidad ? 0 : Number(vehiculo.valorEstimado));
   };
 
   const registrarSalida = async () => {
+    if (!vehiculoSeleccionado) return;
     try {
       const response = await api.post('/salidas/procesar', {
         id_ingreso: vehiculoSeleccionado.id_ingreso,
-        metodo_pago: metodoPago
+        metodo_pago: vehiculoSeleccionado.esMensualidad ? 'Efectivo' : metodoPago 
       });
 
       if (response.data.success) {
-        const servicioActiva = response.data.mensualidad_activa;
-        const totalCobrado = response.data.total_pagar;
-        const tipoServicioBackend = response.data.tipo_servicio || (servicioActiva ? 'Mensualidad' : 'Temporal');
-
-        alert(`¡Salida exitosa!\nPlaca: ${vehiculoSeleccionado.placa}\nServicio: ${tipoServicioBackend}\nCobrado: $${totalCobrado}\nPago en: ${metodoPago}`);
+        alert(`¡Salida exitosa!\nPlaca: ${vehiculoSeleccionado.placa}\nServicio: ${vehiculoSeleccionado.tipoServicio}\nCobrado: $${vehiculoSeleccionado.esMensualidad ? '0' : response.data.total_pagar}\nPago procesado correctamente.`);
         setVehiculoSeleccionado(null);
         setSearchTerm('');
         setTipoServicioSalida('Temporal');
@@ -90,21 +100,20 @@ const SalidaVehiculo = () => {
       }
     } catch (error) {
       console.error("Error al procesar la salida:", error);
-      alert(error.response?.data?.error || "Ocurrió un error al intentar procesar la salida.");
+      alert(error.response?.data?.error || "Ocurrió un error al intentar registrar la salida.");
     }
   };
+
   return (
     <div className="salida-container">
-      {/* Cabecera */}
       <div className="salida-header">
-        <button className="btn-close">✕</button>
+        <button className="btn-close" onClick={() => setVehiculoSeleccionado(null)}>✕</button>
         <div>
           <h2>Salida Vehículos</h2>
           <p>Gestión en altura y subterráneo</p>
         </div>
       </div>
 
-      {/* Tarjeta de Búsqueda */}
       <div className="card search-card">
         <h3>Buscar Vehículo por Placa</h3>
         <form onSubmit={handleSearch} className="search-form">
@@ -115,13 +124,10 @@ const SalidaVehiculo = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
           />
-          <button type="submit" className="btn-search">
-            Buscar
-          </button>
+          <button type="submit" className="btn-search">Buscar</button>
         </form>
       </div>
 
-      {/* Tarjeta de Detalles del Vehículo (Renderizado Condicional) */}
       {vehiculoSeleccionado && (
         <div className="card detail-card">
           <h3>Información del Vehículo</h3>
@@ -141,7 +147,9 @@ const SalidaVehiculo = () => {
             </div>
             <div className="detail-item">
               <span className="detail-label">Tipo de Servicio</span>
-              <span className="detail-value">{tipoServicioSalida}</span>
+              <span className="detail-value" style={{fontWeight: 'bold', color: vehiculoSeleccionado.esMensualidad ? '#2ecc71' : '#333'}}>
+                {tipoServicioSalida}
+              </span>
             </div>
             <div className="detail-item">
               <span className="detail-label">Nivel / Zona</span>
@@ -160,7 +168,9 @@ const SalidaVehiculo = () => {
             </div>
             <div className="highlight-row">
               <span className="icon-blue">💲</span>
-              <span>Valor estimado a pagar: <strong>{`$${valorPagar.toLocaleString('es-CO')}`}</strong></span>
+              <span>Valor estimado a pagar: <strong style={{fontSize: '1.4rem', color: vehiculoSeleccionado.esMensualidad ? '#2ecc71' : '#2ecc71'}}>
+                {`$${valorPagar.toLocaleString('es-CO')}`}
+              </strong></span>
             </div>
           </div>
 
@@ -170,9 +180,10 @@ const SalidaVehiculo = () => {
               className="select-payment"
               value={metodoPago}
               onChange={(e) => setMetodoPago(e.target.value)}
+              disabled={vehiculoSeleccionado.esMensualidad}
             >
               <option value="Efectivo">Efectivo</option>
-              <option value="Transferencia">Transferencia </option>
+              <option value="Transferencia">Transferencia</option>
             </select>
           </div>
 
@@ -182,7 +193,6 @@ const SalidaVehiculo = () => {
         </div>
       )}
 
-      {/* Tarjeta de Tabla de Vehículos */}
       <div className="card table-card">
         <h3>Vehículos en el Parqueadero ({vehiculos.length})</h3>
         <div className="table-responsive">
@@ -200,27 +210,30 @@ const SalidaVehiculo = () => {
               </tr>
             </thead>
             <tbody>
-              {vehiculos.map((vehiculo, index) => (
-                <tr key={index}>
-                  <td><strong>{vehiculo.placa}</strong></td>
-                  <td>{vehiculo.tipo}</td>
-                  <td>{vehiculo.servicioBase}</td>
-                  <td>{vehiculo.nivel}</td>
-                  <td>{vehiculo.horaIngresoCorta}</td>
-                  <td>{vehiculo.tiempo}</td>
-                  <td>
-                    <span className="badge-temporal">{vehiculo.estado}</span>
-                  </td>
-                  <td>
-                    <button 
-                      className="btn-exit" 
-                      onClick={() => seleccionarVehiculo(vehiculo)}
-                    >
-                      Salida
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {vehiculos.length === 0 ? (
+                <tr><td colSpan="8" style={{textAlign: 'center', padding: '20px'}}>No hay vehículos dentro del parqueadero</td></tr>
+              ) : (
+                vehiculos.map((vehiculo, index) => (
+                  <tr key={index} style={{backgroundColor: vehiculo.esMensualidad ? '#f4fff4' : 'transparent'}}>
+                    <td><strong>{vehiculo.placa}</strong></td>
+                    <td>{vehiculo.tipo}</td>
+                    <td>{vehiculo.servicioBase}</td>
+                    <td>{vehiculo.nivel}</td>
+                    <td>{vehiculo.horaIngresoCorta}</td>
+                    <td>{vehiculo.tiempo}</td>
+                    <td>
+                      <span className={vehiculo.esMensualidad ? "badge-mensualidad" : "badge-temporal"}>
+                        {vehiculo.esMensualidad ? 'Mensual' : vehiculo.estado}
+                      </span>
+                    </td>
+                    <td>
+                      <button className="btn-exit" onClick={() => seleccionarVehiculo(vehiculo)}>
+                        Salida
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

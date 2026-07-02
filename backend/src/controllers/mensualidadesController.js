@@ -563,6 +563,8 @@ const verificarMensualidad = async (req, res) => {
         return res.status(200).json({
             success: true,
             tieneMensualidad: true,
+            id_tipo: mensualidad.id_tipo,
+            idTipo: mensualidad.id_tipo,
             tipo_vehiculo: mensualidad.tipo_vehiculo,
             nivel_servicio: mensualidad.nivel_servicio,
             fecha_inicio: mensualidad.fecha_inicio,

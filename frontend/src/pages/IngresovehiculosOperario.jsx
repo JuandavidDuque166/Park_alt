@@ -54,10 +54,10 @@ const IngresoVehiculo = () => {
     const { name, value } = e.target;
     const nuevoValor = name === "placa" ? value.toUpperCase() : value;
 
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: nuevoValor,
-    });
+    }));
 
     if (name === 'placa' && nuevoValor.trim().length >= 4) {
       try {
@@ -65,8 +65,8 @@ const IngresoVehiculo = () => {
         if (response.data.success && response.data.tieneMensualidad) {
           setVehicularMensualidad(response.data);
           setFormData((prev) => ({
-              ...prev,
-              idTipo: response.data.id_tipo ? String(response.data.id_tipo) : prev.idTipo,
+            ...prev,
+            idTipo: String(response.data.id_tipo || response.data.idTipo || response.data.id_tipo_vehiculo || ""),
             nivel: response.data.nivel_servicio || prev.nivel,
           }));
           setCamposBloqueados({ idTipo: true, nivel: true });
@@ -109,9 +109,13 @@ const IngresoVehiculo = () => {
       });
 
       if (response.data.success && response.data.placa) {
-        setFormData(prev => ({ ...prev, placa: response.data.placa.toUpperCase() }));
+        const placaDetectada = response.data.placa.toUpperCase();
+        setFormData(prev => ({ ...prev, placa: placaDetectada }));
         setMensaje({ tipo: "success", texto: "¡Placa detectada y autocompletada por IA!" });
         setIsCameraOpen(false);
+
+        // Disparar verificación de mensualidad con la placa que leyó la IA
+        handleInputChange({ target: { name: 'placa', value: placaDetectada } });
       } else {
         setMensaje({ tipo: "error", texto: "La IA no pudo detectar una placa clara. Intenta acercar la cámara." });
       }
@@ -140,9 +144,15 @@ const IngresoVehiculo = () => {
     setIsLoading(true);
     setMensaje({ tipo: "", texto: "" });
 
+    if (!formData.placa || !formData.idTipo || !formData.nivel) {
+      setMensaje({ tipo: "error", texto: "Por favor, complete todos los campos obligatorios." });
+      setIsLoading(false);
+      return;
+    }
+
     const dataToSend = new FormData();
-    dataToSend.append("placa", formData.placa);
-    dataToSend.append("id_tipo", formData.idTipo);
+    dataToSend.append("placa", formData.placa.trim().toUpperCase());
+    dataToSend.append("id_tipo", formData.idTipo); 
     dataToSend.append("nivel", formData.nivel);
     if (usuarioActual) {
       dataToSend.append("idUsuario", usuarioActual.id_usuario);
@@ -159,12 +169,12 @@ const IngresoVehiculo = () => {
       if (response.data.success) {
         setMensaje({
           tipo: "success",
-          texto: `¡Ingreso exitoso! Asigne al conductor el espacio #${response.data.data.espacioAsignado}`,
+          texto: `¡Ingreso exitoso! Asigne al conductor el espacio #${response.data.data?.espacioAsignado || 'Asignado'}`,
         });
         handleLimpiar();
         cargarCupos();
         
-        // --- AQUÍ ESTÁ LA SINCRONIZACIÓN ---
+        // Sincronización global inmediata
         window.dispatchEvent(new Event("actualizar_datos_parqueadero"));
       }
     } catch (error) {
@@ -253,7 +263,16 @@ const IngresoVehiculo = () => {
               </div>
               <div className="form-group">
                 <label>Tipo de Vehículo *</label>
-                <select name="idTipo" value={formData.idTipo} onChange={handleInputChange} required disabled={camposBloqueados.idTipo}>
+                {/* Cambiado disabled porclassName para manejo puramente visual si está bloqueado */}
+                <select 
+                  name="idTipo" 
+                  value={formData.idTipo} 
+                  onChange={handleInputChange} 
+                  onClick={(e) => camposBloqueados.idTipo && e.preventDefault()}
+                  required 
+                  className={camposBloqueados.idTipo ? "input-blocked" : ""}
+                  style={camposBloqueados.idTipo ? { backgroundColor: '#eef2f3', cursor: 'not-allowed' } : {}}
+                >
                   <option value="">Seleccione</option>
                   <option value="1">Automóvil</option>
                   <option value="2">Campero</option>
@@ -266,7 +285,15 @@ const IngresoVehiculo = () => {
               </div>
               <div className="form-group">
                 <label>Nivel / Zona *</label>
-                <select name="nivel" value={formData.nivel} onChange={handleInputChange} required disabled={camposBloqueados.nivel}>
+                <select 
+                  name="nivel" 
+                  value={formData.nivel} 
+                  onChange={handleInputChange} 
+                  onClick={(e) => camposBloqueados.nivel && e.preventDefault()}
+                  required 
+                  className={camposBloqueados.nivel ? "input-blocked" : ""}
+                  style={camposBloqueados.nivel ? { backgroundColor: '#eef2f3', cursor: 'not-allowed' } : {}}
+                >
                   <option value="">Seleccione</option>
                   <option value="Nivel 1">Nivel 1</option>
                   <option value="Nivel 2">Nivel 2</option>
