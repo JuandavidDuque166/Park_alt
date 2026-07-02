@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { FaCar, FaParking, FaMoneyBillWave, FaSignInAlt } from 'react-icons/fa';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
+import { Bar, Pie } from 'react-chartjs-2';
 import './Dashboard.css';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+// Registramos los componentes necesarios de Chart.js
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const Dashboard = () => {
   const [data, setData] = useState({
@@ -22,7 +24,6 @@ const Dashboard = () => {
     const obtenerEstadisticas = async () => {
       try {
         const respuesta = await api.get('/dashboard/resumen');
-        // Imprimimos para ver qué nos manda la API y corregir los dataKey
         console.log("DATOS BACKEND:", respuesta.data?.data);
         if (respuesta.data?.data) {
           setData(respuesta.data.data);
@@ -33,6 +34,84 @@ const Dashboard = () => {
     };
     obtenerEstadisticas();
   }, []);
+
+  // Formateador de moneda para el recaudo
+  const formatCurrency = (val) => {
+    return new Intl.NumberFormat('es-CO', { 
+      style: 'currency', 
+      currency: 'COP', 
+      maximumFractionDigits: 0 
+    }).format(val);
+  };
+
+  // ==========================================
+  // CONFIGURACIÓN GRÁFICO DE BARRAS (TIPO VEHÍCULO)
+  // ==========================================
+  // 1. Intentamos obtener los datos agrupados que envía la API originalmente
+  let totalAutomoviles = data.vehiculosportipo?.find(v => v.nombre?.toUpperCase() === 'AUTOMÓVILES' || v.nombre?.toUpperCase() === 'AUTOMOVIL' || v.tipo?.toUpperCase() === 'AUTOMOVIL')?.total || data.vehiculosportipo?.find(v => v.nombre?.toUpperCase() === 'AUTOMÓVILES' || v.nombre?.toUpperCase() === 'AUTOMOVIL' || v.tipo?.toUpperCase() === 'AUTOMOVIL')?.TOTAL || 0;
+  let totalMotocicletas = data.vehiculosportipo?.find(v => v.nombre?.toUpperCase() === 'MOTOCICLETAS' || v.nombre?.toUpperCase() === 'MOTOCICLETA' || v.tipo?.toUpperCase() === 'MOTOCICLETA')?.total || data.vehiculosportipo?.find(v => v.nombre?.toUpperCase() === 'MOTOCICLETAS' || v.nombre?.toUpperCase() === 'MOTOCICLETA' || v.tipo?.toUpperCase() === 'MOTOCICLETA')?.TOTAL || 0;
+  let totalBicicletas = data.vehiculosportipo?.find(v => v.nombre?.toUpperCase() === 'BICICLETAS' || v.nombre?.toUpperCase() === 'BICICLETA' || v.tipo?.toUpperCase() === 'BICICLETA')?.total || data.vehiculosportipo?.find(v => v.nombre?.toUpperCase() === 'BICICLETAS' || v.nombre?.toUpperCase() === 'BICICLETA' || v.tipo?.toUpperCase() === 'BICICLETA')?.TOTAL || 0;
+
+  // 2. SALVAVIDAS ULTRA-FLEXIBLE: Si los totales anteriores dieron 0 pero la tabla tiene registros abajo, los contamos de ahí mismo
+  if (totalAutomoviles === 0 && totalMotocicletas === 0 && totalBicicletas === 0 && data.ultimosIngresos?.length > 0) {
+    data.ultimosIngresos.forEach(v => {
+      // Convertimos todo el objeto del vehículo a string en mayúsculas para no fallar por nombres de columnas
+      const textoFila = JSON.stringify(v).toUpperCase();
+      
+      if (textoFila.includes('AUTOMOVIL') || textoFila.includes('AUTOMÓVIL') || textoFila.includes('CAMPERO') || textoFila.includes('CAMIONETA')) {
+        totalAutomoviles++;
+      } else if (textoFila.includes('MOTOCICLETA') || textoFila.includes('MOTO') || textoFila.includes('MOTOCARRO')) {
+        totalMotocicletas++;
+      } else if (textoFila.includes('BICICLETA') || textoFila.includes('BICI')) {
+        totalBicicletas++;
+      }
+    });
+  }
+
+  const dataBarras = {
+    labels: ['Automóviles', 'Motocicletas', 'Bicicletas'],
+    datasets: [{
+      label: 'Cantidad',
+      data: [totalAutomoviles, totalMotocicletas, totalBicicletas],
+      backgroundColor: '#3182ce',
+      borderRadius: 4
+    }]
+  };
+
+  const opcionesBarras = {
+    scales: {
+      y: {
+        ticks: { stepSize: 1 }, // Solo números enteros enteros (1, 2, 3...)
+        beginAtZero: true
+      }
+    },
+    maintainAspectRatio: false
+  };
+
+  // ==========================================
+  // CONFIGURACIÓN GRÁFICO CIRCULAR (OCUPACIÓN)
+  // ==========================================
+  // Vinculamos los espacios ocupados directamente con las tarjetas de arriba para que sean idénticos
+  const espaciosOcupados = data.vehiculosActivos || (totalAutomoviles + totalMotocicletas + totalBicicletas) || 0;
+  const espaciosDisponibles = data.espaciosDisponibles || (data.espaciosTotales - espaciosOcupados) || 0;
+
+  const dataPie = {
+    labels: ['Disponibles', 'Ocupados'],
+    datasets: [{
+      data: [espaciosDisponibles, espaciosOcupados],
+      backgroundColor: ['#a0aec0', '#3182ce'], 
+      borderWidth: 2,
+    }]
+  };
+
+  const opcionesPie = {
+    plugins: {
+      legend: {
+        position: 'bottom'
+      }
+    },
+    maintainAspectRatio: false
+  };
 
   return (
     <div className="dashboard-content">
@@ -45,7 +124,7 @@ const Dashboard = () => {
         <section className="metrics-grid">
           <MetricCard title="Vehículos Activos" value={data.vehiculosActivos} sub="En el parqueadero" icon={<FaCar />} color="blue" />
           <MetricCard title="Espacios Disponibles" value={data.espaciosDisponibles} sub={`de ${data.espaciosTotales} totales`} icon={<FaParking />} color="green" />
-          <MetricCard title="Recaudo del Día" value={`$${data.recaudoDia}`} sub="Total recaudado" icon={<FaMoneyBillWave />} color="purple" />
+          <MetricCard title="Recaudo del Día" value={formatCurrency(data.recaudoDia)} sub="Total recaudado" icon={<FaMoneyBillWave />} color="purple" />
           <MetricCard title="Entradas del Día" value={data.entradasDia} sub="Ingresos registrados" icon={<FaSignInAlt />} color="orange" />
         </section>
 
@@ -53,37 +132,17 @@ const Dashboard = () => {
           {/* GRÁFICO DE BARRAS */}
           <div className="chart-card">
             <h3>Vehículos por Tipo</h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={data.vehiculosportipo || []}>
-                <XAxis dataKey="nombre" /> {/* CAMBIA 'nombre' SI TU API USA OTRO NOMBRE */}
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="total" fill="#8884d8" /> {/* CAMBIA 'total' SI TU API USA OTRO NOMBRE */}
-              </BarChart>
-            </ResponsiveContainer>
+            <div style={{ height: '250px', position: 'relative' }}>
+              <Bar data={dataBarras} options={opcionesBarras} />
+            </div>
           </div>
           
           {/* GRÁFICO CIRCULAR */}
           <div className="chart-card">
             <h3>Ocupación del Parqueadero</h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie 
-                  data={data.ocupacion || []} 
-                  dataKey="total" /* CAMBIA 'total' SEGÚN TU API */
-                  nameKey="nombre" /* CAMBIA 'nombre' SEGÚN TU API */
-                  cx="50%" 
-                  cy="50%" 
-                  outerRadius={80} 
-                  label
-                >
-                  {(data.ocupacion || []).map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            <div style={{ height: '250px', position: 'relative' }}>
+              <Pie data={dataPie} options={opcionesPie} />
+            </div>
           </div>
         </section>
 
