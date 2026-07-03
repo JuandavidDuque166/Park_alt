@@ -50,6 +50,18 @@ const IngresoVehiculo = () => {
   const [vehicularMensualidad, setVehicularMensualidad] = useState(null);
   const [camposBloqueados, setCamposBloqueados] = useState({ idTipo: false, nivel: false });
 
+  // ESCUDO 1: Bloquea físicamente las teclas de símbolos antes de que se pinten en pantalla
+  const handleKeyDownPlaca = (e) => {
+    const teclasPermitidas = ["Backspace", "Tab", "Enter", "ArrowLeft", "ArrowRight", "Delete"];
+    if (teclasPermitidas.includes(e.key)) return;
+
+    // Solo permite letras (A-Z, a-z) y números (0-9)
+    const regexAlfanumerico = /^[A-Za-z0-9]$/;
+    if (!regexAlfanumerico.test(e.key)) {
+      e.preventDefault();
+    }
+  };
+
   const handleInputChange = async (e) => {
     const { name, value } = e.target;
     const nuevoValor = name === "placa" ? value.toUpperCase() : value;
@@ -109,12 +121,13 @@ const IngresoVehiculo = () => {
       });
 
       if (response.data.success && response.data.placa) {
-        const placaDetectada = response.data.placa.toUpperCase();
+        // Limpieza preventiva sobre el resultado de la IA
+        const placaDetectada = response.data.placa.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
         setFormData(prev => ({ ...prev, placa: placaDetectada }));
         setMensaje({ tipo: "success", texto: "¡Placa detectada y autocompletada por IA!" });
         setIsCameraOpen(false);
 
-        // Disparar verificación de mensualidad con la placa que leyó la IA
+        // Disparar verificación de mensualidad con la placa limpia
         handleInputChange({ target: { name: 'placa', value: placaDetectada } });
       } else {
         setMensaje({ tipo: "error", texto: "La IA no pudo detectar una placa clara. Intenta acercar la cámara." });
@@ -150,8 +163,53 @@ const IngresoVehiculo = () => {
       return;
     }
 
+    const placaLimpia = formData.placa.trim().toUpperCase();
+
+    // ==========================================
+    // ESCUDO 3: VALIDACIONES SEGÚN EL VEHÍCULO
+    // ==========================================
+    if (formData.idTipo === "7") {
+      // --- VALIDACIÓN PARA BICICLETAS ---
+      if (placaLimpia.length < 10 || placaLimpia.length > 12) {
+        setMensaje({ 
+          tipo: "error", 
+          texto: `La placa de bicicleta debe tener entre 10 y 12 caracteres (Actual: ${placaLimpia.length}).` 
+        });
+        setIsLoading(false);
+        return;
+      }
+    } else {
+      // --- VALIDACIÓN PARA VEHÍCULOS NORMALES ---
+      if (placaLimpia.length < 5) {
+        setMensaje({ tipo: "error", texto: "La placa del vehículo debe tener mínimo 5 caracteres." });
+        setIsLoading(false);
+        return;
+      }
+
+      const regexAAA12 = /^[A-Z]{3}[0-9]{2}$/;
+      const regexAAA123 = /^[A-Z]{3}[0-9]{3}$/;
+      const regexAAA12A = /^[A-Z]{3}[0-9]{2}[A-Z]$/;
+
+      const esFormatoValido = regexAAA12.test(placaLimpia) || 
+                              regexAAA123.test(placaLinter) || 
+                              regexAAA123.test(placaLimpia) || 
+                              regexAAA12A.test(placaLimpia);
+
+      if (!esFormatoValido) {
+        setMensaje({ 
+          tipo: "error", 
+          texto: "Formato de placa inválido. Ejemplos permitidos: AAA12, AAA123 o AAA12A." 
+        });
+        setIsLoading(false);
+        return;
+      }
+    }
+
+    // ==========================================
+    // ENVÍO DE DATOS
+    // ==========================================
     const dataToSend = new FormData();
-    dataToSend.append("placa", formData.placa.trim().toUpperCase());
+    dataToSend.append("placa", placaLimpia);
     dataToSend.append("id_tipo", formData.idTipo); 
     dataToSend.append("nivel", formData.nivel);
     if (usuarioActual) {
@@ -173,17 +231,12 @@ const IngresoVehiculo = () => {
         });
         handleLimpiar();
         cargarCupos();
-        
-        // Sincronización global inmediata
         window.dispatchEvent(new Event("actualizar_datos_parqueadero"));
       }
     } catch (error) {
       console.error(error);
       const errorMsg = error.response?.data?.error || "Ocurrió un error al registrar el ingreso.";
-      setMensaje({
-        tipo: "error",
-        texto: errorMsg,
-      });
+      setMensaje({ tipo: "error", texto: errorMsg });
     } finally {
       setIsLoading(false);
     }
@@ -259,11 +312,23 @@ const IngresoVehiculo = () => {
             <div className="form-grid">
               <div className="form-group">
                 <label>Placa *</label>
-                <input type="text" name="placa" placeholder="ABC123" value={formData.placa} onChange={handleInputChange} maxLength={6} required />
+                <input 
+                  type="text" 
+                  name="placa" 
+                  placeholder={formData.idTipo === "7" ? "BICICLETA123" : "ABC123"} 
+                  value={formData.placa} 
+                  onKeyDown={handleKeyDownPlaca} // ESCUDO 1: Bloqueo de teclado físico
+                  onChange={(e) => {
+                    // ESCUDO 2: Limpieza inmediata por si intentan pegar símbolos con mouse
+                    e.target.value = e.target.value.replace(/[^A-Za-z0-9]/g, "");
+                    handleInputChange(e);
+                  }} 
+                  maxLength={formData.idTipo === "7" ? 12 : 6} // MaxLength Dinámico
+                  required 
+                />
               </div>
               <div className="form-group">
                 <label>Tipo de Vehículo *</label>
-                {/* Cambiado disabled porclassName para manejo puramente visual si está bloqueado */}
                 <select 
                   name="idTipo" 
                   value={formData.idTipo} 
