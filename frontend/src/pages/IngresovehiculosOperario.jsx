@@ -180,29 +180,30 @@ const IngresoVehiculo = () => {
       }
     } else {
       // --- VALIDACIÓN PARA VEHÍCULOS NORMALES ---
-      if (placaLimpia.length < 5) {
-        setMensaje({ tipo: "error", texto: "La placa del vehículo debe tener mínimo 5 caracteres." });
-        setIsLoading(false);
-        return;
-      }
+      // --- VALIDACIÓN PARA VEHÍCULOS NORMALES ---
+if (placaLimpia.length < 5) {
+  setMensaje({ tipo: "error", texto: "La placa del vehículo debe tener mínimo 5 caracteres." });
+  setIsLoading(false);
+  return;
+}
 
-      const regexAAA12 = /^[A-Z]{3}[0-9]{2}$/;
-      const regexAAA123 = /^[A-Z]{3}[0-9]{3}$/;
-      const regexAAA12A = /^[A-Z]{3}[0-9]{2}[A-Z]$/;
+const regexAAA12 = /^[A-Z]{3}[0-9]{2}$/;
+const regexAAA123 = /^[A-Z]{3}[0-9]{3}$/;
+const regexAAA12A = /^[A-Z]{3}[0-9]{2}[A-Z]$/;
 
-      const esFormatoValido = regexAAA12.test(placaLimpia) || 
-                              regexAAA123.test(placaLinter) || 
-                              regexAAA123.test(placaLimpia) || 
-                              regexAAA12A.test(placaLimpia);
+// Corregido: cambiamos placaLinter por placaLimpia
+const esFormatoValido = regexAAA12.test(placaLimpia) || 
+                       regexAAA123.test(placaLimpia) || 
+                       regexAAA12A.test(placaLimpia);
 
-      if (!esFormatoValido) {
-        setMensaje({ 
-          tipo: "error", 
-          texto: "Formato de placa inválido. Ejemplos permitidos: AAA12, AAA123 o AAA12A." 
-        });
-        setIsLoading(false);
-        return;
-      }
+if (!esFormatoValido) {
+  setMensaje({ 
+    tipo: "error", 
+    texto: "Formato de placa inválido. Ejemplos permitidos: AAA12, AAA123 o AAA12A." 
+  });
+  setIsLoading(false);
+  return;
+}
     }
 
     // ==========================================
