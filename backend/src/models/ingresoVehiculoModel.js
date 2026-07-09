@@ -25,17 +25,19 @@ class IngresoVehiculoModel {
         return rows.length > 0;
     }
 
-    // NUEVO: Obtener contador de espacios disponibles totales
+    // Obtener contador de espacios disponibles usando ingresos activos
     static async obtenerEspaciosDisponibles() {
-        const [rows] = await db.query(
-            "SELECT COUNT(*) as disponibles FROM espacio WHERE estado = 'DISPONIBLE'"
-        );
         const [totalRows] = await db.query(
             "SELECT COUNT(*) as total FROM espacio WHERE estado != 'INACTIVO'"
         );
+        const [ocupadosRows] = await db.query(
+            `SELECT COUNT(*) AS ocupados
+             FROM control_i_s c
+             WHERE c.fecha_hora_salida IS NULL`
+        );
         return {
-            disponibles: rows[0].disponibles,
-            total: totalRows[0].total
+            disponibles: Math.max(0, Number(totalRows[0].total) - Number(ocupadosRows[0].ocupados)),
+            total: Number(totalRows[0].total)
         };
     }
 

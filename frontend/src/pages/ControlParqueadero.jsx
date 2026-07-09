@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { api } from '../services/api';
 import './ControlParqueadero.css';
 
 const ControlParqueadero = () => {
@@ -18,7 +18,7 @@ const ControlParqueadero = () => {
   useEffect(() => {
     const cargarDatos = async () => {
       try {
-        const respuesta = await axios.get('http://localhost:3000/api/control/datos');
+        const respuesta = await api.get('/control/datos');
         if (respuesta.data.success) {
           const { stats, niveles, vehiculos } = respuesta.data.data;
           setStats(stats);

@@ -2,31 +2,61 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 const AppError = require('./errors/AppError');
 const globalErrorHandler = require('./middlewares/errorHandler');
-const IngresoController = require('./controllers/ingresoVehiculoController');
-const upload = require('./middlewares/uploadMiddleware');
+const { apiLimiter } = require('./middlewares/rateLimitMiddleware');
+const logger = require('./utils/logger');
 
 const app = express();
 
-// Configurar CORS para permitir acceso desde Angular y React
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(cookieParser());
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+    : ['http://localhost:4200', 'http://localhost:5173'];
+
 app.use(cors({
-    origin: ['http://localhost:4200', 'http://localhost:5173'],
+    origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Configurar Helmet con políticas relajadas para desarrollo
-app.use(helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" },
-    contentSecurityPolicy: false // Desactivar CSP en desarrollo para evitar bloqueos
+app.use(helmet());
+app.use(helmet.hidePoweredBy());
+app.use(helmet.frameguard({ action: 'deny' }));
+app.use(helmet.noSniff());
+app.use(helmet.hsts({ maxAge: 31536000, includeSubDomains: true, preload: true }));
+app.use(helmet.referrerPolicy({ policy: 'strict-origin-when-cross-origin' }));
+app.use(helmet.crossOriginResourcePolicy({ policy: 'same-origin' }));
+app.use(helmet.contentSecurityPolicy({
+    directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        connectSrc: ["'self'", 'http://localhost:3000'],
+        imgSrc: ["'self'", 'data:'],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        fontSrc: ["'self'"]
+    }
 }));
 
-app.use(express.json());
+// Limitar la API general para evitar abuso
+app.use('/api', apiLimiter);
+
+app.use((req, res, next) => {
+    logger.logInfo(`${req.method} ${req.originalUrl} - ${req.ip}`);
+    next();
+});
 
 // Servir archivos estáticos (imágenes subidas)
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
+    index: false,
+    dotfiles: 'deny',
+    maxAge: '1d'
+}));
 
 // Importar rutas
 const authRoutes = require('./routes/authRoutes');

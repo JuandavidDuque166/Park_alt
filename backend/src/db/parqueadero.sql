@@ -221,24 +221,24 @@ INSERT INTO espacio (numero, nivel, estado) VALUES
 
 -- Aquí forzamos de forma implícita los IDs del 1 al 53 mapeados con los tipos correctos
 INSERT INTO vehiculo (placa, id_tipo) VALUES 
-('ABC-001', 1), ('XYZ-002', 6), ('LMN-003', 3), -- IDs 1, 2, 3
-('KMS-521', 1), ('MXZ-894', 6), ('PEW-302', 1), -- IDs 4, 5, 6
-('QER-745', 3), ('ZXT-112', 6), ('OSD-889', 2), -- IDs 7, 8, 9
-('IOP-441', 1), ('YTR-632', 7), ('CVB-105', 6), -- IDs 10, 11, 12
-('HJK-963', 1), ('BNM-741', 3), ('ASD-852', 6), -- IDs 13, 14, 15
-('QWE-963', 4), ('RFV-123', 7), ('TGB-159', 1), -- IDs 16, 17, 18 (Se corrigió la placa 'RFV' inválida)
-('EDC-357', 5), ('WSX-951', 6), ('UJM-258', 1), -- IDs 19, 20, 21
-('IKM-456', 2), ('OLP-789', 1), ('ZAQ-123', 6), -- IDs 22, 23, 24
-('XSW-456', 3), ('CDE-789', 1), ('VFR-012', 6), -- IDs 25, 26, 27
-('BGT-345', 7), ('NHY-678', 1), ('MJU-901', 1), -- IDs 28, 29, 30
-('KIU-234', 6), ('LOI-567', 4), ('PAS-890', 2), -- IDs 31, 32, 33
-('DFG-123', 1), ('HJK-456', 6), ('LZX-789', 1), -- IDs 34, 35, 36
-('CVB-012', 3), ('NMK-345', 6), ('TYU-678', 1), -- IDs 37, 38, 39
-('GHJ-901', 5), ('VBN-234', 7), ('WER-567', 1), -- IDs 40, 41, 42
-('SDF-890', 6), ('XCV-123', 1), ('ERT-456', 3), -- IDs 43, 44, 45
-('UIO-789', 6), ('JKL-012', 1), ('YUI-345', 2), -- IDs 46, 47, 48
-('HGF-678', 6), ('ZXC-901', 1), ('VBN-567', 1), -- IDs 49, 50, 51
-('ASD-012', 6), ('QWE-345', 3);                 -- IDs 52, 53
+('ABC001', 1), ('XYZ002', 6), ('LMN003', 3), -- IDs 1, 2, 3
+('KMS521', 1), ('MXZ894', 6), ('PEW302', 1), -- IDs 4, 5, 6
+('QER745', 3), ('ZXT112', 6), ('OSD889', 2), -- IDs 7, 8, 9
+('IOP441', 1), ('YTR632', 7), ('CVB105', 6), -- IDs 10, 11, 12
+('HJK963', 1), ('BNM741', 3), ('ASD852', 6), -- IDs 13, 14, 15
+('QWE963', 4), ('RFV123', 7), ('TGB159', 1), -- IDs 16, 17, 18 (Se corrigió la placa 'RFV' inválida)
+('EDC357', 5), ('WSX951', 6), ('UJM258', 1), -- IDs 19, 20, 21
+('IKM456', 2), ('OLP789', 1), ('ZAQ123', 6), -- IDs 22, 23, 24
+('XSW456', 3), ('CDE789', 1), ('VFR012', 6), -- IDs 25, 26, 27
+('BGT345', 7), ('NHY678', 1), ('MJU901', 1), -- IDs 28, 29, 30
+('KIU234', 6), ('LOI567', 4), ('PAS890', 2), -- IDs 31, 32, 33
+('DFG123', 1), ('HJK456', 6), ('LZX789', 1), -- IDs 34, 35, 36
+('CVB012', 3), ('NMK345', 6), ('TYU678', 1), -- IDs 37, 38, 39
+('GHJ901', 5), ('VBN234', 7), ('WER567', 1), -- IDs 40, 41, 42
+('SDF890', 6), ('XCV123', 1), ('ERT456', 3), -- IDs 43, 44, 45
+('UIO789', 6), ('JKL012', 1), ('YUI345', 2), -- IDs 46, 47, 48
+('HGF678', 6), ('ZXC901', 1), ('VBN567', 1), -- IDs 49, 50, 51
+('ASD012', 6), ('QWE345', 3);                 -- IDs 52, 53
 
 -- =========================================================================
 -- 5. MOVIMIENTOS Y REGISTROS FINALES
@@ -300,56 +300,58 @@ INSERT INTO mensualidad (id_cliente, id_vehiculo, fecha_inicio, fecha_fin, valor
 (53, 53, '2026-07-01', '2026-08-01', 160000.00, 'ACTIVA', 'Nivel 2');
 
 INSERT INTO control_i_s (fecha_hora_entrada, fecha_hora_salida, url_imagen, id_vehiculo, id_espacio, id_usuario) VALUES 
-('2026-07-01 07:15:00', '2026-07-01 09:30:00', 'evidencia_4.jpg', 4, 1, 2),
-('2026-07-01 07:20:00', '2026-07-01 12:00:00', 'evidencia_5.jpg', 5, 2, 2),
-('2026-07-01 08:00:00', '2026-07-01 10:15:00', 'evidencia_6.jpg', 6, 3, 2),
-('2026-07-01 08:30:00', '2026-07-01 17:30:00', 'evidencia_7.jpg', 7, 31, 2),
-('2026-07-01 09:00:00', '2026-07-01 11:00:00', 'evidencia_8.jpg', 8, 4, 2),
-('2026-07-01 09:15:00', '2026-07-01 14:15:00', 'evidencia_9.jpg', 9, 5, 2),
-('2026-07-01 09:45:00', '2026-07-01 11:15:00', 'evidencia_10.jpg', 10, 6, 2),
-('2026-07-01 10:00:00', '2026-07-01 10:45:00', 'evidencia_11.jpg', 11, 7, 2),
-('2026-07-01 10:30:00', '2026-07-01 13:00:00', 'evidencia_12.jpg', 12, 8, 2),
-('2026-07-01 11:00:00', '2026-07-01 16:00:00', 'evidencia_13.jpg', 13, 32, 2),
-('2026-07-01 11:15:00', '2026-07-01 19:15:00', 'evidencia_14.jpg', 14, 33, 2),
-('2026-07-01 11:30:00', '2026-07-01 12:30:00', 'evidencia_15.jpg', 15, 9, 2),
-('2026-07-01 12:00:00', '2026-07-01 15:30:00', 'evidencia_16.jpg', 16, 56, 2),
-('2026-07-01 12:15:00', '2026-07-01 13:15:00', 'evidencia_17.jpg', 17, 10, 2),
-('2026-07-01 12:45:00', '2026-07-01 14:45:00', 'evidencia_18.jpg', 18, 11, 2),
-('2026-07-01 13:00:00', '2026-07-01 18:00:00', 'evidencia_19.jpg', 19, 12, 2),
-('2026-07-01 13:30:00', '2026-07-01 15:00:00', 'evidencia_20.jpg', 20, 13, 2),
-('2026-07-01 14:00:00', '2026-07-01 17:15:00', 'evidencia_21.jpg', 21, 34, 2),
-('2026-07-01 14:15:00', '2026-07-01 15:15:00', 'evidencia_22.jpg', 22, 14, 2),
-('2026-07-01 14:30:00', '2026-07-01 16:30:00', 'evidencia_23.jpg', 23, 15, 2),
-('2026-07-01 15:00:00', '2026-07-01 16:15:00', 'evidencia_24.jpg', 24, 16, 2),
-('2026-07-01 15:15:00', '2026-07-01 18:15:00', 'evidencia_25.jpg', 25, 17, 2),
-('2026-07-01 15:45:00', '2026-07-01 16:45:00', 'evidencia_26.jpg', 26, 18, 2),
-('2026-07-01 16:00:00', '2026-07-01 20:00:00', 'evidencia_27.jpg', 27, 35, 2),
-('2026-07-01 16:15:00', '2026-07-01 17:45:00', 'evidencia_28.jpg', 28, 36, 2),
-('2026-07-01 16:30:00', '2026-07-01 19:30:00', 'evidencia_29.jpg', 29, 19, 2),
-('2026-07-01 17:00:00', '2026-07-01 18:30:00', 'evidencia_30.jpg', 30, 57, 2),
-('2026-07-01 17:15:00', '2026-07-01 21:15:00', 'evidencia_31.jpg', 31, 20, 2),
-('2026-07-01 17:30:00', '2026-07-01 19:00:00', 'evidencia_32.jpg', 32, 21, 2),
-('2026-07-01 18:00:00', '2026-07-01 19:45:00', 'evidencia_33.jpg', 33, 22, 2),
-('2026-07-01 18:15:00', '2026-07-01 20:15:00', 'evidencia_34.jpg', 34, 23, 2),
-('2026-07-01 18:30:00', '2026-07-01 22:30:00', 'evidencia_35.jpg', 35, 37, 2),
-('2026-07-01 19:00:00', '2026-07-01 20:00:00', 'evidencia_36.jpg', 36, 24, 2),
-('2026-07-01 19:15:00', '2026-07-01 21:45:00', 'evidencia_37.jpg', 37, 38, 2),
-('2026-07-01 19:30:00', '2026-07-01 20:30:00', 'evidencia_38.jpg', 38, 58, 2),
-('2026-07-01 19:45:00', '2026-07-01 21:00:00', 'evidencia_39.jpg', 39, 25, 2),
-('2026-07-01 20:00:00', '2026-07-01 23:00:00', 'evidencia_40.jpg', 40, 26, 2),
-('2026-07-01 20:15:00', '2026-07-01 21:30:00', 'evidencia_41.jpg', 41, 27, 2),
-('2026-07-01 20:30:00', '2026-07-01 22:00:00', 'evidencia_42.jpg', 42, 28, 2),
-('2026-07-01 21:00:00', '2026-07-01 23:30:00', 'evidencia_43.jpg', 43, 39, 2),
-('2026-07-01 21:15:00', '2026-07-01 22:45:00', 'evidencia_44.jpg', 44, 29, 2),
-('2026-07-01 21:30:00', '2026-07-01 23:45:00', 'evidencia_45.jpg', 45, 30, 2),
-('2026-07-01 22:00:00', '2026-07-01 23:00:00', 'evidencia_46.jpg', 46, 81, 2),
-('2026-07-01 22:15:00', '2026-07-01 23:45:00', 'evidencia_47.jpg', 47, 82, 2),
-('2026-07-01 22:30:00', '2026-07-01 23:30:00', 'evidencia_48.jpg', 48, 59, 2),
-('2026-07-01 22:45:00', '2026-07-01 23:55:00', 'evidencia_49.jpg', 49, 83, 2),
-('2026-07-01 23:00:00', '2026-07-01 23:45:00', 'evidencia_50.jpg', 50, 84, 2),
-('2026-07-01 23:10:00', '2026-07-01 23:55:00', 'evidencia_51.jpg', 51, 85, 2),
-('2026-07-01 23:15:00', '2026-07-01 23:45:00', 'evidencia_52.jpg', 52, 86, 2),
-('2026-07-01 23:20:00', '2026-07-01 23:50:00', 'evidencia_53.jpg', 53, 40, 2);
+('2026-07-01 07:15:00', '2026-07-01 09:30:00', 'evidencia_4.jpg', 4, (SELECT id_espacio FROM espacio WHERE numero = 101 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 07:20:00', '2026-07-01 12:00:00', 'evidencia_5.jpg', 5, (SELECT id_espacio FROM espacio WHERE numero = 102 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 08:00:00', '2026-07-01 10:15:00', 'evidencia_6.jpg', 6, (SELECT id_espacio FROM espacio WHERE numero = 103 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 08:30:00', '2026-07-01 17:30:00', 'evidencia_7.jpg', 7, (SELECT id_espacio FROM espacio WHERE numero = 201 AND nivel = 'Nivel 2'), 2), 
+('2026-07-01 09:00:00', '2026-07-01 11:00:00', 'evidencia_8.jpg', 8, (SELECT id_espacio FROM espacio WHERE numero = 104 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 09:15:00', '2026-07-01 14:15:00', 'evidencia_9.jpg', 9, (SELECT id_espacio FROM espacio WHERE numero = 105 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 09:45:00', '2026-07-01 11:15:00', 'evidencia_10.jpg', 10, (SELECT id_espacio FROM espacio WHERE numero = 106 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 10:00:00', '2026-07-01 10:45:00', 'evidencia_11.jpg', 11, (SELECT id_espacio FROM espacio WHERE numero = 107 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 10:30:00', '2026-07-01 13:00:00', 'evidencia_12.jpg', 12, (SELECT id_espacio FROM espacio WHERE numero = 108 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 11:00:00', '2026-07-01 16:00:00', 'evidencia_13.jpg', 13, (SELECT id_espacio FROM espacio WHERE numero = 202 AND nivel = 'Nivel 2'), 2), 
+('2026-07-01 11:15:00', '2026-07-01 19:15:00', 'evidencia_14.jpg', 14, (SELECT id_espacio FROM espacio WHERE numero = 203 AND nivel = 'Nivel 2'), 2), 
+('2026-07-01 11:30:00', '2026-07-01 12:30:00', 'evidencia_15.jpg', 15, (SELECT id_espacio FROM espacio WHERE numero = 109 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 12:00:00', '2026-07-01 15:30:00', 'evidencia_16.jpg', 16, (SELECT id_espacio FROM espacio WHERE numero = 301 AND nivel = 'Nivel 3'), 2), 
+('2026-07-01 12:15:00', '2026-07-01 13:15:00', 'evidencia_17.jpg', 17, (SELECT id_espacio FROM espacio WHERE numero = 110 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 12:45:00', '2026-07-01 14:45:00', 'evidencia_18.jpg', 18, (SELECT id_espacio FROM espacio WHERE numero = 111 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 13:00:00', '2026-07-01 18:00:00', 'evidencia_19.jpg', 19, (SELECT id_espacio FROM espacio WHERE numero = 112 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 13:30:00', '2026-07-01 15:00:00', 'evidencia_20.jpg', 20, (SELECT id_espacio FROM espacio WHERE numero = 113 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 14:00:00', '2026-07-01 17:15:00', 'evidencia_21.jpg', 21, (SELECT id_espacio FROM espacio WHERE numero = 204 AND nivel = 'Nivel 2'), 2), 
+('2026-07-01 14:15:00', '2026-07-01 15:15:00', 'evidencia_22.jpg', 22, (SELECT id_espacio FROM espacio WHERE numero = 114 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 14:30:00', '2026-07-01 16:30:00', 'evidencia_23.jpg', 23, (SELECT id_espacio FROM espacio WHERE numero = 115 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 15:00:00', '2026-07-01 16:15:00', 'evidencia_24.jpg', 24, (SELECT id_espacio FROM espacio WHERE numero = 116 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 15:15:00', '2026-07-01 18:15:00', 'evidencia_25.jpg', 25, (SELECT id_espacio FROM espacio WHERE numero = 117 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 15:45:00', '2026-07-01 16:45:00', 'evidencia_26.jpg', 26, (SELECT id_espacio FROM espacio WHERE numero = 118 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 16:00:00', '2026-07-01 20:00:00', 'evidencia_27.jpg', 27, (SELECT id_espacio FROM espacio WHERE numero = 205 AND nivel = 'Nivel 2'), 2), 
+('2026-07-01 16:15:00', '2026-07-01 17:45:00', 'evidencia_28.jpg', 28, (SELECT id_espacio FROM espacio WHERE numero = 206 AND nivel = 'Nivel 2'), 2),  
+
+-- SIGUIENTES 25 REGISTROS: Siguen dentro del parqueadero (fecha_hora_salida = NULL) 
+('2026-07-01 16:30:00', NULL, 'evidencia_29.jpg', 29, (SELECT id_espacio FROM espacio WHERE numero = 119 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 17:00:00', NULL, 'evidencia_30.jpg', 30, (SELECT id_espacio FROM espacio WHERE numero = 302 AND nivel = 'Nivel 3'), 2), 
+('2026-07-01 17:15:00', NULL, 'evidencia_31.jpg', 31, (SELECT id_espacio FROM espacio WHERE numero = 120 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 17:30:00', NULL, 'evidencia_32.jpg', 32, (SELECT id_espacio FROM espacio WHERE numero = 121 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 18:00:00', NULL, 'evidencia_33.jpg', 33, (SELECT id_espacio FROM espacio WHERE numero = 122 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 18:15:00', NULL, 'evidencia_34.jpg', 34, (SELECT id_espacio FROM espacio WHERE numero = 123 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 18:30:00', NULL, 'evidencia_35.jpg', 35, (SELECT id_espacio FROM espacio WHERE numero = 207 AND nivel = 'Nivel 2'), 2), 
+('2026-07-01 19:00:00', NULL, 'evidencia_36.jpg', 36, (SELECT id_espacio FROM espacio WHERE numero = 124 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 19:15:00', NULL, 'evidencia_37.jpg', 37, (SELECT id_espacio FROM espacio WHERE numero = 208 AND nivel = 'Nivel 2'), 2), 
+('2026-07-01 19:30:00', NULL, 'evidencia_38.jpg', 38, (SELECT id_espacio FROM espacio WHERE numero = 303 AND nivel = 'Nivel 3'), 2), 
+('2026-07-01 19:45:00', NULL, 'evidencia_39.jpg', 39, (SELECT id_espacio FROM espacio WHERE numero = 125 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 20:00:00', NULL, 'evidencia_40.jpg', 40, (SELECT id_espacio FROM espacio WHERE numero = 126 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 20:15:00', NULL, 'evidencia_41.jpg', 41, (SELECT id_espacio FROM espacio WHERE numero = 127 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 20:30:00', NULL, 'evidencia_42.jpg', 42, (SELECT id_espacio FROM espacio WHERE numero = 128 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 21:00:00', NULL, 'evidencia_43.jpg', 43, (SELECT id_espacio FROM espacio WHERE numero = 209 AND nivel = 'Nivel 2'), 2), 
+('2026-07-01 21:15:00', NULL, 'evidencia_44.jpg', 44, (SELECT id_espacio FROM espacio WHERE numero = 129 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 21:30:00', NULL, 'evidencia_45.jpg', 45, (SELECT id_espacio FROM espacio WHERE numero = 130 AND nivel = 'Nivel 1'), 2), 
+('2026-07-01 22:00:00', NULL, 'evidencia_46.jpg', 46, (SELECT id_espacio FROM espacio WHERE numero = 1 AND nivel = 'Subterráneo'), 2), 
+('2026-07-01 22:15:00', NULL, 'evidencia_47.jpg', 47, (SELECT id_espacio FROM espacio WHERE numero = 2 AND nivel = 'Subterráneo'), 2), 
+('2026-07-01 22:30:00', NULL, 'evidencia_48.jpg', 48, (SELECT id_espacio FROM espacio WHERE numero = 304 AND nivel = 'Nivel 3'), 2), 
+('2026-07-01 22:45:00', NULL, 'evidencia_49.jpg', 49, (SELECT id_espacio FROM espacio WHERE numero = 3 AND nivel = 'Subterráneo'), 2), 
+('2026-07-01 23:00:00', NULL, 'evidencia_50.jpg', 50, (SELECT id_espacio FROM espacio WHERE numero = 4 AND nivel = 'Subterráneo'), 2), 
+('2026-07-01 23:10:00', NULL, 'evidencia_51.jpg', 51, (SELECT id_espacio FROM espacio WHERE numero = 5 AND nivel = 'Subterráneo'), 2), 
+('2026-07-01 23:15:00', NULL, 'evidencia_52.jpg', 52, (SELECT id_espacio FROM espacio WHERE numero = 6 AND nivel = 'Subterráneo'), 2), 
+('2026-07-01 23:20:00', NULL, 'evidencia_53.jpg', 53, (SELECT id_espacio FROM espacio WHERE numero = 210 AND nivel = 'Nivel 2'), 2);
 
 INSERT INTO pago (metodo_pago, valor_total, fecha_pago, id_ingreso) VALUES 
 ('EFECTIVO', 11500.00, '2026-07-01 09:30:00', 1), ('TRASNFERENCIA', 11250.00, '2026-07-01 12:00:00', 2),

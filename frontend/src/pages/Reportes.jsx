@@ -3,7 +3,8 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 import { Bar } from 'react-chartjs-2';
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable';
-import { Download, Wallet, LogIn, LogOut } from 'lucide-react'; 
+import { Download, Wallet, LogIn, LogOut } from 'lucide-react';
+import { api } from '../services/api';
 import './Reportes.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -22,9 +23,8 @@ const Reportes = () => {
         if (filtros.fechaInicio) params.append('fechaInicio', filtros.fechaInicio);
         if (filtros.fechaFin) params.append('fechaFin', filtros.fechaFin);
 
-        // Ajusta el puerto (ej. 4000) según la configuración de tu servidor backend
-        const response = await fetch(`http://localhost:3000/api/reportes?${params.toString()}`);
-        const result = await response.json();
+        const response = await api.get(`/reportes?${params.toString()}`);
+        const result = response.data;
 
         if (result.success) {
           setTransacciones(result.data);

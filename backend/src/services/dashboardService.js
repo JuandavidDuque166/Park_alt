@@ -10,7 +10,7 @@ const DashboardService = {
       );
 
       const [espaciosTotalesRows] = await db.execute(
-        `SELECT COUNT(*) AS total FROM espacio`
+        `SELECT COUNT(*) AS total FROM espacio WHERE estado != 'INACTIVO'`
       );
 
       const [entradasDiaRows] = await db.execute(
@@ -23,8 +23,8 @@ const DashboardService = {
 
       const [vehiculosPorTipoRows] = await db.execute(
         `SELECT
-            tv.nombre AS tipo,
-            COUNT(c.id_ingreso) AS cantidad
+            tv.nombre AS nombre,
+            COUNT(c.id_ingreso) AS total
           FROM tipo_vehiculo tv
           LEFT JOIN vehiculo v ON v.id_tipo = tv.id_tipo
           LEFT JOIN control_i_s c ON c.id_vehiculo = v.id_vehiculo
@@ -60,8 +60,13 @@ const DashboardService = {
         ocupados: vehiculosActivos,
         libres: espaciosDisponibles,
         recaudoDia: Number(recaudoDiaRows[0]?.total || 0),
-        entradasDia: entradasDiaRows[0]?.total || 0,
+        entradasDia: Number(entradasDiaRows[0]?.total || 0),
         vehiculosPorTipo: vehiculosPorTipoRows,
+        vehiculosportipo: vehiculosPorTipoRows,
+        ocupacion: [
+          { label: 'Disponibles', value: espaciosDisponibles },
+          { label: 'Ocupados', value: vehiculosActivos }
+        ],
         ultimosIngresos: ultimosIngresosRows
       };
     } catch (error) {

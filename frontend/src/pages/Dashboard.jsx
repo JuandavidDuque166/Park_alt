@@ -24,15 +24,29 @@ const Dashboard = () => {
     const obtenerEstadisticas = async () => {
       try {
         const respuesta = await api.get('/dashboard/resumen');
-        console.log("DATOS BACKEND:", respuesta.data?.data);
         if (respuesta.data?.data) {
-          setData(respuesta.data.data);
+          setData(prev => ({
+            ...prev,
+            ...respuesta.data.data,
+            vehiculosportipo: respuesta.data.data.vehiculosportipo || respuesta.data.data.vehiculosPorTipo || prev.vehiculosportipo,
+            ocupacion: respuesta.data.data.ocupacion || prev.ocupacion
+          }));
         }
       } catch (error) {
         console.error('Error al cargar:', error);
       }
     };
+
     obtenerEstadisticas();
+
+    const manejarActualizacion = () => {
+      obtenerEstadisticas();
+    };
+
+    window.addEventListener('actualizar_datos_parqueadero', manejarActualizacion);
+    return () => {
+      window.removeEventListener('actualizar_datos_parqueadero', manejarActualizacion);
+    };
   }, []);
 
   // Formateador de moneda para el recaudo
@@ -47,26 +61,24 @@ const Dashboard = () => {
   // ==========================================
   // CONFIGURACIÓN GRÁFICO DE BARRAS (TIPO VEHÍCULO)
   // ==========================================
-  // 1. Intentamos obtener los datos agrupados que envía la API originalmente
-  let totalAutomoviles = data.vehiculosportipo?.find(v => v.nombre?.toUpperCase() === 'AUTOMÓVILES' || v.nombre?.toUpperCase() === 'AUTOMOVIL' || v.tipo?.toUpperCase() === 'AUTOMOVIL')?.total || data.vehiculosportipo?.find(v => v.nombre?.toUpperCase() === 'AUTOMÓVILES' || v.nombre?.toUpperCase() === 'AUTOMOVIL' || v.tipo?.toUpperCase() === 'AUTOMOVIL')?.TOTAL || 0;
-  let totalMotocicletas = data.vehiculosportipo?.find(v => v.nombre?.toUpperCase() === 'MOTOCICLETAS' || v.nombre?.toUpperCase() === 'MOTOCICLETA' || v.tipo?.toUpperCase() === 'MOTOCICLETA')?.total || data.vehiculosportipo?.find(v => v.nombre?.toUpperCase() === 'MOTOCICLETAS' || v.nombre?.toUpperCase() === 'MOTOCICLETA' || v.tipo?.toUpperCase() === 'MOTOCICLETA')?.TOTAL || 0;
-  let totalBicicletas = data.vehiculosportipo?.find(v => v.nombre?.toUpperCase() === 'BICICLETAS' || v.nombre?.toUpperCase() === 'BICICLETA' || v.tipo?.toUpperCase() === 'BICICLETA')?.total || data.vehiculosportipo?.find(v => v.nombre?.toUpperCase() === 'BICICLETAS' || v.nombre?.toUpperCase() === 'BICICLETA' || v.tipo?.toUpperCase() === 'BICICLETA')?.TOTAL || 0;
+  const tiposVehiculo = Array.isArray(data.vehiculosPorTipo)
+    ? data.vehiculosPorTipo
+    : Array.isArray(data.vehiculosportipo)
+      ? data.vehiculosportipo
+      : [];
 
-  // 2. SALVAVIDAS ULTRA-FLEXIBLE: Si los totales anteriores dieron 0 pero la tabla tiene registros abajo, los contamos de ahí mismo
-  if (totalAutomoviles === 0 && totalMotocicletas === 0 && totalBicicletas === 0 && data.ultimosIngresos?.length > 0) {
-    data.ultimosIngresos.forEach(v => {
-      // Convertimos todo el objeto del vehículo a string en mayúsculas para no fallar por nombres de columnas
-      const textoFila = JSON.stringify(v).toUpperCase();
-      
-      if (textoFila.includes('AUTOMOVIL') || textoFila.includes('AUTOMÓVIL') || textoFila.includes('CAMPERO') || textoFila.includes('CAMIONETA')) {
-        totalAutomoviles++;
-      } else if (textoFila.includes('MOTOCICLETA') || textoFila.includes('MOTO') || textoFila.includes('MOTOCARRO')) {
-        totalMotocicletas++;
-      } else if (textoFila.includes('BICICLETA') || textoFila.includes('BICI')) {
-        totalBicicletas++;
-      }
+  const obtenerTotalPorTipo = (nombres) => {
+    const coincidencia = tiposVehiculo.find((v) => {
+      const nombre = String(v.nombre || v.tipo || v.TIPO || '').toUpperCase();
+      return nombres.some((valor) => nombre.includes(valor));
     });
-  }
+
+    return Number(coincidencia?.total ?? coincidencia?.cantidad ?? coincidencia?.TOTAL ?? coincidencia?.COUNT ?? 0);
+  };
+
+  const totalAutomoviles = obtenerTotalPorTipo(['AUTOMOVIL', 'AUTOMÓVIL', 'CAMPERO', 'CAMIONETA']);
+  const totalMotocicletas = obtenerTotalPorTipo(['MOTOCICLETA', 'MOTO', 'MOTOCARRO']);
+  const totalBicicletas = obtenerTotalPorTipo(['BICICLETA', 'BICI']);
 
   const dataBarras = {
     labels: ['Automóviles', 'Motocicletas', 'Bicicletas'],
@@ -91,9 +103,8 @@ const Dashboard = () => {
   // ==========================================
   // CONFIGURACIÓN GRÁFICO CIRCULAR (OCUPACIÓN)
   // ==========================================
-  // Vinculamos los espacios ocupados directamente con las tarjetas de arriba para que sean idénticos
-  const espaciosOcupados = data.vehiculosActivos || (totalAutomoviles + totalMotocicletas + totalBicicletas) || 0;
-  const espaciosDisponibles = data.espaciosDisponibles || (data.espaciosTotales - espaciosOcupados) || 0;
+  const espaciosOcupados = Number(data.vehiculosActivos ?? 0);
+  const espaciosDisponibles = Math.max(Number(data.espaciosDisponibles ?? (Number(data.espaciosTotales || 0) - espaciosOcupados) ?? 0), 0);
 
   const dataPie = {
     labels: ['Disponibles', 'Ocupados'],

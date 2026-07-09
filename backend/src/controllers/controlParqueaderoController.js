@@ -5,14 +5,15 @@ const controlParqueaderoController = {
     try {
       // 1. Obtener estadísticas de los espacios por nivel
       const [nivelesData] = await db.query(`
-        SELECT 
-          nivel as nombre,
-          COUNT(*) as total,
-          SUM(CASE WHEN estado = 'OCUPADO' THEN 1 ELSE 0 END) as ocupados,
-          SUM(CASE WHEN estado = 'DISPONIBLE' THEN 1 ELSE 0 END) as disponibles
-        FROM espacio
-        WHERE estado != 'INACTIVO'
-        GROUP BY nivel
+        SELECT
+          e.nivel AS nombre,
+          COUNT(*) AS total,
+          SUM(CASE WHEN c.id_ingreso IS NOT NULL THEN 1 ELSE 0 END) AS ocupados,
+          COUNT(*) - SUM(CASE WHEN c.id_ingreso IS NOT NULL THEN 1 ELSE 0 END) AS disponibles
+        FROM espacio e
+        LEFT JOIN control_i_s c ON c.id_espacio = e.id_espacio AND c.fecha_hora_salida IS NULL
+        WHERE e.estado != 'INACTIVO'
+        GROUP BY e.nivel
       `);
 
       let totalEspacios = 0;
@@ -45,7 +46,18 @@ const controlParqueaderoController = {
           v.placa, 
           t.nombre as tipo, 
           e.nivel, 
-          c.fecha_hora_entrada
+          c.fecha_hora_entrada,
+          IF(
+            (
+              SELECT COUNT(1)
+              FROM mensualidad m
+              WHERE m.id_vehiculo = v.id_vehiculo
+                AND m.estado = 'ACTIVA'
+                AND CURDATE() BETWEEN m.fecha_inicio AND m.fecha_fin
+            ) > 0,
+            'Mensualidad',
+            'Temporal'
+          ) AS estado
         FROM control_i_s c
         JOIN vehiculo v ON c.id_vehiculo = v.id_vehiculo
         JOIN tipo_vehiculo t ON v.id_tipo = t.id_tipo

@@ -6,6 +6,7 @@ class IngresoVehiculoController {
         try {
             // Recibimos 'nivel' desde el cliente
             const { placa, id_tipo, nivel } = req.body;
+            const documento = String(req.body.documento || req.body.placa || '').trim();
             const archivoFoto = req.file;
             
             // Si tu middleware de autenticación inyecta al usuario en req.user:
@@ -18,12 +19,22 @@ class IngresoVehiculoController {
                 });
             }
 
+            if (parseInt(id_tipo, 10) === 7) {
+                if (!/^\d{10,12}$/.test(documento)) {
+                    return res.status(400).json({
+                        success: false,
+                        error: 'Para bicicletas, el documento de identidad debe tener entre 10 y 12 dígitos numéricos.'
+                    });
+                }
+            }
+
             const resultado = await IngresoService.procesarIngreso(
                 { 
                     placa: placa.trim().toUpperCase(), 
                     id_tipo: parseInt(id_tipo, 10),
                     nivel: nivel,
-                    idUsuario: idUsuario
+                    idUsuario: idUsuario,
+                    documento: String(documento || '').trim()
                 }, 
                 archivoFoto
             );

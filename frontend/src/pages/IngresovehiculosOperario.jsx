@@ -50,9 +50,21 @@ const IngresoVehiculo = () => {
   const [vehicularMensualidad, setVehicularMensualidad] = useState(null);
   const [camposBloqueados, setCamposBloqueados] = useState({ idTipo: false, nivel: false });
 
+  const esBicicleta = String(formData.idTipo) === "7";
+  const placaMaxLength = esBicicleta ? 12 : 6;
+  const placaPlaceholder = esBicicleta ? "Documento del cliente" : "ABC123";
+
   const handleInputChange = async (e) => {
     const { name, value } = e.target;
-    const nuevoValor = name === "placa" ? value.toUpperCase() : value;
+    let nuevoValor = value;
+
+    if (name === "placa") {
+      if (esBicicleta) {
+        nuevoValor = value.replace(/\D/g, "").slice(0, 12);
+      } else {
+        nuevoValor = value.toUpperCase();
+      }
+    }
 
     setFormData((prev) => ({
       ...prev,
@@ -150,8 +162,15 @@ const IngresoVehiculo = () => {
       return;
     }
 
+    if (esBicicleta && !/^\d{10,12}$/.test(formData.placa)) {
+      setMensaje({ tipo: "error", texto: "Para bicicletas, el documento debe tener entre 10 y 12 números." });
+      setIsLoading(false);
+      return;
+    }
+
     const dataToSend = new FormData();
     dataToSend.append("placa", formData.placa.trim().toUpperCase());
+    dataToSend.append("documento", formData.placa.trim());
     dataToSend.append("id_tipo", formData.idTipo); 
     dataToSend.append("nivel", formData.nivel);
     if (usuarioActual) {
@@ -214,7 +233,7 @@ const IngresoVehiculo = () => {
           )}
           <div className="form-group" style={{ marginBottom: '20px', border: '1px solid #ddd', padding: '15px', borderRadius: '8px' }}>
             <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
-              Lector Automático de Placas (IA) 📷
+              Lector Automático de Placas
             </label>
             {!isCameraOpen ? (
               <button 
@@ -259,11 +278,20 @@ const IngresoVehiculo = () => {
             <div className="form-grid">
               <div className="form-group">
                 <label>Placa *</label>
-                <input type="text" name="placa" placeholder="ABC123" value={formData.placa} onChange={handleInputChange} maxLength={6} required />
+                <input
+                  type="text"
+                  name="placa"
+                  placeholder={placaPlaceholder}
+                  value={formData.placa}
+                  onChange={handleInputChange}
+                  maxLength={placaMaxLength}
+                  inputMode={esBicicleta ? "numeric" : "text"}
+                  pattern={esBicicleta ? "[0-9]*" : undefined}
+                  required
+                />
               </div>
               <div className="form-group">
                 <label>Tipo de Vehículo *</label>
-                {/* Cambiado disabled porclassName para manejo puramente visual si está bloqueado */}
                 <select 
                   name="idTipo" 
                   value={formData.idTipo} 
