@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const AppError = require('./errors/AppError');
 const globalErrorHandler = require('./middlewares/errorHandler');
 const { apiLimiter } = require('./middlewares/rateLimitMiddleware');
+const sanitizeInput = require('./middlewares/sanitizationMiddleware');
 const logger = require('./utils/logger');
 
 const app = express();
@@ -13,6 +14,7 @@ const app = express();
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
+app.use(sanitizeInput);
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())

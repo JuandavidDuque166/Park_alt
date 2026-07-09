@@ -2,6 +2,7 @@ const AuthService = require('../services/authService');
 const { validateRegister, validateLogin } = require('../validators/authValidator');
 const AppError = require('../errors/AppError');
 const httpStatus = require('../constants/httpStatus');
+const { loginSecurityFailure, loginSecuritySuccess } = require('../middlewares/loginSecurityMiddleware');
 
 const authController = {
     //Controlador para el registro de usuarios
@@ -30,8 +31,6 @@ const authController = {
     //Controlador para el login de usuarios
     async login(req, res, next) {
         try {
-            console.log('AuthController.login - body received:', req.body);
-
             //1. Validacion de entrada
             const validation = validateLogin(req.body);
 
@@ -41,17 +40,19 @@ const authController = {
             }
 
             // 2. lógica de servicio
-            const { user, token } = await AuthService.loginUser(validation.data);
+            const { user, token, refreshToken } = await AuthService.loginUser(validation.data);
+            loginSecuritySuccess(req, res, () => {});
             
             // 3. Enviar respuesta
             res.status(httpStatus.OK).json({
                 status: 'success',
                 token,
+                refreshToken,
                 data: user
             });
 
         } catch (error) {
-            console.error('AuthController.login - error:', error.message);
+            loginSecurityFailure(req, res, () => {});
             next(error);
         }
     }

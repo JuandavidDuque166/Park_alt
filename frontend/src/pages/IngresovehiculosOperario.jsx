@@ -50,6 +50,10 @@ const IngresoVehiculo = () => {
   const [vehicularMensualidad, setVehicularMensualidad] = useState(null);
   const [camposBloqueados, setCamposBloqueados] = useState({ idTipo: false, nivel: false });
 
+  const esBicicleta = String(formData.idTipo) === "7";
+  const placaMaxLength = esBicicleta ? 12 : 6;
+  const placaPlaceholder = esBicicleta ? "Documento del cliente" : "ABC123";
+
   const handleInputChange = async (e) => {
     const { name, value } = e.target;
     let nuevoValor = value;
@@ -315,7 +319,17 @@ if (!esFormatoValido) {
             <div className="form-grid">
               <div className="form-group">
                 <label>Placa *</label>
-                <input type="text" name="placa" placeholder="ABC123" value={formData.placa} onChange={handleInputChange} maxLength={6} required />
+                <input
+                  type="text"
+                  name="placa"
+                  placeholder={placaPlaceholder}
+                  value={formData.placa}
+                  onChange={handleInputChange}
+                  maxLength={placaMaxLength}
+                  inputMode={esBicicleta ? "numeric" : "text"}
+                  pattern={esBicicleta ? "[0-9]*" : undefined}
+                  required
+                />
               </div>
               <div className="form-group">
                 <label>Tipo de Vehículo *</label>

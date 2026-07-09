@@ -19,7 +19,6 @@ const AuthService = {
         const { login, clave } = credentials;
 
         const user = await UserModel.findByEmail(login);
-        console.log('AuthService.loginUser - login intent:', { login, userFound: !!user });
 
         if (!user) {
             throw new AppError('Credenciales inválidas', httpStatus.UNAUTHORIZED);
@@ -38,6 +37,7 @@ const AuthService = {
         }
 
         const token = signToken(user.id_usuario, userRole);
+        const refreshToken = signToken(user.id_usuario, userRole, '7d');
 
         // AQUÍ ESTÁ EL CAMBIO CLAVE: Agregamos rol_nombre
         const safeUser = {
@@ -49,7 +49,7 @@ const AuthService = {
             estado: user.estado
         };
 
-        return { user: safeUser, token };
+        return { user: safeUser, token, refreshToken };
     }
 };
 

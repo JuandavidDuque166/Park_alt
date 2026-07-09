@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const AppError = require ('../errors/appError');
+const AppError = require('../errors/AppError');
 const httpStatus = require ('../constants/httpStatus');
 const UserModel = require('../models/userModel');
 
@@ -51,7 +51,7 @@ async updateUser(id, updateData) {
         let hashedKey = userExists.clave; // Por defecto usamos la que ya tiene
 
         if (updateData.clave && updateData.clave.trim() !== '') {
-            const salt = await bcrypt.genSalt(10);
+            const salt = await bcrypt.genSalt(12);
             hashedKey = await bcrypt.hash(updateData.clave, salt);
         }
 

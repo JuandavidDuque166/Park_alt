@@ -73,7 +73,18 @@ const Dashboard = () => {
       return nombres.some((valor) => nombre.includes(valor));
     });
 
-    return Number(coincidencia?.total ?? coincidencia?.cantidad ?? coincidencia?.TOTAL ?? coincidencia?.COUNT ?? 0);
+    if (coincidencia) {
+      return Number(coincidencia.total ?? coincidencia.cantidad ?? coincidencia.TOTAL ?? coincidencia.COUNT ?? 0);
+    }
+
+    if (Array.isArray(data.ultimosIngresos) && data.ultimosIngresos.length > 0) {
+      return data.ultimosIngresos.filter((v) => {
+        const texto = String(v.tipo || v.nombre || '').toUpperCase();
+        return nombres.some((valor) => texto.includes(valor));
+      }).length;
+    }
+
+    return 0;
   };
 
   const totalAutomoviles = obtenerTotalPorTipo(['AUTOMOVIL', 'AUTOMÓVIL', 'CAMPERO', 'CAMIONETA']);

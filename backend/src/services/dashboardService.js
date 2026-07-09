@@ -24,11 +24,15 @@ const DashboardService = {
       const [vehiculosPorTipoRows] = await db.execute(
         `SELECT
             tv.nombre AS nombre,
-            COUNT(c.id_ingreso) AS total
+            COUNT(DISTINCT c.id_vehiculo) AS total
           FROM tipo_vehiculo tv
           LEFT JOIN vehiculo v ON v.id_tipo = tv.id_tipo
-          LEFT JOIN control_i_s c ON c.id_vehiculo = v.id_vehiculo
-            AND c.fecha_hora_salida IS NULL
+          LEFT JOIN (
+            SELECT id_vehiculo
+            FROM control_i_s
+            WHERE fecha_hora_salida IS NULL
+            GROUP BY id_vehiculo
+          ) c ON c.id_vehiculo = v.id_vehiculo
           GROUP BY tv.id_tipo, tv.nombre
           ORDER BY tv.nombre`
       );
